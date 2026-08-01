@@ -66,7 +66,7 @@ export default function Signup() {
       return;
     } //if there is an error in any one of the following, stop the program from running
 
-    const response = await fetch("http://localhost:8080/signup", {
+    const response = await fetch("https://khal-fintrack.onrender.com/signup", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
