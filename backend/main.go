@@ -3,6 +3,7 @@ package main
 import (
 	"khal-fintrack/initializers"
 	"khal-fintrack/routes"
+	"os"
 	"time"
 
 	"github.com/gin-contrib/cors"
@@ -39,8 +40,13 @@ func main() {
 		AllowCredentials: true,
 		MaxAge: 12 * time.Hour,
 	}))
+
+	port := os.Getenv("PORT")
+if port == "" {
+    port = "8080"
+}
 	routes.RegisterRoutes(router)
-	router.Run() //to run the site
+	router.Run(":" + port) //to run the site
 
 }
 
