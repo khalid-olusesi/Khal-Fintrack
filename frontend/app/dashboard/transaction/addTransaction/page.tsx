@@ -96,10 +96,10 @@ export default function AddTransaction() {
         {/* Type Toggle */}
         <div className="flex bg-gray-50 border border-gray-100 p-1 rounded-xl mb-6">
           <button type="button" className="flex-1 py-2.5 rounded-lg bg-green-700 text-white font-medium text-[13px] text-center shadow-sm">
-            Expense
+            Income
           </button>
           <button type="button" className="flex-1 py-2.5 rounded-lg bg-transparent text-gray-800 font-medium text-[13px] text-center">
-            Income
+            Expense
           </button>
         </div>
 
