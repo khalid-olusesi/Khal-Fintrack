@@ -76,8 +76,8 @@ export default function AddTransaction() {
       {/* header */}
       <div className="flex items-center justify-between">
         <div className="flex gap-4 items-center">
-          <button className="mb-4" onClick={toggleSidebar}>
-            <Menu className="w-4 h-4 cursor-pointer" />
+          <button className="mb-4 cursor-pointer" onClick={toggleSidebar}>
+            <Menu className="w-4 h-4" />
           </button>
           <h1 className="text-xl mb-4 font-bold">Add Transaction</h1>
         </div>

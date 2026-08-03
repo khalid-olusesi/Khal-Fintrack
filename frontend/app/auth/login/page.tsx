@@ -6,6 +6,7 @@ import Link from "next/link";
 import Image from "next/image";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import { ChevronLeft } from "lucide-react";
 
 export default function Login() {
   const [form, setForm] = useState({
@@ -72,78 +73,97 @@ export default function Login() {
     // main container
     <div className="min-h-screen flex">
       {/* first column */}
-      <div className="flex-1 p-8">
-        <div className="flex justify-center items-center mb-10">
-          <MainLogo />
+      <div className="flex-1 p-8 px-6">
+        {/* Header with back button and centered logo on mobile, default on desktop */}
+        <div className="relative flex justify-center items-center mb-6">
+          <Link href="/" className="absolute left-0 p-1 md:hidden">
+            <ChevronLeft className="w-5 h-5 text-gray-700" />
+          </Link>
+          <div className="flex justify-center items-center">
+            <MainLogo />
+          </div>
         </div>
-        {/* header component of the signup */}
-        <div className="mb-4">
-          <h2 className="text-3xl font-bold text-center">Welcome back</h2>
-          <p className="text-muted-foreground text-center">
-            Log in to your account
+
+        {/* mobile image - shown at top on small screens */}
+        <div className="flex justify-center mb-4 md:hidden">
+          <Image
+            src="/illustrations/Security On-bro.svg"
+            alt="Security illustration"
+            width={150}
+            height={150}
+            priority
+          />
+        </div>
+
+        {/* header component of the login */}
+        <div className="mb-6">
+          <h2 className="text-2xl md:text-3xl font-bold text-center">Welcome back</h2>
+          <p className="text-muted-foreground text-sm text-center">
+            Login to your account.
           </p>
         </div>
 
         {/* form */}
         <div>
           <form onSubmit={handleSubmit}>
-            <div className="mb-5">
-              <p className="mb-1.5 text-muted-foreground text-[14px]">Email</p>
+            <div className="mb-4">
+              <p className="mb-1.5 text-muted-foreground text-[13px] md:text-[14px]">Email</p>
               <input
                 value={form.email}
                 onChange={(e) =>
                   setForm({
                     ...form,
-                    email: e.target.value, //value already contains the form.email
+                    email: e.target.value,
                   })
                 }
-                className="border-2 rounded-[8px] outline-0 p-2 text-[14px] w-[100%] pl-3"
+                className="border rounded-[8px] outline-0 p-2.5 text-[13px] md:text-[14px] w-[100%] pl-3"
                 type="email"
-                placeholder="olusesikhalid43@gmail.com"
+                placeholder="john@example.com"
               />
-              <p className="text-red-500 text-center text-[14px]">
+              <p className="text-red-500 text-center text-[13px] md:text-[14px] mt-1">
                 {errors.email}
               </p>
             </div>
 
-            <div className="mb-5">
-              <p className="mb-1.5 text-muted-foreground text-[14px]">
+            <div className="mb-4">
+              <p className="mb-1.5 text-muted-foreground text-[13px] md:text-[14px]">
                 Password
               </p>
-              <input
-                value={form.password}
-                onChange={(e) =>
-                  setForm({
-                    ...form,
-                    password: e.target.value,
-                  })
-                }
-                className="border-2 rounded-[8px] outline-0 p-2 text-[14px] w-[100%] pl-3 mb-4"
-                type="password"
-                placeholder="****"
-              />
-              <p className="text-red-500 text-center text-[14px]">
+              <div className="relative">
+                <input
+                  value={form.password}
+                  onChange={(e) =>
+                    setForm({
+                      ...form,
+                      password: e.target.value,
+                    })
+                  }
+                  className="border rounded-[8px] outline-0 p-2.5 text-[13px] md:text-[14px] w-[100%] pl-3 pr-10 mb-2"
+                  type="password"
+                  placeholder="********"
+                />
+              </div>
+              <p className="text-red-500 text-center text-[13px] md:text-[14px] mt-1">
                 {errors.password}
               </p>
-              <div className="flex items-center justify-end">
-                <span className="text-green-600 text-[14px]">
-                  <Link href="">forgot password</Link>
+              <div className="flex items-center justify-end mt-1">
+                <span className="text-green-600 text-[13px] md:text-[14px] cursor-pointer">
+                  <Link href="">Forgot password?</Link>
                 </span>
               </div>
             </div>
 
-            <div>
+            <div className="mt-6">
               <Button
                 type="submit"
-                className="cursor-pointer w-[100%] p-5 mb-5"
+                className="cursor-pointer w-[100%] p-5 mb-1.5 rounded-xl md:rounded-lg"
               >
-                {/*always remeber to name the type submit*/}
                 Login
               </Button>
-              <p className="text-muted-foreground text-[14px] text-center">
-                Dont have an account?
-                <Link className="text-green-600 ml-1" href={"/auth/signup"}>
-                  Signup
+              <p className="text-muted-foreground text-[13px] md:text-[14px] text-center mt-3">
+                Don't have an account?
+                <Link className="text-green-600 ml-1 font-medium" href={"/auth/signup"}>
+                  Sign up
                 </Link>
               </p>
             </div>
@@ -151,8 +171,8 @@ export default function Login() {
         </div>
       </div>
 
-      {/* second column */}
-      <div className="relative w-1/2 bg-gray-100 flex items-center justify-center h-full p-8 overflow-hidden">
+      {/* second column - desktop only */}
+      <div className="hidden md:relative md:flex relative w-1/2 bg-gray-100 items-center justify-center h-full p-8 overflow-hidden">
         <div className="absolute -left-10 top-0 h-full w-32 bg-white -skew-x-6" />
 
         <div className="relative z-10">
@@ -168,3 +188,4 @@ export default function Login() {
     </div>
   );
 }
+

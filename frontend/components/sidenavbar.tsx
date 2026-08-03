@@ -19,14 +19,31 @@ import { useRouter } from "next/navigation";
 
 export default function SideNavbar() {
   const router = useRouter();
-  const { isOpen } = useSidebar();
+  const { isOpen, toggleSidebar } = useSidebar();
+
+  const handleNavigation = (path: string) => {
+    router.push(path);
+    if (isOpen && window.innerWidth < 768) {
+      toggleSidebar();
+    }
+  };
 
   return (
-    <div
-      className={`flex flex-col h-full shrink-0 transition-all duration-300 ${
-        isOpen ? "w-56" : "w-16"
-      }`}
-    >
+    <>
+      {/* Mobile Sidebar Overlay Backdrop */}
+      {isOpen && (
+        <div
+          onClick={toggleSidebar}
+          className="fixed inset-0 bg-black/40 z-40 md:hidden transition-opacity"
+        />
+      )}
+
+      <div
+        className={`flex flex-col h-full bg-[#17283E] shrink-0 transition-all duration-300 z-50 
+          fixed md:relative left-0 top-0
+          ${isOpen ? "translate-x-0 w-56" : "-translate-x-full md:translate-x-0 w-16"}
+        `}
+      >
       {/* Logo */}
       <div className="p-4">
         <Link
@@ -51,43 +68,43 @@ export default function SideNavbar() {
           icon={<Home className="w-4 h-4 text-white shrink-0" />}
           label="Dashboard"
           isOpen={isOpen}
-          onClick={() => router.push("/dashboard/main")}
+          onClick={() => handleNavigation("/dashboard/main")}
         />
         <NavItem
           icon={<Wallet className="w-4 h-4 text-white shrink-0" />}
           label="Transactions"
           isOpen={isOpen}
-          onClick={() => router.push("/dashboard/transaction")}
+          onClick={() => handleNavigation("/dashboard/transaction")}
         />
         <NavItem
           icon={<LayoutGrid className="w-4 h-4 text-white shrink-0" />}
           label="Categories"
           isOpen={isOpen}
-          onClick={() => router.push("/dashboard/categories")}
+          onClick={() => handleNavigation("/dashboard/categories")}
         />
         <NavItem
           icon={<ChartPie className="w-4 h-4 text-white shrink-0" />}
           label="Budgets"
           isOpen={isOpen}
-          onClick={() => router.push("/dashboard/budgets")}
+          onClick={() => handleNavigation("/dashboard/budgets")}
         />
         <NavItem
           icon={<ChartColumn className="w-4 h-4 text-white shrink-0" />}
           label="Reports"
           isOpen={isOpen}
-          onClick={() => router.push("/dashboard/reports")}
+          onClick={() => handleNavigation("/dashboard/reports")}
         />
         <NavItem
           icon={<CircleUser className="w-4 h-4 text-white shrink-0" />}
           label="Profile"
           isOpen={isOpen}
-          onClick={() => router.push("/dashboard/profile")}
+          onClick={() => handleNavigation("/dashboard/profile")}
         />
         <NavItem
           icon={<Settings className="w-4 h-4 text-white shrink-0" />}
           label="Settings"
           isOpen={isOpen}
-          onClick={() => router.push("/dashboard/settings")}
+          onClick={() => handleNavigation("/dashboard/settings")}
         />
 
         {/* Logout */}
@@ -101,6 +118,7 @@ export default function SideNavbar() {
         </div>
       </div>
     </div>
+    </>
   );
 }
 

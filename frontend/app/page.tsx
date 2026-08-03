@@ -13,7 +13,6 @@ import {
 } from "recharts";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
-  faBars,
   faReceipt,
   faChartPie,
   faBullseye,
@@ -49,11 +48,6 @@ export default function LandingPage() {
             <MainLogo />
           </div>
 
-          {/* hamburger menu - mobile only */}
-          <button className="md:hidden text-gray-700 p-2">
-            <FontAwesomeIcon icon={faBars} className="w-5 h-5" />
-          </button>
-
           {/* header nav links - desktop only */}
           <div className="hidden md:flex gap-4 items-center">
             <span className="text-black">
@@ -87,7 +81,7 @@ export default function LandingPage() {
         {/* landing page main contents */}
         <div className="flex flex-col items-center px-5 pt-6 pb-4 md:flex md:flex-1 md:flex-row md:items-center md:justify-between md:ml-10 md:mr-10">
           {/* text content */}
-          <div className="w-full md:w-65 flex gap-3 flex-col">
+          <div className="w-full md:w-65 flex gap-2 flex-col">
             <p className="text-2xl md:text-3xl font-bold leading-tight">
               Take Control of Your Finances
             </p>
@@ -96,12 +90,12 @@ export default function LandingPage() {
               powerful and built for you.
             </p>
 
-            {/* mobile buttons */}
-            <div className="px-5 pb-6 pt-2 flex flex-col gap-3 md:flex-row md:pl-0 mt-auto">
-              <Button className="w-full md:rounded-md md:pl-2.5 md:pr-2.5 md:h-10 md: md:w-auto h-11 rounded-xl text-sm cursor-pointer">
+            {/* desktop buttons only */}
+            <div className="hidden md:flex md:flex-row md:pl-0 mt-auto gap-3">
+              <Button className="md:rounded-md md:pl-2.5 md:pr-2.5 md:h-10 md:w-auto text-sm cursor-pointer">
                 <Link href={"/auth/signup"}>Get Started</Link>
               </Button>
-              <Button className="w-full h-11 md:w-auto md:h-10 md:rounded-md rounded-xl text-sm bg-white text-green-700 border border-green-700 hover:bg-green-50 cursor-pointer">
+              <Button className="md:w-auto md:h-10 md:rounded-md text-sm bg-white text-green-700 border border-green-700 hover:bg-green-50 cursor-pointer">
                 Learn More
               </Button>
             </div>
@@ -245,8 +239,8 @@ export default function LandingPage() {
       </div>
 
       {/* footer */}
-      <div className="px-5 py-4 pb-12 pt-5 bg-white shadow-lg">
-        <div className="md:flex md:flex-row md:items-center md:justify-around flex-col gap-4">
+      <div className="px-5 py-4 pb-6 pt-5 bg-white shadow-lg">
+        <div className="flex flex-col gap-5 md:flex-row md:items-center md:justify-around md:gap-4">
           <div className="flex items-center gap-4">
             <div className="w-10 h-10 rounded-xl bg-green-100 flex items-center justify-center shrink-0">
               <FontAwesomeIcon
@@ -255,21 +249,21 @@ export default function LandingPage() {
               />
             </div>
             <div>
-              <p className="md:font-semibold text-sm">Track Expenses</p>
+              <p className="font-semibold text-sm">Track Expenses</p>
               <p className="text-muted-foreground text-xs md:w-35">
                 Easily track and categorize your expenses
               </p>
             </div>
           </div>
 
-          <div className="flex items-center gap-4 border-l-2 border-r-2 pl-12 pr-12">
+          <div className="flex items-center gap-4 md:border-l-2 md:border-r-2 md:pl-12 md:pr-12">
             <div className="w-10 h-10 rounded-xl bg-green-100 flex items-center justify-center shrink-0">
               <FontAwesomeIcon
                 icon={faChartPie}
                 className="w-4 h-4 text-green-700"
               />
             </div>
-            <div className="">
+            <div>
               <p className="font-semibold text-sm">Analyze Spending</p>
               <p className="text-muted-foreground text-xs md:w-35">
                 Visualize your spending with powerful charts
@@ -291,6 +285,16 @@ export default function LandingPage() {
               </p>
             </div>
           </div>
+        </div>
+
+        {/* mobile buttons */}
+        <div className="flex flex-col gap-3 mt-6 md:hidden">
+          <Button className="w-full h-11 rounded-xl text-sm cursor-pointer">
+            <Link href={"/auth/signup"}>Get Started</Link>
+          </Button>
+          <Button className="w-full h-11 rounded-xl text-sm bg-white text-green-700 border border-green-700 hover:bg-green-50 cursor-pointer">
+            Learn More
+          </Button>
         </div>
       </div>
     </div>

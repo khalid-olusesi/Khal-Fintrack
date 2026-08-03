@@ -1,5 +1,19 @@
-import { SidebarProvider } from "@/context/sidebar-context";
+"use client";
+
+import { SidebarProvider, useSidebar } from "@/context/sidebar-context";
 import SideNavbar from "@/components/sidenavbar";
+
+function LayoutContent({ children }: { children: React.ReactNode }) {
+  const { isOpen } = useSidebar();
+  return (
+    <div className="flex h-screen bg-[#17283E] overflow-hidden">
+      <SideNavbar />
+      <div className={`flex-1 min-w-0 h-full relative transition-all duration-300 ${isOpen ? "max-md:blur-[4px] max-md:pointer-events-none" : ""}`}>
+        {children}
+      </div>
+    </div>
+  );
+}
 
 export default function DashLayout({
   children,
@@ -8,10 +22,7 @@ export default function DashLayout({
 }>) {
   return (
     <SidebarProvider>
-      <div className="flex h-screen bg-[#17283E]">
-        <SideNavbar />
-        {children}
-      </div>
+      <LayoutContent>{children}</LayoutContent>
     </SidebarProvider>
   );
 }

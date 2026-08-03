@@ -6,6 +6,7 @@ import Link from "next/link";
 import Image from "next/image";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import { ChevronLeft } from "lucide-react";
 
 export default function Signup() {
   const router = useRouter();
@@ -91,25 +92,43 @@ export default function Signup() {
     // main container
     <div className="min-h-screen flex">
       {/* first column */}
-      <div className="flex-1 p-8">
-        <div className="flex justify-center items-center mb-6">
-          <MainLogo />
+      <div className="flex-1 p-8 px-6">
+        {/* Header with back button and centered logo on mobile, default on desktop */}
+        <div className="relative flex justify-center items-center mb-4 md:mb-6">
+          <Link href="/" className="absolute left-0 p-1 md:hidden">
+            <ChevronLeft className="w-5 h-5 text-gray-700" />
+          </Link>
+          <div className="flex justify-center items-center">
+            <MainLogo />
+          </div>
         </div>
+
+        {/* mobile image - shown at top on small screens */}
+        <div className="flex justify-center mb-4 md:hidden">
+          <Image
+            src="/illustrations/Revenue-bro.svg"
+            alt="Revenue illustration"
+            width={150}
+            height={150}
+            priority
+          />
+        </div>
+
         {/* header component of the signup */}
         <div className="mb-4">
-          <h2 className="text-3xl font-bold text-center">
+          <h2 className="text-2xl md:text-3xl font-bold text-center">
             Create your account
           </h2>
-          <p className="text-muted-foreground text-center">
-            start your journey to better finances
+          <p className="text-muted-foreground text-sm text-center">
+            Start your journey to better finances
           </p>
         </div>
 
         {/* form */}
         <div>
           <form onSubmit={handleSubmit}>
-            <div className="mb-4">
-              <p className="mb-1.5 text-muted-foreground text-[14px]">
+            <div className="mb-3 md:mb-4">
+              <p className="mb-1.5 text-muted-foreground text-[13px] md:text-[14px]">
                 Full Name
               </p>
               <input
@@ -120,17 +139,17 @@ export default function Signup() {
                     name: e.target.value,
                   })
                 }
-                className="border-2 rounded-[8px] outline-0 p-2 text-[14px] w-[100%] pl-3"
+                className="border rounded-[8px] outline-0 p-2.5 text-[13px] md:text-[14px] w-[100%] pl-3"
                 type="text"
                 placeholder="Olusesi Khalid"
               />
-              <p className="text-red-500 text-center text-[14px] -mb[-16px]">
+              <p className="text-red-500 text-center text-[13px] md:text-[14px]">
                 {errors.name}
               </p>
             </div>
 
-            <div className="mb-4">
-              <p className="mb-1.5 text-muted-foreground text-[14px]">Email</p>
+            <div className="mb-3 md:mb-4">
+              <p className="mb-1.5 text-muted-foreground text-[13px] md:text-[14px]">Email</p>
               <input
                 value={form.email}
                 onChange={(e) =>
@@ -139,17 +158,17 @@ export default function Signup() {
                     email: e.target.value,
                   })
                 }
-                className="border-2 rounded-[8px] outline-0 p-2 text-[14px] w-[100%] pl-3"
+                className="border rounded-[8px] outline-0 p-2.5 text-[13px] md:text-[14px] w-[100%] pl-3"
                 type="email"
                 placeholder="olusesikhalid43@gmail.com"
               />
-              <p className="text-red-500 text-center text-[14px] -mb[-16px]">
+              <p className="text-red-500 text-center text-[13px] md:text-[14px]">
                 {errors.email}
               </p>
             </div>
 
-            <div className="mb-4">
-              <p className="mb-1.5 text-muted-foreground text-[14px]">
+            <div className="mb-3 md:mb-4">
+              <p className="mb-1.5 text-muted-foreground text-[13px] md:text-[14px]">
                 Password
               </p>
               <input
@@ -160,17 +179,17 @@ export default function Signup() {
                     password: e.target.value,
                   })
                 }
-                className="border-2 rounded-[8px] outline-0 p-2 text-[14px] w-[100%] pl-3"
+                className="border rounded-[8px] outline-0 p-2.5 text-[13px] md:text-[14px] w-[100%] pl-3"
                 type="password"
                 placeholder="****"
               />
-              <p className="text-red-500 text-center text-[14px] -mb[-16px]">
+              <p className="text-red-500 text-center text-[13px] md:text-[14px]">
                 {errors.password}
               </p>
             </div>
 
             <div className="mb-4">
-              <p className="mb-0.5 text-muted-foreground text-[14px]">
+              <p className="mb-1.5 text-muted-foreground text-[13px] md:text-[14px]">
                 Confirm Password
               </p>
               <input
@@ -181,12 +200,11 @@ export default function Signup() {
                     confirmPassword: e.target.value,
                   })
                 }
-                className="border-2 rounded-[8px] outline-0 p-2 text-[14px] w-[100%] pl-3 mb-3"
+                className="border rounded-[8px] outline-0 p-2.5 text-[13px] md:text-[14px] w-[100%] pl-3"
                 type="password"
                 placeholder="****"
               />
-
-              <p className="text-red-500 text-center text-[14px] -mb[-16px]">
+              <p className="text-red-500 text-center text-[13px] md:text-[14px]">
                 {errors.confirmPassword}
               </p>
             </div>
@@ -194,11 +212,11 @@ export default function Signup() {
             <div>
               <Button
                 type="submit"
-                className="cursor-pointer w-[100%] p-5 mb-1.5"
+                className="cursor-pointer w-[100%] p-5 mb-1.5 rounded-xl md:rounded-lg"
               >
-                Signup
+                Sign Up
               </Button>
-              <p className="text-muted-foreground text-[14px] text-center">
+              <p className="text-muted-foreground text-[13px] md:text-[14px] text-center mt-2">
                 Already have an account?
                 <Link className="text-green-600 ml-1" href={"/auth/login"}>
                   Login
@@ -209,8 +227,8 @@ export default function Signup() {
         </div>
       </div>
 
-      {/* second column */}
-      <div className="relative w-1/2 bg-gray-100 flex items-center justify-center h-full p-8 overflow-hidden">
+      {/* second column - desktop only */}
+      <div className="hidden md:relative md:flex relative w-1/2 bg-gray-100 items-center justify-center h-full p-8 overflow-hidden">
         <div className="absolute -left-10 top-0 h-full w-32 bg-white -skew-x-6" />
 
         <div className="relative z-10">
