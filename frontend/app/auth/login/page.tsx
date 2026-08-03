@@ -78,7 +78,7 @@ export default function Login() {
         </div>
         {/* header component of the signup */}
         <div className="mb-4">
-          <h2 className="text-4xl font-bold text-center">Welcome back</h2>
+          <h2 className="text-3xl font-bold text-center">Welcome back</h2>
           <p className="text-muted-foreground text-center">
             Log in to your account
           </p>

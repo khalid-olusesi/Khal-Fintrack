@@ -38,14 +38,14 @@ func main() {
 			"Authorization",
 		},
 		AllowCredentials: true,
-		MaxAge: 12 * time.Hour,
+		MaxAge:           12 * time.Hour,
 	}))
 
 	port := os.Getenv("PORT")
-if port == "" {
-    port = "8080"
-}
-	routes.RegisterRoutes(router)
+	if port == "" {
+		port = "8080"
+	}
+	routes.AppRoute(router)
 	router.Run(":" + port) //to run the site
 
 }

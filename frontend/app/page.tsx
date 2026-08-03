@@ -88,7 +88,7 @@ export default function LandingPage() {
         <div className="flex flex-col items-center px-5 pt-6 pb-4 md:flex md:flex-1 md:flex-row md:items-center md:justify-between md:ml-10 md:mr-10">
           {/* text content */}
           <div className="w-full md:w-65 flex gap-3 flex-col">
-            <p className="text-3xl md:text-4xl font-bold leading-tight">
+            <p className="text-2xl md:text-3xl font-bold leading-tight">
               Take Control of Your Finances
             </p>
             <p className="text-sm text-muted-foreground md:w-58 leading-relaxed">
@@ -110,7 +110,7 @@ export default function LandingPage() {
           {/* balance card */}
           <div className="w-full md:w-95 h-auto md:h-auto rounded-2xl bg-white shadow-xl p-5 md:p-6 mt-6 md:mt-10">
             <p className="text-muted-foreground text-[10px]">Total Balance</p>
-            <p className="font-bold text-2xl">$5,231.89</p>
+            <p className="font-bold text-xl">$5,231.89</p>
 
             <div className="flex items-center justify-between mt-3 mb-1 md:hidden">
               <div>

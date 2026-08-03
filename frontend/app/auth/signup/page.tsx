@@ -97,7 +97,7 @@ export default function Signup() {
         </div>
         {/* header component of the signup */}
         <div className="mb-4">
-          <h2 className="text-4xl font-bold text-center">
+          <h2 className="text-3xl font-bold text-center">
             Create your account
           </h2>
           <p className="text-muted-foreground text-center">
