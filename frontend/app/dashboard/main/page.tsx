@@ -3,6 +3,7 @@ import { ResponsiveContainer, PieChart, Pie, Cell } from "recharts";
 import { Menu, ArrowDown, Bell } from "lucide-react";
 import { useSidebar } from "@/context/sidebar-context";
 import { MainLogo } from "@/components/logo";
+import { useRouter } from "next/navigation";
 import {
   BriefcaseBusiness,
   Laptop,
@@ -31,6 +32,7 @@ const COLORS = [
 
 export default function Main() {
   const { isOpen, toggleSidebar } = useSidebar();
+  const router = useRouter();
 
   return (
     //main container
