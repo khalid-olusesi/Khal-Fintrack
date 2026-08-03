@@ -143,7 +143,7 @@ export default function Signup() {
                 type="text"
                 placeholder="Olusesi Khalid"
               />
-              <p className="text-red-500 text-center text-[13px] md:text-[14px]">
+              <p className="text-red-500 text-left text-[11px] md:text-[12px] mt-1">
                 {errors.name}
               </p>
             </div>
@@ -162,7 +162,7 @@ export default function Signup() {
                 type="email"
                 placeholder="olusesikhalid43@gmail.com"
               />
-              <p className="text-red-500 text-center text-[13px] md:text-[14px]">
+              <p className="text-red-500 text-left text-[11px] md:text-[12px] mt-1">
                 {errors.email}
               </p>
             </div>
@@ -183,7 +183,7 @@ export default function Signup() {
                 type="password"
                 placeholder="****"
               />
-              <p className="text-red-500 text-center text-[13px] md:text-[14px]">
+              <p className="text-red-500 text-left text-[11px] md:text-[12px] mt-1">
                 {errors.password}
               </p>
             </div>
@@ -204,7 +204,7 @@ export default function Signup() {
                 type="password"
                 placeholder="****"
               />
-              <p className="text-red-500 text-center text-[13px] md:text-[14px]">
+              <p className="text-red-500 text-left text-[11px] md:text-[12px] mt-1">
                 {errors.confirmPassword}
               </p>
             </div>

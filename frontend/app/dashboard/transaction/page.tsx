@@ -74,7 +74,7 @@ export default function Transaction() {
 
   return (
     // container
-    <div className="bg-gray-100 w-full h-full p-4 md:p-6 overflow-auto">
+    <div className="bg-gray-100 w-full h-full p-4 md:p-6 overflow-y-auto scroll-smooth" style={{ WebkitOverflowScrolling: "touch" }}>
       {/* --- MOBILE VIEW --- */}
       <div className="block md:hidden space-y-5">
         {/* Mobile Top Header */}

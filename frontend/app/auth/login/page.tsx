@@ -120,7 +120,7 @@ export default function Login() {
                 type="email"
                 placeholder="john@example.com"
               />
-              <p className="text-red-500 text-center text-[13px] md:text-[14px] mt-1">
+              <p className="text-red-500 text-left text-[11px] md:text-[12px] mt-1">
                 {errors.email}
               </p>
             </div>
@@ -143,7 +143,7 @@ export default function Login() {
                   placeholder="********"
                 />
               </div>
-              <p className="text-red-500 text-center text-[13px] md:text-[14px] mt-1">
+              <p className="text-red-500 text-left text-[11px] md:text-[12px] mt-1">
                 {errors.password}
               </p>
               <div className="flex items-center justify-end mt-1">
