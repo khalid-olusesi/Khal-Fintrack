@@ -21,12 +21,12 @@ import { useRouter } from "next/navigation";
 
 export default function Transaction() {
   type Transaction = {
-    ID: number;
-    Description: string;
-    Category: string;
-    Amount: number;
-    Date: string;
-    Type: string;
+    id: number;
+    description: string;
+    category: string;
+    amount: number;
+    date: string;
+    type: string;
   };
   const [transactions, setTransactions] = useState<Transaction[]>([]);
   const { toggleSidebar } = useSidebar();
@@ -208,15 +208,15 @@ export default function Transaction() {
             </thead>
             <tbody className="divide-y divide-gray-50">
               {transactions.map((transaction, index) => (
-                <tr key={transaction.ID || index} className="border">
+                <tr key={transaction.id || index} className="border">
                   <td className="py-4 px-2 text-left text-muted-foreground">
-                    {new Date(transaction.Date).toLocaleDateString()}
+                    {new Date(transaction.date).toLocaleDateString()}
                   </td>
                   <td className="py-4 px-2 text-center font-medium">
-                    {transaction.Description}
+                    {transaction.description}
                   </td>
                   <td className="py-4 px-2 text-right text-red-500 font-bold">
-                    ₦{(transaction.Amount ?? 0).toLocaleString()}
+                    ₦{(transaction.amount ?? 0).toLocaleString()}
                   </td>
                 </tr>
               ))}
@@ -388,37 +388,37 @@ export default function Transaction() {
             <tbody>
               {transactions.map((transaction, index) => (
                 <tr
-                  key={transaction.ID ?? index}
+                  key={transaction.id ?? index}
                   className="border-b hover:bg-gray-50"
                 >
                   <td className="p-4">
-                    {new Date(transaction.Date).toLocaleDateString()}
+                    {new Date(transaction.date).toLocaleDateString()}
                   </td>
 
-                  <td>{transaction.Description}</td>
+                  <td>{transaction.description}</td>
 
-                  <td>{transaction.Category}</td>
+                  <td>{transaction.category}</td>
 
                   <td>
                     <span
                       className={
-                        transaction.Type === "income"
+                        transaction.type === "income"
                           ? "text-green-600 font-medium"
                           : "text-red-500 font-medium"
                       }
                     >
-                      {transaction.Type}
+                      {transaction.type}
                     </span>
                   </td>
 
                   <td
                     className={
-                      transaction.Type === "income"
+                      transaction.type === "income"
                         ? "text-green-600 font-semibold"
                         : "text-red-500 font-semibold"
                     }
                   >
-                    ₦{(transaction.Amount ?? 0).toLocaleString()}
+                    ₦{(transaction.amount ?? 0).toLocaleString()}
                   </td>
 
                   <td className="py-4">
