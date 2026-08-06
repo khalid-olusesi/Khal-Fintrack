@@ -7,6 +7,7 @@ import { Menu } from "lucide-react";
 import { MainLogo } from "@/components/logo";
 import { SelectSeparator } from "@/components/ui/select";
 import { Pencil, Trash2 } from "lucide-react";
+import { useEffect, useState } from "react";
 import {
   Select,
   SelectContent,
@@ -19,8 +20,36 @@ import {
 import { useRouter } from "next/navigation";
 
 export default function Transaction() {
+  type Transaction = {
+    ID: number;
+    Description: string;
+    Category: string;
+    Amount: number;
+    Date: string;
+    Type: string;
+  };
+  const [transactions, setTransactions] = useState<Transaction[]>([]);
   const { toggleSidebar } = useSidebar();
+
   const router = useRouter();
+
+  useEffect(() => {
+    const fetchTransactions = async () => {
+      try {
+        const response = await fetch(
+          "https://khal-fintrack.onrender.com/transactions",
+        );
+
+        const data = await response.json();
+
+        setTransactions(data.transactions);
+      } catch (error) {
+        console.error(error);
+      }
+    };
+
+    fetchTransactions();
+  }, []);
 
   const expenses = [
     { label: "Food & Dining", value: "food & dining" },
@@ -74,7 +103,10 @@ export default function Transaction() {
 
   return (
     // container
-    <div className="bg-gray-100 w-full h-full p-4 md:p-6 overflow-y-auto scroll-smooth" style={{ WebkitOverflowScrolling: "touch" }}>
+    <div
+      className="bg-gray-100 w-full h-full p-4 md:p-6 overflow-y-auto scroll-smooth"
+      style={{ WebkitOverflowScrolling: "touch" }}
+    >
       {/* --- MOBILE VIEW --- */}
       <div className="block md:hidden space-y-5">
         {/* Mobile Top Header */}
@@ -168,35 +200,64 @@ export default function Transaction() {
             <thead>
               <tr className="border-b border-gray-100 text-muted-foreground">
                 <th className="py-3 px-2 text-left font-semibold">Date</th>
-                <th className="py-3 px-2 text-center font-semibold">Description</th>
+                <th className="py-3 px-2 text-center font-semibold">
+                  Description
+                </th>
                 <th className="py-3 px-2 text-right font-semibold">Amount</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-gray-50">
+              {transactions.map((transaction, index) => (
+                <tr key={transaction.ID || index} className="border">
+                  <td className="py-4 px-2 text-left text-muted-foreground">
+                    {new Date(transaction.Date).toLocaleDateString()}
+                  </td>
+                  <td className="py-4 px-2 text-center font-medium">
+                    {transaction.Description}
+                  </td>
+                  <td className="py-4 px-2 text-right text-red-500 font-bold">
+                    ₦{(transaction.Amount ?? 0).toLocaleString()}
+                  </td>
+                </tr>
+              ))}
+
               <tr className="text-gray-900">
-                <td className="py-4 px-2 text-left text-muted-foreground">May 12, 2025</td>
-                <td className="py-4 px-2 text-center font-medium">Grocery Store</td>
-                <td className="py-4 px-2 text-right text-red-500 font-bold">-$45.20</td>
-              </tr>
-              <tr className="text-gray-900">
-                <td className="py-4 px-2 text-left text-muted-foreground">May 11, 2025</td>
+                <td className="py-4 px-2 text-left text-muted-foreground">
+                  May 11, 2025
+                </td>
                 <td className="py-4 px-2 text-center font-medium">Netflix</td>
-                <td className="py-4 px-2 text-right text-red-500 font-bold">-$15.99</td>
+                <td className="py-4 px-2 text-right text-red-500 font-bold">
+                  -$15.99
+                </td>
               </tr>
               <tr className="text-gray-900">
-                <td className="py-4 px-2 text-left text-muted-foreground">May 10, 2025</td>
+                <td className="py-4 px-2 text-left text-muted-foreground">
+                  May 10, 2025
+                </td>
                 <td className="py-4 px-2 text-center font-medium">Salary</td>
-                <td className="py-4 px-2 text-right text-green-600 font-bold">+$4,500.00</td>
+                <td className="py-4 px-2 text-right text-green-600 font-bold">
+                  +$4,500.00
+                </td>
               </tr>
               <tr className="text-gray-900">
-                <td className="py-4 px-2 text-left text-muted-foreground">May 9, 2025</td>
+                <td className="py-4 px-2 text-left text-muted-foreground">
+                  May 9, 2025
+                </td>
                 <td className="py-4 px-2 text-center font-medium">Transport</td>
-                <td className="py-4 px-2 text-right text-red-500 font-bold">-$12.50</td>
+                <td className="py-4 px-2 text-right text-red-500 font-bold">
+                  -$12.50
+                </td>
               </tr>
               <tr className="text-gray-900">
-                <td className="py-4 px-2 text-left text-muted-foreground">May 8, 2025</td>
-                <td className="py-4 px-2 text-center font-medium">Restaurant</td>
-                <td className="py-4 px-2 text-right text-red-500 font-bold">-$38.00</td>
+                <td className="py-4 px-2 text-left text-muted-foreground">
+                  May 8, 2025
+                </td>
+                <td className="py-4 px-2 text-center font-medium">
+                  Restaurant
+                </td>
+                <td className="py-4 px-2 text-right text-red-500 font-bold">
+                  -$38.00
+                </td>
               </tr>
             </tbody>
           </table>
@@ -313,85 +374,74 @@ export default function Transaction() {
         {/* tables */}
         <div>
           <table className="w-full shadow-lg">
-            <thead className="border bg-gray-200">
+            <thead className="bg-gray-200">
               <tr>
                 <th className="p-4 text-left">Date</th>
                 <th className="text-left">Description</th>
                 <th className="text-left">Category</th>
                 <th className="text-left">Type</th>
                 <th className="text-left">Amount</th>
-                <th>Action</th>
+                <th className="text-center">Action</th>
               </tr>
             </thead>
 
             <tbody>
-              <tr className="border">
-                <td className="p-4">May 12, 2024</td>
-                <td>Grocery Store</td>
-                <td>Food & Drink</td>
-                <td>Expense</td>
-                <td className="text-red-500">-$45.00</td>
-                <td className="flex gap-4 items-center justify-center pt-4">
-                  <Pencil className="w-4 h-4 cursor-pointer" />
-                  <Trash2 className="w-4 h-4 text-red-500 cursor-pointer" />
-                </td>
-              </tr>
-            </tbody>
+              {transactions.map((transaction, index) => (
+                <tr
+                  key={transaction.ID ?? index}
+                  className="border-b hover:bg-gray-50"
+                >
+                  <td className="p-4">
+                    {new Date(transaction.Date).toLocaleDateString()}
+                  </td>
 
-            <tbody>
-              <tr className="border">
-                <td className="p-4">July 2, 2023</td>
-                <td>Grocery Store</td>
-                <td>Food & Drink</td>
-                <td>Expense</td>
-                <td className="text-red-500">-$45.00</td>
-                <td className="flex gap-4 items-center justify-center pt-4">
-                  <Pencil className="w-4 h-4 cursor-pointer" />
-                  <Trash2 className="w-4 h-4 text-red-500 cursor-pointer" />
-                </td>
-              </tr>
-            </tbody>
+                  <td>{transaction.Description}</td>
 
-            <tbody>
-              <tr className="border">
-                <td className="p-4">May 12, 2024</td>
-                <td>Grocery Store</td>
-                <td>Food & Drink</td>
-                <td>Expense</td>
-                <td className="text-red-500">-$45.00</td>
-                <td className="flex gap-4 items-center justify-center pt-4">
-                  <Pencil className="w-4 h-4 cursor-pointer" />
-                  <Trash2 className="w-4 h-4 text-red-500 cursor-pointer" />
-                </td>
-              </tr>
-            </tbody>
+                  <td>{transaction.Category}</td>
 
-            <tbody>
-              <tr className="border">
-                <td className="p-4">May 12, 2024</td>
-                <td>Grocery Store</td>
-                <td>Food & Drink</td>
-                <td>Expense</td>
-                <td className="text-green-600">$45.00</td>
-                <td className="flex gap-4 items-center justify-center pt-4">
-                  <Pencil className="w-4 h-4 cursor-pointer" />
-                  <Trash2 className="w-4 h-4 text-red-500 cursor-pointer" />
-                </td>
-              </tr>
-            </tbody>
+                  <td>
+                    <span
+                      className={
+                        transaction.Type === "income"
+                          ? "text-green-600 font-medium"
+                          : "text-red-500 font-medium"
+                      }
+                    >
+                      {transaction.Type}
+                    </span>
+                  </td>
 
-            <tbody>
-              <tr className="border">
-                <td className="p-4">May 12, 2024</td>
-                <td>Grocery Store</td>
-                <td>Food & Drink</td>
-                <td>Expense</td>
-                <td className="text-green-600">$45.00</td>
-                <td className="flex gap-4 items-center justify-center pt-4">
-                  <Pencil className="w-4 h-4 cursor-pointer" />
-                  <Trash2 className="w-4 h-4 text-red-500 cursor-pointer" />
-                </td>
-              </tr>
+                  <td
+                    className={
+                      transaction.Type === "income"
+                        ? "text-green-600 font-semibold"
+                        : "text-red-500 font-semibold"
+                    }
+                  >
+                    ₦{(transaction.Amount ?? 0).toLocaleString()}
+                  </td>
+
+                  <td className="py-4">
+                    <div className="flex items-center justify-center gap-4">
+                      <button className="cursor-pointer">
+                        <Pencil className="w-4 h-4 text-blue-600 hover:text-blue-800" />
+                      </button>
+
+                      <button className="cursor-pointer">
+                        <Trash2 className="w-4 h-4 text-red-500 hover:text-red-700" />
+                      </button>
+                    </div>
+                  </td>
+                </tr>
+              ))}
+
+              {transactions.length === 0 && (
+                <tr>
+                  <td colSpan={6} className="py-10 text-center text-gray-500">
+                    No transactions found.
+                  </td>
+                </tr>
+              )}
             </tbody>
           </table>
         </div>

@@ -97,7 +97,9 @@ export default function Login() {
 
         {/* header component of the login */}
         <div className="mb-6">
-          <h2 className="text-2xl md:text-3xl font-bold text-center">Welcome back</h2>
+          <h2 className="text-2xl md:text-3xl font-bold text-center">
+            Welcome back
+          </h2>
           <p className="text-muted-foreground text-sm text-center">
             Login to your account.
           </p>
@@ -107,7 +109,9 @@ export default function Login() {
         <div>
           <form onSubmit={handleSubmit}>
             <div className="mb-4">
-              <p className="mb-1.5 text-muted-foreground text-[13px] md:text-[14px]">Email</p>
+              <p className="mb-1.5 text-muted-foreground text-[13px] md:text-[14px]">
+                Email
+              </p>
               <input
                 value={form.email}
                 onChange={(e) =>
@@ -162,7 +166,10 @@ export default function Login() {
               </Button>
               <p className="text-muted-foreground text-[13px] md:text-[14px] text-center mt-3">
                 Don't have an account?
-                <Link className="text-green-600 ml-1 font-medium" href={"/auth/signup"}>
+                <Link
+                  className="text-green-600 ml-1 font-medium"
+                  href={"/auth/signup"}
+                >
                   Sign up
                 </Link>
               </p>
@@ -188,4 +195,3 @@ export default function Login() {
     </div>
   );
 }
-
