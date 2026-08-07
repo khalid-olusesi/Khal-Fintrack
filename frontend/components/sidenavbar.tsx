@@ -39,8 +39,8 @@ export default function SideNavbar() {
       )}
 
       <div
-        className={`flex flex-col h-full bg-[#17283E] shrink-0 transition-all duration-300 z-50 
-          fixed md:relative left-0 top-0
+        className={`flex flex-col h-full bg-[#17283E] dark:bg-card shrink-0 transition-all duration-300 z-50 
+          fixed md:relative left-0 top-0 dark:border-r dark:border-border
           ${isOpen ? "translate-x-0 w-56" : "-translate-x-full md:translate-x-0 w-16"}
         `}
       >
@@ -109,7 +109,7 @@ export default function SideNavbar() {
 
         {/* Logout */}
         <div className="mt-auto">
-          <div className="border border-gray-600"></div>
+          <div className="border border-gray-600 dark:border-border"></div>
           <NavItem
             icon={<LogOut className="w-4 h-4 text-white shrink-0" />}
             label="Log Out"

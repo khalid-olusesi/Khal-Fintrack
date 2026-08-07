@@ -10,7 +10,7 @@ export function MainLogo() {
           icon={faChartColumn}
           className="text-green-700 w-5 h-5"
         />
-        <h1 className="text-[14px] font-medium text-black">Khal-FinTrack</h1>
+        <h1 className="text-[14px] font-medium text-black dark:text-white">Khal-FinTrack</h1>
       </Link>
     </div>
   );

@@ -23,6 +23,7 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover";
+import { ModeToggle } from "@/components/toggle";
 
 export default function EditTransaction() {
   const router = useRouter();
@@ -71,22 +72,22 @@ export default function EditTransaction() {
 
   return (
     // container
-    <div className="bg-white md:bg-gray-100 w-full h-full p-4 md:p-6 overflow-y-auto scroll-smooth" style={{ WebkitOverflowScrolling: "touch" }}>
+    <div className="bg-white dark:bg-background md:bg-gray-100 md:dark:bg-background w-full h-full p-4 md:p-6 overflow-y-auto scroll-smooth" style={{ WebkitOverflowScrolling: "touch" }}>
       {/* --- MOBILE VIEW --- */}
       <div className="block md:hidden">
         {/* Mobile Header */}
         <div className="flex justify-between items-center mb-6">
           <button onClick={() => router.back()} className="p-2 -ml-2 cursor-pointer">
-            <ArrowLeft className="w-5 h-5 text-gray-800" />
+            <ArrowLeft className="w-5 h-5 text-gray-800 dark:text-foreground" />
           </button>
           <div className="flex justify-center items-center">
             <MainLogo />
           </div>
-          <div className="w-9" /> {/* Spacer */}
+          <ModeToggle />
         </div>
 
         <div className="flex justify-between items-center mb-5">
-          <h1 className="text-[18px] font-bold text-gray-900">Edit Transaction</h1>
+          <h1 className="text-[18px] font-bold text-gray-900 dark:text-foreground">Edit Transaction</h1>
           <div className="text-gray-500 text-[13px] flex items-center gap-1">
             <ArrowLeft className="w-3.5 h-3.5" />
             Save
@@ -94,11 +95,11 @@ export default function EditTransaction() {
         </div>
 
         {/* Type Toggle */}
-        <div className="flex bg-gray-50 border border-gray-100 p-1 rounded-xl mb-6">
+        <div className="flex bg-gray-50 dark:bg-card border border-gray-100 dark:border-border p-1 rounded-xl mb-6">
           <button type="button" className="flex-1 py-2.5 rounded-lg bg-red-500 text-white font-medium text-[13px] text-center shadow-sm">
             Expense
           </button>
-          <button type="button" className="flex-1 py-2.5 rounded-lg bg-transparent text-gray-800 font-medium text-[13px] text-center">
+          <button type="button" className="flex-1 py-2.5 rounded-lg bg-transparent text-gray-800 dark:text-muted-foreground font-medium text-[13px] text-center">
             Income
           </button>
         </div>
@@ -106,27 +107,27 @@ export default function EditTransaction() {
         {/* Form */}
         <form className="space-y-4">
           <div className="space-y-1.5">
-            <label className="text-[12px] font-medium text-gray-800">Description</label>
+            <label className="text-[12px] font-medium text-gray-800 dark:text-muted-foreground">Description</label>
             <input
               type="text"
               placeholder="Grocery Store"
-              className="w-full border border-gray-200 bg-white rounded-xl p-3.5 text-[13px] outline-none placeholder:text-gray-900"
+              className="w-full border border-gray-200 dark:border-border bg-white dark:bg-card text-foreground rounded-xl p-3.5 text-[13px] outline-none placeholder:text-gray-900 dark:placeholder-gray-500"
             />
           </div>
 
           <div className="space-y-1.5">
-            <label className="text-[12px] font-medium text-gray-800">Amount</label>
+            <label className="text-[12px] font-medium text-gray-800 dark:text-muted-foreground">Amount</label>
             <input
               type="text"
               placeholder="$ 45.20"
-              className="w-full border border-gray-200 bg-white rounded-xl p-3.5 text-[13px] outline-none placeholder:text-gray-900"
+              className="w-full border border-gray-200 dark:border-border bg-white dark:bg-card text-foreground rounded-xl p-3.5 text-[13px] outline-none placeholder:text-gray-900 dark:placeholder-gray-500"
             />
           </div>
 
           <div className="space-y-1.5">
-            <label className="text-[12px] font-medium text-gray-800">Category</label>
+            <label className="text-[12px] font-medium text-gray-800 dark:text-muted-foreground">Category</label>
             <Select>
-              <SelectTrigger className="w-full border border-gray-200 bg-white rounded-xl p-3.5 h-auto text-[13px] outline-none text-gray-900 [&>svg]:text-gray-500">
+              <SelectTrigger className="w-full border border-gray-200 dark:border-border bg-white dark:bg-card text-foreground rounded-xl p-3.5 h-auto text-[13px] outline-none text-gray-900 dark:text-foreground [&>svg]:text-gray-500">
                 <SelectValue placeholder="Food & Dining" />
               </SelectTrigger>
               <SelectContent>
@@ -143,13 +144,13 @@ export default function EditTransaction() {
           </div>
 
           <div className="space-y-1.5">
-            <label className="text-[12px] font-medium text-gray-800">Date</label>
+            <label className="text-[12px] font-medium text-gray-800 dark:text-muted-foreground">Date</label>
             <Popover>
               <PopoverTrigger
                 render={
                   <Button
                     variant="outline"
-                    className="w-full border border-gray-200 bg-white rounded-xl p-3.5 h-auto text-left font-normal text-[13px] text-gray-900 flex justify-between items-center hover:bg-white"
+                    className="w-full border border-gray-200 dark:border-border bg-white dark:bg-card text-foreground rounded-xl p-3.5 h-auto text-left font-normal text-[13px] text-gray-900 dark:text-foreground flex justify-between items-center hover:bg-white dark:hover:bg-card"
                   >
                     {date ? format(date, "MMM dd, yyyy") : <span>May 12, 2025</span>}
                     <CalendarIcon className="w-4 h-4 text-gray-500" />
@@ -163,17 +164,17 @@ export default function EditTransaction() {
           </div>
 
           <div className="space-y-1.5">
-            <label className="text-[12px] font-medium text-gray-800">Note (optional)</label>
+            <label className="text-[12px] font-medium text-gray-800 dark:text-muted-foreground">Note (optional)</label>
             <input
               type="text"
               placeholder="Weekly groceries"
-              className="w-full border border-gray-200 bg-white rounded-xl p-3.5 text-[13px] outline-none placeholder:text-gray-900"
+              className="w-full border border-gray-200 dark:border-border bg-white dark:bg-card text-foreground rounded-xl p-3.5 text-[13px] outline-none placeholder:text-gray-900 dark:placeholder-gray-500"
             />
           </div>
 
           {/* Buttons */}
           <div className="flex items-center gap-3 pt-4 pb-8">
-            <button type="button" onClick={() => router.back()} className="flex-[0.8] py-3.5 border border-gray-200 bg-white rounded-xl font-semibold text-[13px] text-gray-800 text-center cursor-pointer">
+            <button type="button" onClick={() => router.back()} className="flex-[0.8] py-3.5 border border-gray-200 dark:border-border bg-white dark:bg-card text-foreground rounded-xl font-semibold text-[13px] text-gray-800 dark:text-muted-foreground text-center cursor-pointer">
               Cancel
             </button>
             <button type="submit" className="flex-[1.2] py-3.5 bg-green-700 rounded-xl font-semibold text-[13px] text-white text-center cursor-pointer">
@@ -188,24 +189,27 @@ export default function EditTransaction() {
         {/* header */}
         <div className="flex items-center justify-between">
           <div className="flex gap-4 items-center">
-            <button className="mb-4 cursor-pointer" onClick={toggleSidebar}>
+            <button className="mb-4 cursor-pointer text-foreground" onClick={toggleSidebar}>
               <Menu className="w-4 h-4" />
             </button>
-            <h1 className="text-xl mb-4 font-bold">Edit Transaction</h1>
+            <h1 className="text-xl mb-4 font-bold text-foreground">Edit Transaction</h1>
           </div>
-          <button
-            type="submit"
-            onClick={() => router.push("/dashboard/transaction")}
-            className="flex items-center border outline-none border-gray-400 cursor-pointer p-2 rounded-lg gap-2"
-          >
-            <ArrowLeft className="w-4 h-4" />
-            Back
-          </button>
+          <div className="flex items-center gap-3">
+            <ModeToggle />
+            <button
+              type="submit"
+              onClick={() => router.push("/dashboard/transaction")}
+              className="flex items-center border outline-none border-gray-400 dark:border-border text-foreground cursor-pointer p-2 rounded-lg gap-2 dark:bg-card"
+            >
+              <ArrowLeft className="w-4 h-4" />
+              Back
+            </button>
+          </div>
         </div>
-        <h3 className="font-bold mb-3">Type</h3>
+        <h3 className="font-bold mb-3 text-foreground">Type</h3>
 
         <div className="flex gap-2 mb-5">
-          <span className="pt-2 pb-2 pl-10 pr-12 rounded-lg border-2 cursor-pointer text-center">
+          <span className="pt-2 pb-2 pl-10 pr-12 rounded-lg border-2 border-gray-200 dark:border-border cursor-pointer text-center text-gray-800 dark:text-muted-foreground dark:bg-card">
             Income
           </span>
           <span className="pt-2 pb-2 pl-10 pr-12 rounded-lg  text-white bg-red-500 cursor-pointer text-center">
@@ -216,29 +220,29 @@ export default function EditTransaction() {
         {/* forms */}
         <form className="space-y-4">
           <div className="space-y-0.5">
-            <p>Description</p>
+            <p className="text-gray-700 dark:text-muted-foreground font-medium text-[13px]">Description</p>
             <input
               type="text"
               placeholder="e.g Grocery Shopping"
-              className="border-2 outline-none p-2 rounded-lg w-full"
+              className="border-2 border-gray-200 dark:border-border bg-white dark:bg-card text-foreground outline-none p-2 rounded-lg w-full"
             />
           </div>
 
           <div className="space-y-0.5">
-            <p>Amount</p>
+            <p className="text-gray-700 dark:text-muted-foreground font-medium text-[13px]">Amount</p>
             <input
               type="text"
               placeholder="e.g 100.00"
-              className="border-2 outline-none p-2 rounded-lg w-full"
+              className="border-2 border-gray-200 dark:border-border bg-white dark:bg-card text-foreground outline-none p-2 rounded-lg w-full"
             />
           </div>
 
           {/* category */}
           <div className="space-y-0.5">
-            <p>Category</p>
+            <p className="text-gray-700 dark:text-muted-foreground font-medium text-[13px]">Category</p>
             <div className="flex items-center justify-between mb-8">
               <Select>
-                <SelectTrigger className="w-full p-5 outline-none border-2">
+                <SelectTrigger className="w-full p-5 outline-none border-2 border-gray-200 dark:border-border bg-white dark:bg-card text-foreground">
                   <SelectValue placeholder="Select category" />
                 </SelectTrigger>
 
@@ -271,14 +275,14 @@ export default function EditTransaction() {
 
           {/* date */}
           <div className="-mt-[18px] space-y-0.5">
-            <p>Date</p>
+            <p className="text-gray-700 dark:text-muted-foreground font-medium text-[13px]">Date</p>
             <Popover>
               <PopoverTrigger
                 render={
                   <Button
                     variant={"outline"}
                     data-empty={!date}
-                    className="w-full p-6 justify-between bg-transparent border-2 outline-none text-left font-normal data-[empty=true]:text-muted-foreground"
+                    className="w-full p-6 justify-between bg-transparent dark:bg-card border-2 border-gray-200 dark:border-border outline-none text-left font-normal text-foreground data-[empty=true]:text-muted-foreground"
                   >
                     {date ? format(date, "PPP") : <span>Pick a date</span>}
                     <ChevronDownIcon data-icon="inline-end" />
@@ -297,17 +301,17 @@ export default function EditTransaction() {
           </div>
 
           <div className="space-y-0.5">
-            <p>Notes(optional)</p>
+            <p className="text-gray-700 dark:text-muted-foreground font-medium text-[13px]">Notes(optional)</p>
             <input
               type="text"
               placeholder="Add a note"
-              className="border-2 outline-none p-2 rounded-lg w-full"
+              className="border-2 border-gray-200 dark:border-border bg-white dark:bg-card text-foreground outline-none p-2 rounded-lg w-full"
             />
           </div>
 
           {/* buttons */}
           <div className="flex items-center justify-end gap-4 mt-3">
-            <button className="border-2 rounded-lg cursor-pointer p-1.5 pb-1.5 pl-7 pr-7">
+            <button className="border-2 border-gray-200 dark:border-border text-foreground rounded-lg cursor-pointer p-1.5 pb-1.5 pl-7 pr-7 dark:bg-card">
               Cancel
             </button>
             <button className="text-white rounded-lg cursor-pointer p-1.5 pb-1.5 pl-7 pr-7 bg-green-700">

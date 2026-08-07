@@ -7,6 +7,7 @@ import Image from "next/image";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { ChevronLeft } from "lucide-react";
+import { ModeToggle } from "@/components/toggle";
 
 export default function Login() {
   const [form, setForm] = useState({
@@ -71,16 +72,19 @@ export default function Login() {
 
   return (
     // main container
-    <div className="min-h-screen flex">
+    <div className="min-h-screen flex bg-white dark:bg-background text-gray-900 dark:text-foreground">
       {/* first column */}
       <div className="flex-1 p-8 px-6">
         {/* Header with back button and centered logo on mobile, default on desktop */}
         <div className="relative flex justify-center items-center mb-6">
           <Link href="/" className="absolute left-0 p-1 md:hidden">
-            <ChevronLeft className="w-5 h-5 text-gray-700" />
+            <ChevronLeft className="w-5 h-5 text-gray-700 dark:text-foreground" />
           </Link>
           <div className="flex justify-center items-center">
             <MainLogo />
+          </div>
+          <div className="absolute right-0">
+            <ModeToggle />
           </div>
         </div>
 
@@ -120,7 +124,7 @@ export default function Login() {
                     email: e.target.value,
                   })
                 }
-                className="border rounded-[8px] outline-0 p-2.5 text-[13px] md:text-[14px] w-[100%] pl-3"
+                className="border rounded-[8px] outline-0 p-2.5 text-[13px] md:text-[14px] w-[100%] pl-3 bg-white dark:bg-card border-gray-200 dark:border-border text-foreground dark:placeholder-gray-500"
                 type="email"
                 placeholder="john@example.com"
               />
@@ -142,7 +146,7 @@ export default function Login() {
                       password: e.target.value,
                     })
                   }
-                  className="border rounded-[8px] outline-0 p-2.5 text-[13px] md:text-[14px] w-[100%] pl-3 pr-10 mb-2"
+                  className="border rounded-[8px] outline-0 p-2.5 text-[13px] md:text-[14px] w-[100%] pl-3 pr-10 mb-2 bg-white dark:bg-card border-gray-200 dark:border-border text-foreground dark:placeholder-gray-500"
                   type="password"
                   placeholder="********"
                 />
@@ -179,8 +183,8 @@ export default function Login() {
       </div>
 
       {/* second column - desktop only */}
-      <div className="hidden md:relative md:flex relative w-1/2 bg-gray-100 items-center justify-center h-full p-8 overflow-hidden">
-        <div className="absolute -left-10 top-0 h-full w-32 bg-white -skew-x-6" />
+      <div className="hidden md:relative md:flex relative w-1/2 bg-gray-100 dark:bg-[#0a0e17] items-center justify-center h-full p-8 overflow-hidden">
+        <div className="absolute -left-10 top-0 h-full w-32 bg-white dark:bg-[#0b0f19] -skew-x-6" />
 
         <div className="relative z-10">
           <Image

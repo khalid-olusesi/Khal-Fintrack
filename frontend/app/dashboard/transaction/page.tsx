@@ -5,6 +5,7 @@ import { Plus, Search, X, ChevronLeft, ChevronRight, Bell } from "lucide-react";
 import { useSidebar } from "@/context/sidebar-context";
 import { Menu } from "lucide-react";
 import { MainLogo } from "@/components/logo";
+import { ModeToggle } from "@/components/toggle";
 import { SelectSeparator } from "@/components/ui/select";
 import { Pencil, Trash2 } from "lucide-react";
 import { useEffect, useState } from "react";
@@ -104,25 +105,25 @@ export default function Transaction() {
   return (
     // container
     <div
-      className="bg-gray-100 w-full h-full p-4 md:p-6 overflow-y-auto scroll-smooth"
+      className="bg-gray-100 dark:bg-background w-full h-full p-4 md:p-6 overflow-y-auto scroll-smooth"
       style={{ WebkitOverflowScrolling: "touch" }}
     >
       {/* --- MOBILE VIEW --- */}
       <div className="block md:hidden space-y-5">
         {/* Mobile Top Header */}
-        <div className="flex justify-between items-center bg-white p-4 shadow-sm border-b -mx-4 -mt-4 mb-4">
+        <div className="flex justify-between items-center bg-white dark:bg-card dark:border-border p-4 shadow-sm border-b -mx-4 -mt-4 mb-4">
           <button className="cursor-pointer" onClick={toggleSidebar}>
-            <Menu className="w-5 h-5 text-gray-700" />
+            <Menu className="w-5 h-5 text-gray-700 dark:text-gray-200" />
           </button>
           <MainLogo />
-          <div className="w-5 h-5" /> {/* Empty balance placeholder */}
+          <ModeToggle />
         </div>
 
         {/* Transactions Title & Bell */}
         <div className="flex justify-between items-center mb-1">
-          <h1 className="text-xl font-bold text-gray-900">Transactions</h1>
+          <h1 className="text-xl font-bold text-gray-900 dark:text-gray-100">Transactions</h1>
           <button className="p-1 cursor-pointer">
-            <Bell className="w-5 h-5 text-gray-700" />
+            <Bell className="w-5 h-5 text-gray-700 dark:text-gray-200" />
           </button>
         </div>
 
@@ -141,7 +142,7 @@ export default function Transaction() {
         <div className="flex gap-4">
           <div className="flex-1">
             <Select>
-              <SelectTrigger className="w-full bg-white border border-gray-200 text-xs py-1.5 px-3 rounded-lg h-9">
+              <SelectTrigger className="w-full bg-white dark:bg-card border border-gray-200 dark:border-border text-xs py-1.5 px-3 rounded-lg h-9">
                 <SelectValue placeholder="All Categories" />
               </SelectTrigger>
               <SelectContent>
@@ -170,7 +171,7 @@ export default function Transaction() {
 
           <div className="flex-1">
             <Select>
-              <SelectTrigger className="w-full bg-white border border-gray-200 text-xs py-1.5 px-3 rounded-lg h-9">
+              <SelectTrigger className="w-full bg-white dark:bg-card border border-gray-200 dark:border-border text-xs py-1.5 px-3 rounded-lg h-9">
                 <SelectValue placeholder="This Month" />
               </SelectTrigger>
               <SelectContent>
@@ -190,15 +191,15 @@ export default function Transaction() {
           <input
             type="text"
             placeholder="Search transaction..."
-            className="w-full rounded-lg border border-gray-200 py-2 pl-9 pr-4 text-xs outline-none bg-white"
+            className="w-full rounded-lg border border-gray-200 dark:border-border py-2 pl-9 pr-4 text-xs outline-none bg-white dark:bg-card text-foreground"
           />
         </div>
 
         {/* Mobile Table List */}
-        <div className="bg-white rounded-xl border border-gray-100 shadow-sm p-2">
+        <div className="bg-white dark:bg-card rounded-xl border border-gray-100 dark:border-border shadow-sm p-2 text-foreground">
           <table className="w-full text-xs">
             <thead>
-              <tr className="border-b border-gray-100 text-muted-foreground">
+              <tr className="border-b border-gray-100 dark:border-border text-muted-foreground">
                 <th className="py-3 px-2 text-left font-semibold">Date</th>
                 <th className="py-3 px-2 text-center font-semibold">
                   Description
@@ -206,9 +207,9 @@ export default function Transaction() {
                 <th className="py-3 px-2 text-right font-semibold">Amount</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-gray-50">
+            <tbody className="divide-y divide-gray-50 dark:divide-border">
               {transactions.map((transaction, index) => (
-                <tr key={transaction.id || index} className="border">
+                <tr key={transaction.id || index} className="border border-gray-100 dark:border-border">
                   <td className="py-4 px-2 text-left text-muted-foreground">
                     {new Date(transaction.date).toLocaleDateString()}
                   </td>
@@ -221,7 +222,7 @@ export default function Transaction() {
                 </tr>
               ))}
 
-              <tr className="text-gray-900">
+              <tr className="text-gray-900 dark:text-foreground">
                 <td className="py-4 px-2 text-left text-muted-foreground">
                   May 11, 2025
                 </td>
@@ -230,7 +231,7 @@ export default function Transaction() {
                   -$15.99
                 </td>
               </tr>
-              <tr className="text-gray-900">
+              <tr className="text-gray-900 dark:text-foreground">
                 <td className="py-4 px-2 text-left text-muted-foreground">
                   May 10, 2025
                 </td>
@@ -239,7 +240,7 @@ export default function Transaction() {
                   +$4,500.00
                 </td>
               </tr>
-              <tr className="text-gray-900">
+              <tr className="text-gray-900 dark:text-foreground">
                 <td className="py-4 px-2 text-left text-muted-foreground">
                   May 9, 2025
                 </td>
@@ -248,7 +249,7 @@ export default function Transaction() {
                   -$12.50
                 </td>
               </tr>
-              <tr className="text-gray-900">
+              <tr className="text-gray-900 dark:text-foreground">
                 <td className="py-4 px-2 text-left text-muted-foreground">
                   May 8, 2025
                 </td>
@@ -265,20 +266,20 @@ export default function Transaction() {
 
         {/* Mobile Pagination */}
         <div className="flex items-center justify-center mt-6 gap-2">
-          <button className="p-2 border border-gray-200 rounded-lg hover:bg-gray-50 cursor-pointer bg-white">
-            <ChevronLeft className="w-3.5 h-3.5 text-gray-600" />
+          <button className="p-2 border border-gray-200 dark:border-border rounded-lg hover:bg-gray-50 dark:hover:bg-zinc-800 cursor-pointer bg-white dark:bg-card">
+            <ChevronLeft className="w-3.5 h-3.5 text-gray-600 dark:text-foreground" />
           </button>
           <button className="cursor-pointer font-semibold py-1 px-3 bg-green-600 text-white rounded-lg text-xs">
             1
           </button>
-          <button className="cursor-pointer py-1 px-3 border border-gray-200 rounded-lg text-xs text-gray-600 hover:bg-gray-50 bg-white">
+          <button className="cursor-pointer py-1 px-3 border border-gray-200 dark:border-border rounded-lg text-xs text-gray-650 hover:bg-gray-50 dark:hover:bg-zinc-800 bg-white dark:bg-card">
             2
           </button>
-          <button className="cursor-pointer py-1 px-3 border border-gray-200 rounded-lg text-xs text-gray-600 hover:bg-gray-50 bg-white">
+          <button className="cursor-pointer py-1 px-3 border border-gray-200 dark:border-border rounded-lg text-xs text-gray-650 hover:bg-gray-50 dark:hover:bg-zinc-800 bg-white dark:bg-card">
             3
           </button>
-          <button className="p-2 border border-gray-200 rounded-lg hover:bg-gray-50 cursor-pointer bg-white">
-            <ChevronRight className="w-3.5 h-3.5 text-gray-600" />
+          <button className="p-2 border border-gray-200 dark:border-border rounded-lg hover:bg-gray-50 dark:hover:bg-zinc-800 cursor-pointer bg-white dark:bg-card">
+            <ChevronRight className="w-3.5 h-3.5 text-gray-600 dark:text-foreground" />
           </button>
         </div>
       </div>
@@ -286,24 +287,27 @@ export default function Transaction() {
       {/* --- DESKTOP VIEW --- */}
       <div className="hidden md:block">
         {/* header */}
-        <div className="flex items-center justify-between">
+        <div className="flex items-center justify-between mb-4">
           <div className="flex gap-4 items-center">
-            <button className="mb-4 cursor-pointer" onClick={toggleSidebar}>
+            <button className="cursor-pointer" onClick={toggleSidebar}>
               <Menu className="w-4 h-4" />
             </button>
-            <h1 className="text-xl mb-4 font-bold">Transaction</h1>
+            <h1 className="text-xl font-bold">Transaction</h1>
           </div>
 
-          <Button
-            type="submit"
-            onClick={() => {
-              router.push("/dashboard/transaction/addTransaction");
-            }}
-            className="cursor-pointer flex items-center"
-          >
-            <span>Add Transaction</span>
-            <Plus className="w-4 h-4" />
-          </Button>
+          <div className="flex items-center gap-3">
+            <ModeToggle />
+            <Button
+              type="submit"
+              onClick={() => {
+                router.push("/dashboard/transaction/addTransaction");
+              }}
+              className="cursor-pointer flex items-center"
+            >
+              <span>Add Transaction</span>
+              <Plus className="w-4 h-4" />
+            </Button>
+          </div>
         </div>
 
         {/* dropdowns */}
@@ -362,7 +366,7 @@ export default function Transaction() {
             <input
               type="text"
               placeholder="Search transactions..."
-              className="w-full rounded-lg border py-1 pl-10 pr-10 outline-none"
+              className="w-full rounded-lg border border-gray-200 dark:border-border py-1 pl-10 pr-10 outline-none bg-white dark:bg-card text-foreground"
             />
 
             <button className="absolute right-3 top-1/2 -translate-y-1/2">
@@ -373,8 +377,8 @@ export default function Transaction() {
 
         {/* tables */}
         <div>
-          <table className="w-full shadow-lg">
-            <thead className="bg-gray-200">
+          <table className="w-full bg-white dark:bg-card border border-gray-200 dark:border-border shadow-lg text-foreground">
+            <thead className="bg-gray-200 dark:bg-zinc-800/80">
               <tr>
                 <th className="p-4 text-left">Date</th>
                 <th className="text-left">Description</th>
@@ -389,7 +393,7 @@ export default function Transaction() {
               {transactions.map((transaction, index) => (
                 <tr
                   key={transaction.id ?? index}
-                  className="border-b hover:bg-gray-50"
+                  className="border-b border-gray-200 dark:border-border hover:bg-gray-50 dark:hover:bg-zinc-800/50"
                 >
                   <td className="p-4">
                     {new Date(transaction.date).toLocaleDateString()}
@@ -451,18 +455,18 @@ export default function Transaction() {
           <button className="cursor-pointer pt-1.5 pb-1.5 pl-4 pr-4 text-white bg-green-600 rounded-lg ">
             1
           </button>
-          <button className="cursor-pointer rounded-lg border-2 pt-1.5 pb-1.5 pl-4 pr-4">
+          <button className="cursor-pointer rounded-lg border-2 border-gray-200 dark:border-border pt-1.5 pb-1.5 pl-4 pr-4 dark:text-foreground dark:bg-card">
             2
           </button>
-          <button className="cursor-pointer rounded-lg border-2 pt-1.5 pb-1.5 pl-4 pr-4">
+          <button className="cursor-pointer rounded-lg border-2 border-gray-200 dark:border-border pt-1.5 pb-1.5 pl-4 pr-4 dark:text-foreground dark:bg-card">
             3
           </button>
 
-          <button className="cursor-pointer rounded-lg border-2 pt-1.5 pb-1.5 pl-4 pr-4">
+          <button className="cursor-pointer rounded-lg border-2 border-gray-200 dark:border-border pt-1.5 pb-1.5 pl-4 pr-4 dark:text-foreground dark:bg-card">
             ...
           </button>
 
-          <button className="cursor-pointer rounded-lg border-2 pt-1.5 pb-1.5 pl-4 pr-4">
+          <button className="cursor-pointer rounded-lg border-2 border-gray-200 dark:border-border pt-1.5 pb-1.5 pl-4 pr-4 dark:text-foreground dark:bg-card">
             8
           </button>
         </div>

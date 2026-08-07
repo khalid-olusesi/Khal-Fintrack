@@ -1,6 +1,7 @@
 "use client";
 
 import { MainLogo } from "@/components/logo";
+import { ModeToggle } from "@/components/toggle";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import {
@@ -42,38 +43,38 @@ export default function LandingPage() {
   return (
     <div className="flex flex-1 flex-col">
       {/* header container div */}
-      <div className="bg-[#f5f5f5]">
+      <div className="bg-[#f5f5f5] dark:bg-background">
         <div className="flex justify-between items-center px-5 py-3 md:px-6">
           <div>
             <MainLogo />
           </div>
 
+          <div className="md:hidden">
+            <ModeToggle />
+          </div>
+
           {/* header nav links - desktop only */}
           <div className="hidden md:flex gap-4 items-center">
-            <span className="text-black">
+            <span className="text-black dark:text-foreground">
               <Link href="" className="decoration-0">
                 Features
               </Link>
             </span>
 
-            <span className="text-black">
+            <span className="text-black dark:text-foreground">
               <Link href="" className="decoration-0">
                 About
               </Link>
             </span>
 
-            <span className="text-black">
+            <span className="text-black dark:text-foreground">
               <Link href="" className="decoration-0">
                 Contact
               </Link>
             </span>
 
-            <span className="text-black">
-              <Button>
-                <Link href="" className="decoration-0">
-                  Get started
-                </Link>
-              </Button>
+            <span className="text-black dark:text-foreground flex items-center">
+              <ModeToggle />
             </span>
           </div>
         </div>
@@ -95,14 +96,14 @@ export default function LandingPage() {
               <Button className="md:rounded-md md:pl-2.5 md:pr-2.5 md:h-10 md:w-auto text-sm cursor-pointer">
                 <Link href={"/auth/signup"}>Get Started</Link>
               </Button>
-              <Button className="md:w-auto md:h-10 md:rounded-md text-sm bg-white text-green-700 border border-green-700 hover:bg-green-50 cursor-pointer">
+              <Button className="md:w-auto md:h-10 md:rounded-md text-sm bg-white text-green-700 border border-green-700 hover:bg-green-50 cursor-pointer dark:bg-transparent dark:text-green-400 dark:border-green-400 dark:hover:bg-green-950/20">
                 Learn More
               </Button>
             </div>
           </div>
 
           {/* balance card */}
-          <div className="w-full md:w-95 h-auto md:h-auto rounded-2xl bg-white shadow-xl p-5 md:p-6 mt-6 md:mt-10">
+          <div className="w-full md:w-95 h-auto md:h-auto rounded-2xl bg-white dark:bg-card dark:border dark:border-border shadow-xl p-5 md:p-6 mt-6 md:mt-10">
             <p className="text-muted-foreground text-[10px]">Total Balance</p>
             <p className="font-bold text-xl">$5,231.89</p>
 
@@ -182,6 +183,7 @@ export default function LandingPage() {
                       outerRadius={50}
                       paddingAngle={2}
                       stroke="white"
+                      className="stroke-white dark:stroke-card"
                       strokeWidth={3}
                     >
                       {pieData.map((_, index) => (
@@ -239,13 +241,13 @@ export default function LandingPage() {
       </div>
 
       {/* footer */}
-      <div className="px-5 py-4 pb-6 pt-5 bg-white shadow-lg">
+      <div className="px-5 py-4 pb-6 pt-5 bg-white dark:bg-[#0a0e17] dark:border-t dark:border-border shadow-lg">
         <div className="flex flex-col gap-5 md:flex-row md:items-center md:justify-around md:gap-4">
           <div className="flex items-center gap-4">
-            <div className="w-10 h-10 rounded-xl bg-green-100 flex items-center justify-center shrink-0">
+            <div className="w-10 h-10 rounded-xl bg-green-100 dark:bg-emerald-950/20 flex items-center justify-center shrink-0">
               <FontAwesomeIcon
                 icon={faReceipt}
-                className="w-4 h-4 text-green-700"
+                className="w-4 h-4 text-green-700 dark:text-green-400"
               />
             </div>
             <div>
@@ -256,11 +258,11 @@ export default function LandingPage() {
             </div>
           </div>
 
-          <div className="flex items-center gap-4 md:border-l-2 md:border-r-2 md:pl-12 md:pr-12">
-            <div className="w-10 h-10 rounded-xl bg-green-100 flex items-center justify-center shrink-0">
+          <div className="flex items-center gap-4 md:border-l-2 md:border-r-2 md:pl-12 md:pr-12 border-gray-100 dark:border-border">
+            <div className="w-10 h-10 rounded-xl bg-green-100 dark:bg-emerald-950/20 flex items-center justify-center shrink-0">
               <FontAwesomeIcon
                 icon={faChartPie}
-                className="w-4 h-4 text-green-700"
+                className="w-4 h-4 text-green-700 dark:text-green-400"
               />
             </div>
             <div>
@@ -272,10 +274,10 @@ export default function LandingPage() {
           </div>
 
           <div className="flex items-center gap-4">
-            <div className="w-10 h-10 rounded-xl bg-green-100 flex items-center justify-center shrink-0">
+            <div className="w-10 h-10 rounded-xl bg-green-100 dark:bg-emerald-950/20 flex items-center justify-center shrink-0">
               <FontAwesomeIcon
                 icon={faBullseye}
-                className="w-4 h-4 text-green-700"
+                className="w-4 h-4 text-green-700 dark:text-green-400"
               />
             </div>
             <div>
@@ -292,7 +294,7 @@ export default function LandingPage() {
           <Button className="w-full h-11 rounded-xl text-sm cursor-pointer">
             <Link href={"/auth/signup"}>Get Started</Link>
           </Button>
-          <Button className="w-full h-11 rounded-xl text-sm bg-white text-green-700 border border-green-700 hover:bg-green-50 cursor-pointer">
+          <Button className="w-full h-11 rounded-xl text-sm bg-white text-green-700 border border-green-700 hover:bg-green-50 cursor-pointer dark:bg-transparent dark:text-green-400 dark:border-green-400 dark:hover:bg-green-950/20">
             Learn More
           </Button>
         </div>
