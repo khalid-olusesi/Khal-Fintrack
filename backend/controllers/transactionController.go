@@ -1,6 +1,7 @@
 package controllers
 
 import (
+	"fmt"
 	"khal-fintrack/initializers"
 	"khal-fintrack/models"
 	"net/http"
@@ -25,7 +26,19 @@ func CreateTransaction(c *gin.Context) {
 		return
 	}
 
+	user, exists := c.Get("user")
+
+	if !exists {
+		c.JSON(http.StatusBadRequest, gin.H{
+			"error": "user not found",
+		})
+		return
+	}
+
+	currentUser := user.(*models.User)
+
 	transaction := models.Transaction{
+		UserID:      currentUser.ID,
 		Type:        body.Type,
 		Category:    body.Category,
 		Amount:      body.Amount,
@@ -73,12 +86,29 @@ func CreateTransaction(c *gin.Context) {
 
 func GetTransactions(c *gin.Context) {
 
+	user, exists := c.Get("user")
+
+	if !exists {
+		c.JSON(http.StatusUnauthorized, gin.H{
+			"error": "user unauthorized",
+		})
+
+		return
+	}
+
+	currentUser := user.(*models.User)
+
+	fmt.Println("USER ID:", currentUser.ID)
+	fmt.Println("USER EMAIL:", currentUser.Email)
+
 	var transactions []models.Transaction //created a slice of transaction model to be used to get preexisting content, the slice there is like the bucket where where result := initializers.DB.Find(&transactions) saves its content
 
-	result := initializers.DB.Find(&transactions) // i used find here to get the trans and i've been provuded with the extra address and it looks for the whole content something like SELECT * FROM transaction in the db
+	result := initializers.DB.
+		Where("user_id = ?", currentUser.ID).
+		Find(&transactions)
 
 	if result.Error != nil {
-		c.JSON(http.StatusBadRequest, gin.H{
+		c.JSON(http.StatusInternalServerError, gin.H{
 			"error": "failed to get transaction",
 		})
 		return
@@ -100,9 +130,20 @@ func UpdateTransaction(c *gin.Context) {
 
 	id := c.Param("id") //to get the id for what i want to edit
 
+	user, exists := c.Get("user")
+
+	if !exists {
+		c.JSON(http.StatusUnauthorized, gin.H{
+			"error": "user unauthorized",
+		})
+		return
+	}
+
+	currentUser := user.(*models.User)
+
 	var transaction models.Transaction //saves the transaction in a variable
 
-	result := initializers.DB.First(&transaction, id) //.first looks for a single id
+	result := initializers.DB.Where("id = ? AND user_id = ?", id, currentUser.ID).First(&transaction)
 
 	if result.Error != nil {
 		c.JSON(http.StatusNotFound, gin.H{
@@ -165,9 +206,20 @@ func UpdateTransaction(c *gin.Context) {
 func DeleteTransaction(c *gin.Context) {
 	id := c.Param("id") //getting the id to be deleted
 
+	user, exists := c.Get("user")
+
+	if !exists {
+		c.JSON(http.StatusUnauthorized, gin.H{
+			"error": "user unauthorized",
+		})
+		return
+	}
+
+	currentUser := user.(*models.User)
+
 	var transaction models.Transaction //to get the transaction
 
-	result := initializers.DB.First(&transaction, id)
+	result := initializers.DB.Where("id = ? AND user_id = ?", id, currentUser.ID).First(&transaction)
 
 	if result.Error != nil {
 		c.JSON(http.StatusNotFound, gin.H{

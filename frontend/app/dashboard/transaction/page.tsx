@@ -38,12 +38,15 @@ export default function Transaction() {
     const fetchTransactions = async () => {
       try {
         const response = await fetch(
-          "https://khal-fintrack.onrender.com/transactions",
+          `${process.env.NEXT_PUBLIC_API_URL}/transactions`,
+          {
+            credentials: "include",
+          }
         );
 
         const data = await response.json();
 
-        setTransactions(data.transactions);
+        setTransactions(data.transactions || []);
       } catch (error) {
         console.error(error);
       }
@@ -222,44 +225,13 @@ export default function Transaction() {
                 </tr>
               ))}
 
-              <tr className="text-gray-900 dark:text-foreground">
-                <td className="py-4 px-2 text-left text-muted-foreground">
-                  May 11, 2025
-                </td>
-                <td className="py-4 px-2 text-center font-medium">Netflix</td>
-                <td className="py-4 px-2 text-right text-red-500 font-bold">
-                  -$15.99
-                </td>
-              </tr>
-              <tr className="text-gray-900 dark:text-foreground">
-                <td className="py-4 px-2 text-left text-muted-foreground">
-                  May 10, 2025
-                </td>
-                <td className="py-4 px-2 text-center font-medium">Salary</td>
-                <td className="py-4 px-2 text-right text-green-600 font-bold">
-                  +$4,500.00
-                </td>
-              </tr>
-              <tr className="text-gray-900 dark:text-foreground">
-                <td className="py-4 px-2 text-left text-muted-foreground">
-                  May 9, 2025
-                </td>
-                <td className="py-4 px-2 text-center font-medium">Transport</td>
-                <td className="py-4 px-2 text-right text-red-500 font-bold">
-                  -$12.50
-                </td>
-              </tr>
-              <tr className="text-gray-900 dark:text-foreground">
-                <td className="py-4 px-2 text-left text-muted-foreground">
-                  May 8, 2025
-                </td>
-                <td className="py-4 px-2 text-center font-medium">
-                  Restaurant
-                </td>
-                <td className="py-4 px-2 text-right text-red-500 font-bold">
-                  -$38.00
-                </td>
-              </tr>
+              {transactions.length === 0 && (
+                <tr>
+                  <td colSpan={3} className="py-10 text-center text-gray-500">
+                    No transactions found.
+                  </td>
+                </tr>
+              )}
             </tbody>
           </table>
         </div>

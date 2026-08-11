@@ -68,8 +68,9 @@ export default function Signup() {
       return;
     } //if there is an error in any one of the following, stop the program from running
 
-    const response = await fetch("https://khal-fintrack.onrender.com/signup", {
+    const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/signup`, {
       method: "POST",
+      credentials: "include",
       headers: {
         "Content-Type": "application/json",
       },
@@ -83,7 +84,7 @@ export default function Signup() {
     const data = await response.json();
 
     if (response.ok) {
-      router.push("/dashboard/main");
+      router.push("/auth/login");
     } else {
       alert(data.error);
     }
@@ -153,7 +154,9 @@ export default function Signup() {
             </div>
 
             <div className="mb-3 md:mb-4">
-              <p className="mb-1.5 text-muted-foreground text-[13px] md:text-[14px]">Email</p>
+              <p className="mb-1.5 text-muted-foreground text-[13px] md:text-[14px]">
+                Email
+              </p>
               <input
                 value={form.email}
                 onChange={(e) =>

@@ -71,9 +71,10 @@ export default function AddTransaction() {
 
     try {
       const response = await fetch(
-        "https://khal-fintrack.onrender.com/transactions",
+        `${process.env.NEXT_PUBLIC_API_URL}/transactions`,
         {
           method: "POST",
+          credentials: "include",
           headers: {
             "Content-Type": "application/json",
           },
