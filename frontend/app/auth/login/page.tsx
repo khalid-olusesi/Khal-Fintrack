@@ -48,6 +48,8 @@ export default function Login() {
     }
 
     try {
+      console.log("API URL:", `${process.env.NEXT_PUBLIC_API_URL}/login`);
+
       const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/login`, {
         method: "POST",
         credentials: "include",
