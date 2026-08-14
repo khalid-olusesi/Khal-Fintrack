@@ -70,6 +70,7 @@ export default function AddTransaction() {
     }
 
     try {
+      const token = localStorage.getItem("token");
       const response = await fetch(
         `${process.env.NEXT_PUBLIC_API_URL}/transactions`,
         {
@@ -77,6 +78,7 @@ export default function AddTransaction() {
           credentials: "include",
           headers: {
             "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
           },
           body: JSON.stringify({
             Type: form.type,

@@ -63,6 +63,10 @@ export default function Login() {
       const data = await response.json(); //use the content for error handling
 
       if (response.ok) {
+        // Store token for cross-origin auth (cookies don't work reliably across domains)
+        if (data.token) {
+          localStorage.setItem("token", data.token);
+        }
         router.push("/dashboard/main");
       } else {
         alert(data.error || "login failed");

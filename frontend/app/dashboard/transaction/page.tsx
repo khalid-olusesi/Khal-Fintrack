@@ -37,10 +37,14 @@ export default function Transaction() {
   useEffect(() => {
     const fetchTransactions = async () => {
       try {
+        const token = localStorage.getItem("token");
         const response = await fetch(
           `${process.env.NEXT_PUBLIC_API_URL}/transactions`,
           {
             credentials: "include",
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
           }
         );
 

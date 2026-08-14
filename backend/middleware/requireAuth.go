@@ -11,13 +11,21 @@ import (
 )
 
 func RequireAuth(c *gin.Context) {
+	// Try cookie first, then fall back to Authorization header
 	tokenString, err := c.Cookie("Authorization")
 
 	if err != nil {
-		c.JSON(http.StatusUnauthorized, gin.H{
-			"error": "Authorization cookie not found",
-		})
-		return
+		// Try Authorization header: "Bearer <token>"
+		authHeader := c.GetHeader("Authorization")
+		if len(authHeader) > 7 && authHeader[:7] == "Bearer " {
+			tokenString = authHeader[7:]
+		} else {
+			c.JSON(http.StatusUnauthorized, gin.H{
+				"error": "Authorization cookie or header not found",
+			})
+			c.Abort()
+			return
+		}
 	}
 
 	token, err := jwt.Parse(tokenString,
