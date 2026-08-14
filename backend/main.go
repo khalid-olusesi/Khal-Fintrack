@@ -23,6 +23,7 @@ func main() {
 		AllowOrigins: []string{
 			"http://localhost:3000",
 			"https://khal-fintrack.vercel.app",
+			"https://khal-fintrack-git-main-khalid-olusesis-projects.vercel.app",
 		},
 		AllowMethods: []string{
 			"GET",
