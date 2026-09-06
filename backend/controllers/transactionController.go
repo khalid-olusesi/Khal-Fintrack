@@ -119,6 +119,38 @@ func GetTransactions(c *gin.Context) {
 	})
 } //what this does is ask the backend for the data saved in it so it can be used on the frontend to display there on the dashboard
 
+func GetTransaction(c *gin.Context) {
+	id := c.Param("id") // gets the ID from /transactions/:id
+
+	user, exists := c.Get("user")
+
+	if !exists {
+		c.JSON(http.StatusUnauthorized, gin.H{
+			"error": "user unauthorized",
+		})
+		return
+	}
+
+	currentUser := user.(*models.User)
+
+	var transaction models.Transaction
+
+	result := initializers.DB.
+		Where("id = ? AND user_id = ?", id, currentUser.ID).
+		First(&transaction)
+
+	if result.Error != nil {
+		c.JSON(http.StatusNotFound, gin.H{
+			"error": "transaction not found",
+		})
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{
+		"transaction": transaction,
+	})
+}
+
 func UpdateTransaction(c *gin.Context) {
 	var body struct {
 		Type        string    `json:"type"`
@@ -238,7 +270,6 @@ func DeleteTransaction(c *gin.Context) {
 	}
 
 	c.JSON(http.StatusOK, gin.H{
-		"message":     "transaction deleted successfully",
-		"transaction": transaction,
+		"message": "transaction deleted successfully",
 	})
 }

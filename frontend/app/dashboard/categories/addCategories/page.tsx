@@ -1,0 +1,236 @@
+"use client";
+
+import * as React from "react";
+
+import { Button } from "@/components/ui/button";
+import { Icons } from "@/components/category-icons";
+import { useState } from "react";
+import {
+  Card,
+  CardAction,
+  CardContent,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { X } from "lucide-react";
+import {
+  Select,
+  SelectTrigger,
+  SelectValue,
+  SelectContent,
+  SelectGroup,
+  SelectItem,
+  SelectLabel,
+} from "@/components/ui/select";
+
+type Category = {
+  id: number;
+  name: string;
+  type: string;
+  icon: string;
+  color: string;
+};
+
+type CardSpacingProps = {
+  onClose: () => void;
+  selectedCategory: Category | null;
+  isEditing: boolean;
+  onSuccess: () => Promise<void>;
+};
+
+export default function CardSpacing({
+  onClose,
+  selectedCategory,
+  isEditing,
+  onSuccess,
+}: CardSpacingProps) {
+  const [form, setForm] = useState({
+    name: selectedCategory?.name ?? "",
+    icon: selectedCategory?.icon ?? "",
+    type: selectedCategory?.type ?? "",
+  });
+
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+
+    if (!form.name.trim()) {
+      alert("category name is required");
+      return;
+    }
+
+    if (!form.icon) {
+      alert("pick an icon");
+      return;
+    }
+
+    if (!form.type) {
+      alert("choose a type (income or expense)");
+      return;
+    }
+
+    try {
+      const token = localStorage.getItem("token");
+
+      const url = isEditing
+        ? `${process.env.NEXT_PUBLIC_API_URL}/categories/${selectedCategory?.id}`
+        : `${process.env.NEXT_PUBLIC_API_URL}/categories`;
+
+      const method = isEditing ? "PATCH" : "POST";
+      const response = await fetch(url, {
+        method,
+        credentials: "include",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({
+          Type: form.type,
+          Name: form.name,
+          Icon: form.icon,
+        }),
+      });
+
+      const text = await response.text();
+      let data;
+
+      try {
+        data = JSON.parse(text);
+      } catch {
+        data = null;
+      }
+
+      if (!response.ok) {
+        alert(data?.error || text || "Something went wrong");
+        return;
+      }
+      onClose();
+      await onSuccess();
+
+      if (isEditing) {
+        alert("category updated successfully");
+      } else {
+        alert("A new category created");
+      }
+
+      setForm({
+        type: "",
+        name: "",
+        icon: "",
+      });
+    } catch (err) {
+      console.error(err);
+      alert("Unable to connect to the server.");
+    }
+  };
+
+  return (
+    <div className="mx-auto h95 grid w-full max-w-2xl gap-4">
+      <Card>
+        <CardHeader>
+          <CardTitle className="mt-3">Add Category</CardTitle>
+          <CardAction>
+            <Button
+              type="button"
+              onClick={onClose}
+              className="cursor-pointer"
+              variant="link"
+            >
+              <X />
+            </Button>
+          </CardAction>
+        </CardHeader>
+        <CardContent>
+          <form onSubmit={handleSubmit}>
+            <div className="flex flex-col gap-6">
+              <div className="grid gap-2">
+                <Label
+                  htmlFor="texts-spacing"
+                  className="text-muted-foreground"
+                >
+                  Category Name
+                </Label>
+                <Input
+                  id="texts-spacing"
+                  type="text"
+                  placeholder="e.g Groceries"
+                  required
+                  value={form.name}
+                  onChange={(e) => {
+                    setForm({
+                      ...form,
+                      name: e.target.value,
+                    });
+                  }}
+                />
+              </div>
+              <div className="grid gap-2">
+                <div className="flex items-center">
+                  <Label
+                    htmlFor="texts-spacing"
+                    className="text-muted-foreground"
+                  >
+                    Type
+                  </Label>
+                </div>
+                <Select
+                  value={form.type}
+                  onValueChange={(value) => {
+                    setForm({
+                      ...form,
+                      type: value ?? "",
+                    });
+                  }}
+                >
+                  <SelectTrigger className="w-full max-w-full">
+                    <SelectValue placeholder="Select Type" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectGroup>
+                      <SelectLabel>Type</SelectLabel>
+
+                      <SelectItem value="expense">Expense</SelectItem>
+                      <SelectItem value="income">Income</SelectItem>
+                    </SelectGroup>
+                  </SelectContent>
+                </Select>
+              </div>
+            </div>
+
+            <div className="mt-5">
+              <p className="mb-3 text-muted-foreground text-sm">Icon</p>
+              <div className="flex items-center justify-between">
+                {Icons.map(
+                  ({ name, icon: Icon, textColor, hoverBg, selectedBg }) => (
+                    <div
+                      className={`border-2 rounded-lg cursor-pointer p-3  ${textColor} ${hoverBg}  ${form.icon === name ? selectedBg : ""} `}
+                      key={name}
+                      onClick={() => {
+                        setForm({
+                          ...form,
+                          icon: name,
+                        });
+                      }}
+                    >
+                      <Icon className="w-5 h-5" />
+                    </div>
+                  ),
+                )}
+              </div>
+            </div>
+
+            <div className="flex justify-end gap-3 border-none mt-7 bg-none">
+              <Button className="cursor-pointer bg-0 border-xl text-black hover:opacity-100 hover:text-white">
+                Cancel
+              </Button>
+              <Button type="submit" className="cursor-pointer">
+                {isEditing ? "Update Category" : "Add Category"}
+              </Button>
+            </div>
+          </form>
+        </CardContent>
+      </Card>
+    </div>
+  );
+}

@@ -10,6 +10,7 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/golang-jwt/jwt/v5"
 	"golang.org/x/crypto/bcrypt"
+	"gorm.io/gorm"
 )
 
 func Signup(c *gin.Context) {
@@ -19,7 +20,7 @@ func Signup(c *gin.Context) {
 		Password string `json:"password"`
 	} //empty container, when gin sends info from the frontend, it fills it up
 
-	if c.Bind(&body) != nil {
+	if c.ShouldBindJSON(&body) != nil {
 		c.JSON(http.StatusBadRequest, gin.H{
 			"error": "Failed to read request body",
 		})
@@ -41,16 +42,68 @@ func Signup(c *gin.Context) {
 		Password: string(hash),
 	}
 
-	result := initializers.DB.Create(&user) //creates the user db
+	err = initializers.DB.Transaction(func(tx *gorm.DB) error {
+		result := tx.Create(&user)
+
+		if result.Error != nil {
+			
+				return result.Error
+		}
+	
+		defaultCategories := []models.Category{
+		{
+			UserID: user.ID,
+			Name: "Food",
+			Type: "expense",
+		},{
+			UserID: user.ID,
+			Name: "Transport",
+			Type: "expense",
+		},
+		{
+			UserID: user.ID,
+			Name: "Bills",
+			Type: "expense",
+		},{
+			UserID: user.ID,
+			Name: "Shopping",
+			Type: "expense",
+		},
+		{
+			UserID: user.ID,
+			Name: "Healthcare",
+			Type: "expense",
+		},
+		{
+			UserID: user.ID,
+			Name: "Salary",
+			Type: "income",
+		}, 
+		{
+			UserID: user.ID,
+			Name: "Other Income",
+			Type: "income",
+		},
+	}
+
+	result = tx.Create(&defaultCategories)
 
 	if result.Error != nil {
+		return result.Error
+	}
+	  return nil
+	})
+
+
+	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{
 			"error": "Failed to create user",
 		})
 		return
 	}
 
-	c.JSON(http.StatusOK, gin.H{
+
+	c.JSON(http.StatusCreated, gin.H{
 		"message": "User created successfully",
 	})
 }
@@ -62,7 +115,7 @@ func Login(c *gin.Context) {
 	}
 
 	//Read the JSON request and fill my struct. c.Bind(&body)
-	if c.Bind(&body) != nil {
+	if c.ShouldBindJSON(&body) != nil {
 		c.JSON(http.StatusBadRequest, gin.H{
 			"error": "Failed to read body",
 		})

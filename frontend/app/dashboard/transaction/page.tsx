@@ -45,7 +45,7 @@ export default function Transaction() {
             headers: {
               Authorization: `Bearer ${token}`,
             },
-          }
+          },
         );
 
         const data = await response.json();
@@ -59,43 +59,56 @@ export default function Transaction() {
     fetchTransactions();
   }, []);
 
+  const deleteTransaction = async (id: string | number) => {
+    try {
+      const token = localStorage.getItem("token");
+      const response = await fetch(
+        `${process.env.NEXT_PUBLIC_API_URL}/transactions/${id}`,
+        {
+          method: "DELETE",
+          credentials: "include",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+        },
+      );
+
+      const text = await response.text();
+
+      let data;
+
+      try {
+        data = JSON.parse(text);
+      } catch {
+        data = null;
+      }
+
+      if (!response.ok) {
+        alert(data?.error || text || "failed to delete transaction");
+        return;
+      }
+
+      setTransactions((prev) =>
+        prev.filter((transaction) => transaction.id !== id),
+      ); //removes the deleted transaction from the UI
+      alert("Transaction deleted successfully");
+    } catch (err) {
+      console.error(err);
+      alert("unable to connect to server");
+    }
+  };
+
   const expenses = [
     { label: "Food & Dining", value: "food & dining" },
-    { label: "Groceries", value: "groceries" },
     { label: "Transport", value: "transport" },
-    { label: "Fuel", value: "fuel" },
-    { label: "Rent", value: "rent" },
-    { label: "Utilities", value: "utilities" },
+    { label: "Bills & Utilities", value: "bills & utilities" },
     { label: "Electricity", value: "electricity" },
-    { label: "Water", value: "water" },
-    { label: "Internet", value: "internet" },
     { label: "Shopping", value: "shopping" },
-    { label: "Entertainment", value: "entertainment" },
-    { label: "Subscription", value: "subscriptions" },
-    { label: "Healthcare", value: "healthcare" },
-    { label: "Pharmacy", value: "pharmacy" },
-    { label: "Education", value: "education" },
-    { label: "Insurance", value: "insurance" },
-    { label: "Travel", value: "travel" },
-    { label: "Personal care", value: "personal-care" },
-    { label: "Fitness", value: "fitness" },
-    { label: "Family", value: "family" },
-    { label: "Taxes", value: "taxes" },
-    { label: "Donations", value: "donations" },
-    { label: "Other Expenses", value: "other-expenses" },
   ];
 
   const incomes = [
     { label: "Salary", value: "salary" },
-    { label: "Freelance", value: "freelance" },
-    { label: "Business", value: "business" },
-    { label: "Bonus", value: "bonus" },
-    { label: "Investment", value: "investment" },
-    { label: "Interest", value: "interest" },
-    { label: "Dividend", value: "dividend" },
-    { label: "Rental Income", value: "rental-income" },
-    { label: "Gift", value: "gift" },
-    { label: "Refund", value: "refund" },
     { label: "Other Income", value: "other-income" },
   ];
 
@@ -128,7 +141,9 @@ export default function Transaction() {
 
         {/* Transactions Title & Bell */}
         <div className="flex justify-between items-center mb-1">
-          <h1 className="text-xl font-bold text-gray-900 dark:text-gray-100">Transactions</h1>
+          <h1 className="text-xl font-bold text-gray-900 dark:text-gray-100">
+            Transactions
+          </h1>
           <button className="p-1 cursor-pointer">
             <Bell className="w-5 h-5 text-gray-700 dark:text-gray-200" />
           </button>
@@ -216,7 +231,10 @@ export default function Transaction() {
             </thead>
             <tbody className="divide-y divide-gray-50 dark:divide-border">
               {transactions.map((transaction, index) => (
-                <tr key={transaction.id || index} className="border border-gray-100 dark:border-border">
+                <tr
+                  key={transaction.id || index}
+                  className="border border-gray-100 dark:border-border"
+                >
                   <td className="py-4 px-2 text-left text-muted-foreground">
                     {new Date(transaction.date).toLocaleDateString()}
                   </td>
@@ -402,13 +420,25 @@ export default function Transaction() {
                   </td>
 
                   <td className="py-4">
-                    <div className="flex items-center justify-center gap-4">
+                    <div className="flex items-center gap-4  justify-evenly">
                       <button className="cursor-pointer">
-                        <Pencil className="w-4 h-4 text-blue-600 hover:text-blue-800" />
+                        <Pencil
+                          onClick={() => {
+                            router.push(
+                              `/dashboard/transaction/editTransaction/${transaction.id}`,
+                            );
+                          }}
+                          className="w-4 h-4 text-blue-600 hover:text-blue-800"
+                        />
                       </button>
 
                       <button className="cursor-pointer">
-                        <Trash2 className="w-4 h-4 text-red-500 hover:text-red-700" />
+                        <Trash2
+                          onClick={() => {
+                            deleteTransaction(transaction.id);
+                          }}
+                          className="w-4 h-4 text-red-500 hover:text-red-700"
+                        />
                       </button>
                     </div>
                   </td>

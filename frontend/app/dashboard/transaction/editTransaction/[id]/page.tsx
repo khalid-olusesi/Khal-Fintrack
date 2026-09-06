@@ -5,7 +5,7 @@ import {
   ChevronDownIcon,
   Calendar as CalendarIcon,
 } from "lucide-react";
-import { useRouter } from "next/navigation";
+import { useRouter, useParams } from "next/navigation";
 import {
   Select,
   SelectContent,
@@ -24,14 +24,17 @@ import { useSidebar } from "@/context/sidebar-context";
 import { MainLogo } from "@/components/logo";
 import { ModeToggle } from "@/components/toggle";
 import { useState } from "react";
+import { useEffect } from "react";
 import {
   Popover,
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover";
 
-export default function AddTransaction() {
+export default function EditTransaction() {
+  const params = useParams();
   const router = useRouter();
+  const id = params.id;
   const { toggleSidebar } = useSidebar();
 
   const [form, setForm] = useState({
@@ -42,35 +45,67 @@ export default function AddTransaction() {
     date: new Date(),
   });
 
+  useEffect(() => {
+    const fetchTransaction = async () => {
+      try {
+        const token = localStorage.getItem("token");
+
+        const response = await fetch(
+          `${process.env.NEXT_PUBLIC_API_URL}/transactions/${id}`,
+          {
+            method: "GET",
+            credentials: "include",
+            headers: {
+              "Content-Type": "application/json",
+              Authorization: `Bearer ${token}`,
+            },
+          },
+        );
+
+        const text = await response.text();
+
+        let data;
+        try {
+          data = JSON.parse(text);
+        } catch {
+          data = null;
+        }
+
+        if (!response.ok) {
+          alert(data?.error || text || "Failed to retrieve transaction data");
+          return;
+        }
+
+        console.log("transaction retrieved :", data);
+
+        const transaction = data.transaction;
+        
+        setForm({
+          type: transaction.type || "",
+          description: transaction.description || "",
+          amount: String(transaction.amount ?? ""),
+          category: transaction.category || "",
+          date: transaction.date ? new Date(transaction.date) : new Date(),
+        }); //puts the old transaction into the form
+      } catch (err) {
+        console.error(err);
+      }
+    };
+
+    if (id) {
+      fetchTransaction();
+    }
+  }, [id]); //Gets the user old saved message that wants to be edited
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
-    if (!form.description.trim()) {
-      alert("Description is required");
-      return;
-    }
-
-    if (!form.category) {
-      alert("Choose a category");
-      return;
-    }
-
-    if (!form.type) {
-      alert("Choose Income or Expense");
-      return;
-    }
-
-    if (Number(form.amount) <= 0) {
-      alert("Amount must be greater than zero");
-      return;
-    }
-
     try {
       const token = localStorage.getItem("token");
+
       const response = await fetch(
-        `${process.env.NEXT_PUBLIC_API_URL}/transactions`,
+        `${process.env.NEXT_PUBLIC_API_URL}/transactions/${id}`,
         {
-          method: "POST",
+          method: "PATCH",
           credentials: "include",
           headers: {
             "Content-Type": "application/json",
@@ -87,7 +122,9 @@ export default function AddTransaction() {
       );
 
       const text = await response.text();
+
       let data;
+
       try {
         data = JSON.parse(text);
       } catch {
@@ -99,33 +136,51 @@ export default function AddTransaction() {
         return;
       }
 
-      alert("Transaction created successfully");
-
-      setForm({
-        type: "",
-        category: "",
-        amount: "",
-        description: "",
-        date: new Date(),
-      });
-
+      alert("Transaction updated successfully");
       router.push("/dashboard/transaction");
     } catch (err) {
       console.error(err);
-      alert("Unable to connect to the server.");
+      alert("Unable to connect to server");
     }
-  };
+  }; //updates the page after the users data that want to be edited has been retrieved(GET)
 
   const expenses = [
     { label: "Food & Dining", value: "food & dining" },
+    { label: "Groceries", value: "groceries" },
     { label: "Transport", value: "transport" },
-    { label: "Bills & Utilities", value: "bills & utilities" },
+    { label: "Fuel", value: "fuel" },
+    { label: "Rent", value: "rent" },
+    { label: "Utilities", value: "utilities" },
     { label: "Electricity", value: "electricity" },
+    { label: "Water", value: "water" },
+    { label: "Internet", value: "internet" },
     { label: "Shopping", value: "shopping" },
+    { label: "Entertainment", value: "entertainment" },
+    { label: "Subscription", value: "subscriptions" },
+    { label: "Healthcare", value: "healthcare" },
+    { label: "Pharmacy", value: "pharmacy" },
+    { label: "Education", value: "education" },
+    { label: "Insurance", value: "insurance" },
+    { label: "Travel", value: "travel" },
+    { label: "Personal care", value: "personal-care" },
+    { label: "Fitness", value: "fitness" },
+    { label: "Family", value: "family" },
+    { label: "Taxes", value: "taxes" },
+    { label: "Donations", value: "donations" },
+    { label: "Other Expenses", value: "other-expenses" },
   ];
 
   const incomes = [
     { label: "Salary", value: "salary" },
+    { label: "Freelance", value: "freelance" },
+    { label: "Business", value: "business" },
+    { label: "Bonus", value: "bonus" },
+    { label: "Investment", value: "investment" },
+    { label: "Interest", value: "interest" },
+    { label: "Dividend", value: "dividend" },
+    { label: "Rental Income", value: "rental-income" },
+    { label: "Gift", value: "gift" },
+    { label: "Refund", value: "refund" },
     { label: "Other Income", value: "other-income" },
   ];
 
@@ -155,7 +210,7 @@ export default function AddTransaction() {
 
         <div className="flex justify-between items-center mb-5">
           <h1 className="text-[18px] font-bold text-gray-900 dark:text-foreground">
-            Add Transaction
+            Edit Transaction
           </h1>
           <div className="text-gray-500 text-[13px] flex items-center gap-1">
             <ChevronDownIcon className="w-3.5 h-3.5" />
@@ -341,7 +396,7 @@ export default function AddTransaction() {
               <Menu className="w-4 h-4 text-foreground" />
             </button>
             <h1 className="text-xl font-bold text-foreground">
-              Add Transaction
+              Edit Transaction
             </h1>
           </div>
 
@@ -532,7 +587,7 @@ export default function AddTransaction() {
               Cancel
             </button>
             <button className="text-white rounded-lg cursor-pointer p-1.5 pb-1.5 pl-7 pr-7 bg-green-700">
-              Save Transaction
+              Update Transaction
             </button>
           </div>
         </form>

@@ -10,6 +10,7 @@ import (
 func TransactionRoute(router *gin.Engine) {
 	router.POST("/transactions", middleware.RequireAuth, controllers.CreateTransaction)
 	router.GET("/transactions", middleware.RequireAuth, controllers.GetTransactions)
+	router.GET("/transactions/:id", middleware.RequireAuth, controllers.GetTransaction)
 	router.PATCH("/transactions/:id", middleware.RequireAuth, controllers.UpdateTransaction)
 	router.DELETE("/transactions/:id", middleware.RequireAuth, controllers.DeleteTransaction)
 }
