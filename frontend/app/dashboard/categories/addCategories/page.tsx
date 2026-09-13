@@ -52,6 +52,14 @@ export default function CardSpacing({
     type: selectedCategory?.type ?? "",
   });
 
+  const handleCancel = () => {
+    setForm({
+      name: "",
+      icon: "",
+      type: "",
+    });
+  };
+
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
@@ -221,7 +229,11 @@ export default function CardSpacing({
             </div>
 
             <div className="flex justify-end gap-3 border-none mt-7 bg-none">
-              <Button className="cursor-pointer bg-0 border-xl text-black hover:opacity-100 hover:text-white">
+              <Button
+                type="submit"
+                className="cursor-pointer bg-0 border-xl text-black hover:opacity-100 hover:text-white"
+                onClick={handleCancel}
+              >
                 Cancel
               </Button>
               <Button type="submit" className="cursor-pointer">

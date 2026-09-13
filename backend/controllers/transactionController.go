@@ -13,18 +13,21 @@ import (
 func CreateTransaction(c *gin.Context) {
 	var body struct {
 		Type        string    `json:"type"`
-		Category    string    `json:"category"`
+		CategoryID  uint      `json:"categoryId"`
 		Amount      float64   `json:"amount"`
 		Description string    `json:"description"`
 		Date        time.Time `json:"date"`
 	}
 
-	if c.ShouldBindJSON(&body) != nil {
+	if err := c.ShouldBindJSON(&body); err != nil {
+		fmt.Println("BIND ERROR:", err.Error())
 		c.JSON(http.StatusBadRequest, gin.H{
-			"error": "Failed to request the body",
+			"error": "Failed to request the body: " + err.Error(),
 		})
 		return
 	}
+
+	fmt.Println("PARSED BODY - Type:", body.Type, "CategoryID:", body.CategoryID, "Amount:", body.Amount, "Description:", body.Description, "Date:", body.Date)
 
 	user, exists := c.Get("user")
 
@@ -37,15 +40,6 @@ func CreateTransaction(c *gin.Context) {
 
 	currentUser := user.(*models.User)
 
-	transaction := models.Transaction{
-		UserID:      currentUser.ID,
-		Type:        body.Type,
-		Category:    body.Category,
-		Amount:      body.Amount,
-		Description: body.Description,
-		Date:        body.Date,
-	} //next is to save the contents sent by the user in transaction
-
 	if body.Amount <= 0 {
 		c.JSON(http.StatusBadRequest, gin.H{
 			"error": "amount is invalid",
@@ -57,16 +51,24 @@ func CreateTransaction(c *gin.Context) {
 		c.JSON(http.StatusBadRequest, gin.H{
 			"error": "type error",
 		})
-
 		return
 	}
 
-	if body.Category == "" {
+	if body.CategoryID == 0 {
 		c.JSON(http.StatusBadRequest, gin.H{
 			"error": "categories cant be found",
 		})
 		return
 	}
+
+	transaction := models.Transaction{
+		UserID:      currentUser.ID,
+		Type:        body.Type,
+		CategoryID:  body.CategoryID,
+		Amount:      body.Amount,
+		Description: body.Description,
+		Date:        body.Date,
+	} //next is to save the contents sent by the user in transaction
 
 	result := initializers.DB.Create(&transaction) //saves the the content the user typed and sent in the database
 
@@ -92,30 +94,73 @@ func GetTransactions(c *gin.Context) {
 		c.JSON(http.StatusUnauthorized, gin.H{
 			"error": "user unauthorized",
 		})
-
 		return
 	}
 
 	currentUser := user.(*models.User)
 
-	fmt.Println("USER ID:", currentUser.ID)
-	fmt.Println("USER EMAIL:", currentUser.Email)
+	page := 1
+	limit := 10
 
-	var transactions []models.Transaction //created a slice of transaction model to be used to get preexisting content, the slice there is like the bucket where where result := initializers.DB.Find(&transactions) saves its content
+	if pageStr := c.Query("page"); pageStr != "" {
+		if _, err := fmt.Sscanf(pageStr, "%d", &page); err != nil || page < 1 {
+			page = 1
+		}
+	}
 
-	result := initializers.DB.
-		Where("user_id = ?", currentUser.ID).
-		Find(&transactions)
+	if limitStr := c.Query("limit"); limitStr != "" {
+		if _, err := fmt.Sscanf(limitStr, "%d", &limit); err != nil || limit < 1 {
+			limit = 10
+		}
+	}
 
-	if result.Error != nil {
+	offset := (page - 1) * limit
+
+	// Build a shared base query so COUNT and FIND always use the same filters
+	categoryID := c.Query("categoryId")
+	baseQuery := initializers.DB.Model(&models.Transaction{}).Where("user_id = ?", currentUser.ID)
+	if categoryID != "" {
+		baseQuery = baseQuery.Where("category_id = ?", categoryID)
+	}
+
+	var total int64
+	if err := baseQuery.Count(&total).Error; err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{
-			"error": "failed to get transaction",
+			"error": "failed to count transactions",
 		})
 		return
 	}
 
+	var transactions []models.Transaction
+
+	fetchQuery := initializers.DB.
+		Preload("Category").
+		Where("user_id = ?", currentUser.ID).
+		Order("date DESC").
+		Limit(limit).
+		Offset(offset)
+
+	if categoryID != "" {
+		fetchQuery = fetchQuery.Where("category_id = ?", categoryID)
+	}
+
+	if err := fetchQuery.Find(&transactions).Error; err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"error": "failed to get transactions",
+		})
+		return
+	}
+
+	totalPages := int((total + int64(limit) - 1) / int64(limit))
+
 	c.JSON(http.StatusOK, gin.H{
 		"transactions": transactions,
+		"pagination": gin.H{
+			"page":       page,
+			"limit":      limit,
+			"total":      total,
+			"totalPages": totalPages,
+		},
 	})
 } //what this does is ask the backend for the data saved in it so it can be used on the frontend to display there on the dashboard
 
@@ -136,6 +181,7 @@ func GetTransaction(c *gin.Context) {
 	var transaction models.Transaction
 
 	result := initializers.DB.
+		Preload("Category").
 		Where("id = ? AND user_id = ?", id, currentUser.ID).
 		First(&transaction)
 
@@ -154,7 +200,7 @@ func GetTransaction(c *gin.Context) {
 func UpdateTransaction(c *gin.Context) {
 	var body struct {
 		Type        string    `json:"type"`
-		Category    string    `json:"category"`
+		CategoryID  uint      `json:"categoryId"`
 		Amount      float64   `json:"amount"`
 		Description string    `json:"description"`
 		Date        time.Time `json:"date"`
@@ -207,7 +253,7 @@ func UpdateTransaction(c *gin.Context) {
 		return
 	}
 
-	if body.Category == "" {
+	if body.CategoryID == 0 {
 		c.JSON(http.StatusBadRequest, gin.H{
 			"error": "categories cant be found",
 		})
@@ -215,7 +261,7 @@ func UpdateTransaction(c *gin.Context) {
 	}
 
 	transaction.Type = body.Type
-	transaction.Category = body.Category
+	transaction.CategoryID = body.CategoryID
 	transaction.Amount = body.Amount
 	transaction.Description = body.Description
 	transaction.Date = body.Date

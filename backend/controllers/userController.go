@@ -46,54 +46,60 @@ func Signup(c *gin.Context) {
 		result := tx.Create(&user)
 
 		if result.Error != nil {
-			
-				return result.Error
+
+			return result.Error
 		}
-	
+
 		defaultCategories := []models.Category{
-		{
-			UserID: user.ID,
-			Name: "Food",
-			Type: "expense",
-		},{
-			UserID: user.ID,
-			Name: "Transport",
-			Type: "expense",
-		},
-		{
-			UserID: user.ID,
-			Name: "Bills",
-			Type: "expense",
-		},{
-			UserID: user.ID,
-			Name: "Shopping",
-			Type: "expense",
-		},
-		{
-			UserID: user.ID,
-			Name: "Healthcare",
-			Type: "expense",
-		},
-		{
-			UserID: user.ID,
-			Name: "Salary",
-			Type: "income",
-		}, 
-		{
-			UserID: user.ID,
-			Name: "Other Income",
-			Type: "income",
-		},
-	}
+			{
+				UserID: user.ID,
+				Name:   "Food",
+				Type:   "expense",
+				Icon:   "utensils",
+			}, {
+				UserID: user.ID,
+				Name:   "Transport",
+				Type:   "expense",
+				Icon:   "car",
+			},
+			{
+				UserID: user.ID,
+				Name:   "Bills",
+				Type:   "expense",
+				Icon:   "receipt",
+			}, {
+				UserID: user.ID,
+				Name:   "Shopping",
+				Type:   "expense",
+				Icon:   "shopping-cart",
+			},
+			{
+				UserID: user.ID,
+				Name:   "Healthcare",
+				Type:   "expense",
+				Icon:   "heart-pulse",
+			},
+			{
+				UserID: user.ID,
+				Name:   "Salary",
+				Type:   "income",
+				Icon:   "briefcase",
+			},
+			{
+				UserID: user.ID,
+				Name:   "Other Income",
+				Type:   "income",
+				Icon:   "banknote",
+			},
+		}
 
-	result = tx.Create(&defaultCategories)
+		result = tx.Create(&defaultCategories)
 
-	if result.Error != nil {
-		return result.Error
-	}
-	  return nil
+		if result.Error != nil {
+			return result.Error
+		}
+		return nil
 	})
-
 
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{
@@ -101,7 +107,6 @@ func Signup(c *gin.Context) {
 		})
 		return
 	}
-
 
 	c.JSON(http.StatusCreated, gin.H{
 		"message": "User created successfully",

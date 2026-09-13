@@ -6,16 +6,6 @@ import {
   Calendar as CalendarIcon,
 } from "lucide-react";
 import { useRouter } from "next/navigation";
-import {
-  Select,
-  SelectContent,
-  SelectGroup,
-  SelectItem,
-  SelectLabel,
-  SelectTrigger,
-  SelectValue,
-  SelectSeparator,
-} from "@/components/ui/select";
 import * as React from "react";
 import { format } from "date-fns";
 import { Button } from "@/components/ui/button";
@@ -29,6 +19,7 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover";
+import CategoryDropDown from "@/components/dropdown";
 
 export default function AddTransaction() {
   const router = useRouter();
@@ -41,6 +32,16 @@ export default function AddTransaction() {
     category: "",
     date: new Date(),
   });
+
+  const handleCancel = () => {
+    setForm({
+      type: "",
+      category: "",
+      amount: "",
+      description: "",
+      date: new Date(),
+    });
+  }; //sets the form content back to empty content just like the emoty strings
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -77,14 +78,17 @@ export default function AddTransaction() {
             Authorization: `Bearer ${token}`,
           },
           body: JSON.stringify({
-            Type: form.type,
-            Category: form.category,
-            Amount: Number(form.amount),
-            Description: form.description,
-            Date: form.date,
+            type: form.type,
+            categoryId: Number(form.category),
+            amount: Number(form.amount),
+            description: form.description,
+            date: form.date,
           }),
         },
       );
+
+      console.log("FORM CATEGORY:", form.category);
+      console.log("CATEGORY ID:", Number(form.category));
 
       const text = await response.text();
       let data;
@@ -115,21 +119,6 @@ export default function AddTransaction() {
       alert("Unable to connect to the server.");
     }
   };
-
-  const expenses = [
-    { label: "Food & Dining", value: "food & dining" },
-    { label: "Transport", value: "transport" },
-    { label: "Bills & Utilities", value: "bills & utilities" },
-    { label: "Electricity", value: "electricity" },
-    { label: "Shopping", value: "shopping" },
-  ];
-
-  const incomes = [
-    { label: "Salary", value: "salary" },
-    { label: "Other Income", value: "other-income" },
-  ];
-
-  const categories = form.type === "income" ? incomes : expenses;
 
   return (
     // container
@@ -174,7 +163,7 @@ export default function AddTransaction() {
             }
             className={`flex-1 py-2.5 rounded-lg font-medium text-[13px] text-center ${
               form.type === "income"
-                ? "bg-green-600 text-white"
+                ? "bg-green-600 text-white border-gray-100"
                 : "bg-transparent text-gray-800"
             }`}
           >
@@ -190,7 +179,7 @@ export default function AddTransaction() {
             }
             className={`flex-1 py-2.5 rounded-lg font-medium text-[13px] text-center ${
               form.type === "expense"
-                ? "bg-red-600 text-white"
+                ? "bg-red-600 text-white border-gray-100"
                 : "bg-transparent text-gray-800 dark:text-muted-foreground"
             }`}
           >
@@ -240,32 +229,18 @@ export default function AddTransaction() {
             <label className="text-[12px] font-medium text-gray-800 dark:text-muted-foreground">
               Category
             </label>
-            <Select
-              value={form.category}
-              onValueChange={(value) => {
-                setForm({
-                  ...form,
-                  category: value ?? "",
-                });
-              }}
-            >
-              <SelectTrigger className="w-full border border-gray-200 dark:border-border bg-white dark:bg-card text-foreground rounded-xl p-3.5 h-auto text-[13px] outline-none text-gray-900 dark:text-foreground [&>svg]:text-gray-500">
-                <SelectValue placeholder="Select category" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectGroup>
-                  <SelectLabel>
-                    {form.type === "income" ? "Income" : "Expense"}
-                    {/*if income is not equal to income, give expense*/}
-                  </SelectLabel>
-                  {categories.map((category) => (
-                    <SelectItem key={category.value} value={category.value}>
-                      {category.label}
-                    </SelectItem>
-                  ))}
-                </SelectGroup>
-              </SelectContent>
-            </Select>
+            <div>
+              <CategoryDropDown
+                value={form.category}
+                onValueChange={(value) => {
+                  setForm({
+                    ...form,
+                    category: value ?? "",
+                  });
+                }}
+                type={form.type as "income" | "expense"}
+              />
+            </div>
           </div>
 
           <div className="space-y-1.5">
@@ -300,17 +275,6 @@ export default function AddTransaction() {
                 />
               </PopoverContent>
             </Popover>
-          </div>
-
-          <div className="space-y-1.5">
-            <label className="text-[12px] font-medium text-gray-800 dark:text-muted-foreground">
-              Note (optional)
-            </label>
-            <input
-              type="text"
-              placeholder="Add note"
-              className="w-full border border-gray-200 bg-white rounded-xl p-3.5 text-[13px] outline-none placeholder:text-gray-400"
-            />
           </div>
 
           {/* Buttons */}
@@ -359,7 +323,7 @@ export default function AddTransaction() {
         </div>
         <h3 className="font-bold mb-3 text-foreground">Type</h3>
 
-        <div className="flex gap-2 mb-5">
+        <div className="flex gap-2 mb-7">
           <span
             onClick={() =>
               setForm({
@@ -369,7 +333,7 @@ export default function AddTransaction() {
             }
             className={`pt-2 pb-2 pl-10 pr-12 rounded-lg border-2 cursor-pointer text-center ${
               form.type === "income"
-                ? "bg-green-600 text-white"
+                ? "bg-green-600 text-white border-gray-100"
                 : "bg-transparent text-gray-800"
             }`}
           >
@@ -384,7 +348,7 @@ export default function AddTransaction() {
             }
             className={`pt-2 pb-2 pl-10 pr-12 rounded-lg border-2 cursor-pointer text-center ${
               form.type === "expense"
-                ? "bg-red-600 text-white"
+                ? "bg-red-600 text-white border-gray-100"
                 : "bg-transparent text-gray-800 dark:text-muted-foreground"
             }`}
           >
@@ -393,7 +357,7 @@ export default function AddTransaction() {
         </div>
 
         {/* forms */}
-        <form onSubmit={handleSubmit} className="space-y-4">
+        <form onSubmit={handleSubmit} className="space-y-6">
           <div className="space-y-0.5">
             <p className="text-gray-700 dark:text-muted-foreground font-medium text-[13px]">
               Description
@@ -436,7 +400,7 @@ export default function AddTransaction() {
               Category
             </p>
             <div className="flex items-center justify-between mb-8">
-              <Select
+              <CategoryDropDown
                 value={form.category}
                 onValueChange={(value) => {
                   setForm({
@@ -444,45 +408,19 @@ export default function AddTransaction() {
                     category: value ?? "",
                   });
                 }}
-              >
-                <SelectTrigger className="w-full p-5 outline-none border-2 border-gray-200 dark:border-border bg-white dark:bg-card text-foreground">
-                  <SelectValue placeholder="Select category" />
-                </SelectTrigger>
-
-                <SelectContent>
-                  <SelectSeparator />
-
-                  <SelectGroup>
-                    <SelectLabel>Income</SelectLabel>
-                    {incomes.map((income) => (
-                      <SelectItem key={income.value} value={income.value}>
-                        {income.label}
-                      </SelectItem>
-                    ))}
-                  </SelectGroup>
-
-                  <SelectSeparator />
-
-                  <SelectGroup>
-                    <SelectLabel>Expense</SelectLabel>
-                    {expenses.map((expense) => (
-                      <SelectItem key={expense.value} value={expense.value}>
-                        {expense.label}
-                      </SelectItem>
-                    ))}
-                  </SelectGroup>
-                </SelectContent>
-              </Select>
+                type={form.type as "income" | "expense"}
+              />
             </div>
           </div>
 
           {/* date */}
-          <div className="-mt-[18px] space-y-0.5">
+          <div className="-mt-[6px] space-y-0.5">
             <p className="text-gray-700 dark:text-muted-foreground font-medium text-[13px]">
               Date
             </p>
             <Popover>
               <PopoverTrigger
+                className="bg-white"
                 render={
                   <Button
                     variant={"outline"}
@@ -511,23 +449,12 @@ export default function AddTransaction() {
               </PopoverContent>
             </Popover>
           </div>
-
-          <div className="space-y-0.5">
-            <p className="text-gray-700 dark:text-muted-foreground font-medium text-[13px]">
-              Notes(optional)
-            </p>
-            <input
-              type="text"
-              placeholder="Add a note"
-              className="border-2 border-gray-200 dark:border-border bg-white dark:bg-card text-foreground outline-none p-2 rounded-lg w-full"
-            />
-          </div>
-
           {/* buttons */}
-          <div className="flex items-center justify-end gap-4 mt-3">
+          <div className="flex items-center justify-end gap-4 mt-7">
             <button
               type="button"
               className="border-2 border-gray-250 dark:border-border text-foreground rounded-lg cursor-pointer p-1.5 pb-1.5 pl-7 pr-7 dark:bg-card"
+              onClick={handleCancel}
             >
               Cancel
             </button>

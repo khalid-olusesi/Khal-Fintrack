@@ -6,9 +6,9 @@ import { useSidebar } from "@/context/sidebar-context";
 import { Menu } from "lucide-react";
 import { MainLogo } from "@/components/logo";
 import { ModeToggle } from "@/components/toggle";
-import { SelectSeparator } from "@/components/ui/select";
 import { Pencil, Trash2 } from "lucide-react";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
+import { Icons } from "@/components/category-icons";
 import {
   Select,
   SelectContent,
@@ -19,45 +19,127 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { useRouter } from "next/navigation";
+import CategoryDropDown from "@/components/dropdown";
 
 export default function Transaction() {
+  const [currentPage, setCurrentPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
+  const [transactions, setTransactions] = useState<Transaction[]>([]);
+  const { toggleSidebar } = useSidebar();
+  const router = useRouter();
+  const [selectedCategory, setSelectedCategory] = useState("all");
+  const [isLoading, setIsLoading] = useState(false);
+  const prefetchCache = useRef<Record<string, Transaction[]>>({});
+
   type Transaction = {
     id: number;
     description: string;
-    category: string;
+    categoryId: number;
+    category: {
+      id: number;
+      name: string;
+      icon: string;
+      type: string;
+      color: string;
+    };
     amount: number;
     date: string;
     type: string;
   };
-  const [transactions, setTransactions] = useState<Transaction[]>([]);
-  const { toggleSidebar } = useSidebar();
 
-  const router = useRouter();
+  function CategoryDisplay({
+    category,
+  }: {
+    category?: {
+      name: string;
+      icon: string;
+    };
+  }) {
+    if (!category) {
+      return <span>—</span>;
+    }
+
+    const categoryIcon = Icons.find((item) => item.name === category.icon);
+
+    const Icon = categoryIcon?.icon;
+
+    return (
+      <div className="flex items-center gap-6">
+        {Icon && (
+          <Icon className={`w-4 h-4 ${categoryIcon?.textColor ?? ""}`} />
+        )}
+
+        <span>{category.name}</span>
+      </div>
+    );
+  }
+
+  const buildCacheKey = (page: number, category: string) => `${page}__${category}`;
 
   useEffect(() => {
+    const controller = new AbortController();
+
+    const fetchPage = async (page: number, category: string, signal?: AbortSignal) => {
+      const token = localStorage.getItem("token");
+      const categoryQuery = category !== "all" ? `&categoryId=${category}` : "";
+      const response = await fetch(
+        `${process.env.NEXT_PUBLIC_API_URL}/transactions?page=${page}&limit=10${categoryQuery}`,
+        {
+          credentials: "include",
+          headers: { Authorization: `Bearer ${token}` },
+          signal,
+        },
+      );
+      return response.json();
+    };
+
     const fetchTransactions = async () => {
+      const cacheKey = buildCacheKey(currentPage, selectedCategory);
+
+      // Serve from cache instantly if available
+      if (prefetchCache.current[cacheKey]) {
+        setTransactions(prefetchCache.current[cacheKey]);
+        setIsLoading(false);
+      } else {
+        setIsLoading(true);
+      }
+
       try {
-        const token = localStorage.getItem("token");
-        const response = await fetch(
-          `${process.env.NEXT_PUBLIC_API_URL}/transactions`,
-          {
-            credentials: "include",
-            headers: {
-              Authorization: `Bearer ${token}`,
-            },
-          },
-        );
+        const data = await fetchPage(currentPage, selectedCategory, controller.signal);
+        const fetched: Transaction[] = data.transactions || [];
+        const pages: number = data.pagination?.totalPages || 1;
 
-        const data = await response.json();
+        prefetchCache.current[cacheKey] = fetched;
+        setTransactions(fetched);
+        setTotalPages(pages);
 
-        setTransactions(data.transactions || []);
+        // Prefetch next page in background if it exists
+        if (currentPage < pages) {
+          const nextKey = buildCacheKey(currentPage + 1, selectedCategory);
+          if (!prefetchCache.current[nextKey]) {
+            fetchPage(currentPage + 1, selectedCategory)
+              .then((d) => {
+                prefetchCache.current[nextKey] = d.transactions || [];
+              })
+              .catch(() => {}); // silently ignore prefetch errors
+          }
+        }
       } catch (error) {
+        if (error instanceof DOMException && error.name === "AbortError") {
+          return;
+        }
         console.error(error);
+      } finally {
+        setIsLoading(false);
       }
     };
 
     fetchTransactions();
-  }, []);
+
+    return () => {
+      controller.abort();
+    };
+  }, [currentPage, selectedCategory]);
 
   const deleteTransaction = async (id: string | number) => {
     try {
@@ -99,27 +181,20 @@ export default function Transaction() {
     }
   };
 
-  const expenses = [
-    { label: "Food & Dining", value: "food & dining" },
-    { label: "Transport", value: "transport" },
-    { label: "Bills & Utilities", value: "bills & utilities" },
-    { label: "Electricity", value: "electricity" },
-    { label: "Shopping", value: "shopping" },
-  ];
+  const goToPage = (page: number) => {
+    if (page < 1 || page > totalPages) return;
 
-  const incomes = [
-    { label: "Salary", value: "salary" },
-    { label: "Other Income", value: "other-income" },
-  ];
+    setCurrentPage(page); //this retains the contnet or same page if the condition is not met
+  };
 
   const dateOptions = [
-    { label: "Today", value: "today" },
-    { label: "This week", value: "this-week" },
-    { label: "This Month", value: "this-month" },
-    { label: "Last Month", value: "last-month" },
-    { label: "Last 3 Months", value: "last 3-months" },
-    { label: "This Year", value: "this-year" },
-    { label: "Custom Range", value: "custom-range" },
+    { label: "Today", value: "Today" },
+    { label: "This Week", value: "This Week" },
+    { label: "This Month", value: "This Month" },
+    { label: "Last Month", value: "Last Month" },
+    { label: "Last 3 Months", value: "Last 3 Months" },
+    { label: "This Year", value: "This Year" },
+    { label: "Custom Range", value: "Custom Range" },
   ];
 
   return (
@@ -163,32 +238,14 @@ export default function Transaction() {
         {/* Dropdowns */}
         <div className="flex gap-4">
           <div className="flex-1">
-            <Select>
-              <SelectTrigger className="w-full bg-white dark:bg-card border border-gray-200 dark:border-border text-xs py-1.5 px-3 rounded-lg h-9">
-                <SelectValue placeholder="All Categories" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="all">All Categories</SelectItem>
-                <SelectSeparator />
-                <SelectGroup>
-                  <SelectLabel>Income</SelectLabel>
-                  {incomes.map((income) => (
-                    <SelectItem key={income.value} value={income.value}>
-                      {income.label}
-                    </SelectItem>
-                  ))}
-                </SelectGroup>
-                <SelectSeparator />
-                <SelectGroup>
-                  <SelectLabel>Expense</SelectLabel>
-                  {expenses.map((expense) => (
-                    <SelectItem key={expense.value} value={expense.value}>
-                      {expense.label}
-                    </SelectItem>
-                  ))}
-                </SelectGroup>
-              </SelectContent>
-            </Select>
+            <CategoryDropDown
+              value={selectedCategory}
+              onValueChange={(value) => {
+                setSelectedCategory(value ?? "all");
+                setCurrentPage(1);
+              }}
+              type="all"
+            />
           </div>
 
           <div className="flex-1">
@@ -260,19 +317,41 @@ export default function Transaction() {
 
         {/* Mobile Pagination */}
         <div className="flex items-center justify-center mt-6 gap-2">
-          <button className="p-2 border border-gray-200 dark:border-border rounded-lg hover:bg-gray-50 dark:hover:bg-zinc-800 cursor-pointer bg-white dark:bg-card">
+          <button
+            onClick={() => goToPage(currentPage - 1)}
+            disabled={currentPage === 1}
+            className="p-2 border border-gray-200 dark:border-border rounded-lg hover:bg-gray-50 dark:hover:bg-zinc-800 cursor-pointer bg-white dark:bg-card disabled:opacity-40 disabled:cursor-not-allowed"
+          >
             <ChevronLeft className="w-3.5 h-3.5 text-gray-600 dark:text-foreground" />
           </button>
-          <button className="cursor-pointer font-semibold py-1 px-3 bg-green-600 text-white rounded-lg text-xs">
-            1
-          </button>
-          <button className="cursor-pointer py-1 px-3 border border-gray-200 dark:border-border rounded-lg text-xs text-gray-650 hover:bg-gray-50 dark:hover:bg-zinc-800 bg-white dark:bg-card">
-            2
-          </button>
-          <button className="cursor-pointer py-1 px-3 border border-gray-200 dark:border-border rounded-lg text-xs text-gray-650 hover:bg-gray-50 dark:hover:bg-zinc-800 bg-white dark:bg-card">
-            3
-          </button>
-          <button className="p-2 border border-gray-200 dark:border-border rounded-lg hover:bg-gray-50 dark:hover:bg-zinc-800 cursor-pointer bg-white dark:bg-card">
+
+          {Array.from({ length: totalPages }, (_, i) => i + 1)
+            .filter((page) => {
+              // Show at most 3 page buttons centred around currentPage
+              if (totalPages <= 3) return true;
+              if (currentPage === 1) return page <= 3;
+              if (currentPage === totalPages) return page >= totalPages - 2;
+              return Math.abs(page - currentPage) <= 1;
+            })
+            .map((page) => (
+              <button
+                key={page}
+                onClick={() => goToPage(page)}
+                className={
+                  currentPage === page
+                    ? "cursor-pointer font-semibold py-1 px-3 bg-green-600 text-white rounded-lg text-xs"
+                    : "cursor-pointer py-1 px-3 border border-gray-200 dark:border-border rounded-lg text-xs hover:bg-gray-50 dark:hover:bg-zinc-800 bg-white dark:bg-card"
+                }
+              >
+                {page}
+              </button>
+            ))}
+
+          <button
+            onClick={() => goToPage(currentPage + 1)}
+            disabled={currentPage === totalPages}
+            className="p-2 border border-gray-200 dark:border-border rounded-lg hover:bg-gray-50 dark:hover:bg-zinc-800 cursor-pointer bg-white dark:bg-card disabled:opacity-40 disabled:cursor-not-allowed"
+          >
             <ChevronRight className="w-3.5 h-3.5 text-gray-600 dark:text-foreground" />
           </button>
         </div>
@@ -306,40 +385,16 @@ export default function Transaction() {
 
         {/* dropdowns */}
         <div className="flex items-center justify-between mt-5 mb-10">
+          <CategoryDropDown
+            value={selectedCategory}
+            onValueChange={(value) => {
+              setSelectedCategory(value ?? "all");
+              setCurrentPage(1);
+            }}
+            type="all"
+          />
           <Select>
-            <SelectTrigger>
-              <SelectValue placeholder="All Categories" />
-            </SelectTrigger>
-
-            <SelectContent>
-              <SelectItem value="all">All Categories</SelectItem>
-
-              <SelectSeparator />
-
-              <SelectGroup>
-                <SelectLabel>Income</SelectLabel>
-                {incomes.map((income) => (
-                  <SelectItem key={income.value} value={income.value}>
-                    {income.label}
-                  </SelectItem>
-                ))}
-              </SelectGroup>
-
-              <SelectSeparator />
-
-              <SelectGroup>
-                <SelectLabel>Expense</SelectLabel>
-                {expenses.map((expense) => (
-                  <SelectItem key={expense.value} value={expense.value}>
-                    {expense.label}
-                  </SelectItem>
-                ))}
-              </SelectGroup>
-            </SelectContent>
-          </Select>
-
-          <Select>
-            <SelectTrigger className="w-full max-w-48">
+            <SelectTrigger className="w-full max-w-48 bg-white">
               <SelectValue placeholder="All Categories" />
             </SelectTrigger>
             <SelectContent>
@@ -395,7 +450,9 @@ export default function Transaction() {
 
                   <td>{transaction.description}</td>
 
-                  <td>{transaction.category}</td>
+                  <td>
+                    <CategoryDisplay category={transaction.category} />
+                  </td>
 
                   <td>
                     <span
@@ -458,22 +515,38 @@ export default function Transaction() {
 
         {/* toggling buttons */}
         <div className="flex items-center justify-center mt-6 gap-1">
-          <button className="cursor-pointer pt-1.5 pb-1.5 pl-4 pr-4 text-white bg-green-600 rounded-lg ">
-            1
-          </button>
-          <button className="cursor-pointer rounded-lg border-2 border-gray-200 dark:border-border pt-1.5 pb-1.5 pl-4 pr-4 dark:text-foreground dark:bg-card">
-            2
-          </button>
-          <button className="cursor-pointer rounded-lg border-2 border-gray-200 dark:border-border pt-1.5 pb-1.5 pl-4 pr-4 dark:text-foreground dark:bg-card">
-            3
+          <button
+            className="cursor-pointer rounded-lg border-2 border-gray-200 dark:border-border p-2 dark:bg-card"
+            onClick={() => goToPage(currentPage - 1)}
+            disabled={currentPage === 1}
+          >
+            <ChevronLeft className="w-4 h-4" />
           </button>
 
-          <button className="cursor-pointer rounded-lg border-2 border-gray-200 dark:border-border pt-1.5 pb-1.5 pl-4 pr-4 dark:text-foreground dark:bg-card">
-            ...
-          </button>
+          {Array.from({ length: totalPages }, (_, index) => {
+            const page = index + 1;
 
-          <button className="cursor-pointer rounded-lg border-2 border-gray-200 dark:border-border pt-1.5 pb-1.5 pl-4 pr-4 dark:text-foreground dark:bg-card">
-            8
+            return (
+              <button
+                key={page}
+                onClick={() => goToPage(page)}
+                className={
+                  currentPage === page
+                    ? "cursor-pointer rounded-lg bg-green-600 text-white px-4 py-1.5"
+                    : "cursor-pointer rounded-lg border-2 border-gray-200 dark:border-border px-4 py-1.5 dark:bg-card"
+                }
+              >
+                {page}
+              </button>
+            );
+          })}
+
+          <button
+            className="cursor-pointer rounded-lg border-2 border-gray-200 dark:border-border p-2 dark:bg-card"
+            onClick={() => goToPage(currentPage + 1)}
+            disabled={currentPage === totalPages}
+          >
+            <ChevronRight className="w-4 h-4" />
           </button>
         </div>
       </div>

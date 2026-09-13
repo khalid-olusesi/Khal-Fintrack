@@ -6,16 +6,6 @@ import {
   Calendar as CalendarIcon,
 } from "lucide-react";
 import { useRouter, useParams } from "next/navigation";
-import {
-  Select,
-  SelectContent,
-  SelectGroup,
-  SelectItem,
-  SelectLabel,
-  SelectTrigger,
-  SelectValue,
-  SelectSeparator,
-} from "@/components/ui/select";
 import * as React from "react";
 import { format } from "date-fns";
 import { Button } from "@/components/ui/button";
@@ -30,6 +20,7 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover";
+import CategoryDropDown from "@/components/dropdown";
 
 export default function EditTransaction() {
   const params = useParams();
@@ -79,12 +70,12 @@ export default function EditTransaction() {
         console.log("transaction retrieved :", data);
 
         const transaction = data.transaction;
-        
+
         setForm({
           type: transaction.type || "",
           description: transaction.description || "",
           amount: String(transaction.amount ?? ""),
-          category: transaction.category || "",
+          category: String(transaction.categoryId) || "",
           date: transaction.date ? new Date(transaction.date) : new Date(),
         }); //puts the old transaction into the form
       } catch (err) {
@@ -112,11 +103,11 @@ export default function EditTransaction() {
             Authorization: `Bearer ${token}`,
           },
           body: JSON.stringify({
-            Type: form.type,
-            Category: form.category,
-            Amount: Number(form.amount),
-            Description: form.description,
-            Date: form.date,
+            type: form.type,
+            categoryId: Number(form.category),
+            amount: Number(form.amount),
+            description: form.description,
+            date: form.date,
           }),
         },
       );
@@ -143,48 +134,6 @@ export default function EditTransaction() {
       alert("Unable to connect to server");
     }
   }; //updates the page after the users data that want to be edited has been retrieved(GET)
-
-  const expenses = [
-    { label: "Food & Dining", value: "food & dining" },
-    { label: "Groceries", value: "groceries" },
-    { label: "Transport", value: "transport" },
-    { label: "Fuel", value: "fuel" },
-    { label: "Rent", value: "rent" },
-    { label: "Utilities", value: "utilities" },
-    { label: "Electricity", value: "electricity" },
-    { label: "Water", value: "water" },
-    { label: "Internet", value: "internet" },
-    { label: "Shopping", value: "shopping" },
-    { label: "Entertainment", value: "entertainment" },
-    { label: "Subscription", value: "subscriptions" },
-    { label: "Healthcare", value: "healthcare" },
-    { label: "Pharmacy", value: "pharmacy" },
-    { label: "Education", value: "education" },
-    { label: "Insurance", value: "insurance" },
-    { label: "Travel", value: "travel" },
-    { label: "Personal care", value: "personal-care" },
-    { label: "Fitness", value: "fitness" },
-    { label: "Family", value: "family" },
-    { label: "Taxes", value: "taxes" },
-    { label: "Donations", value: "donations" },
-    { label: "Other Expenses", value: "other-expenses" },
-  ];
-
-  const incomes = [
-    { label: "Salary", value: "salary" },
-    { label: "Freelance", value: "freelance" },
-    { label: "Business", value: "business" },
-    { label: "Bonus", value: "bonus" },
-    { label: "Investment", value: "investment" },
-    { label: "Interest", value: "interest" },
-    { label: "Dividend", value: "dividend" },
-    { label: "Rental Income", value: "rental-income" },
-    { label: "Gift", value: "gift" },
-    { label: "Refund", value: "refund" },
-    { label: "Other Income", value: "other-income" },
-  ];
-
-  const categories = form.type === "income" ? incomes : expenses;
 
   return (
     // container
@@ -229,7 +178,7 @@ export default function EditTransaction() {
             }
             className={`flex-1 py-2.5 rounded-lg font-medium text-[13px] text-center ${
               form.type === "income"
-                ? "bg-green-600 text-white"
+                ? "bg-green-600 text-white border-gray-100"
                 : "bg-transparent text-gray-800"
             }`}
           >
@@ -245,7 +194,7 @@ export default function EditTransaction() {
             }
             className={`flex-1 py-2.5 rounded-lg font-medium text-[13px] text-center ${
               form.type === "expense"
-                ? "bg-red-600 text-white"
+                ? "bg-red-600 text-white border-gray-100"
                 : "bg-transparent text-gray-800 dark:text-muted-foreground"
             }`}
           >
@@ -295,7 +244,7 @@ export default function EditTransaction() {
             <label className="text-[12px] font-medium text-gray-800 dark:text-muted-foreground">
               Category
             </label>
-            <Select
+            <CategoryDropDown
               value={form.category}
               onValueChange={(value) => {
                 setForm({
@@ -303,24 +252,8 @@ export default function EditTransaction() {
                   category: value ?? "",
                 });
               }}
-            >
-              <SelectTrigger className="w-full border border-gray-200 dark:border-border bg-white dark:bg-card text-foreground rounded-xl p-3.5 h-auto text-[13px] outline-none text-gray-900 dark:text-foreground [&>svg]:text-gray-500">
-                <SelectValue placeholder="Select category" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectGroup>
-                  <SelectLabel>
-                    {form.type === "income" ? "Income" : "Expense"}
-                    {/*if income is not equal to income, give expense*/}
-                  </SelectLabel>
-                  {categories.map((category) => (
-                    <SelectItem key={category.value} value={category.value}>
-                      {category.label}
-                    </SelectItem>
-                  ))}
-                </SelectGroup>
-              </SelectContent>
-            </Select>
+              type={form.type as "income" | "expense"}
+            />
           </div>
 
           <div className="space-y-1.5">
@@ -355,17 +288,6 @@ export default function EditTransaction() {
                 />
               </PopoverContent>
             </Popover>
-          </div>
-
-          <div className="space-y-1.5">
-            <label className="text-[12px] font-medium text-gray-800 dark:text-muted-foreground">
-              Note (optional)
-            </label>
-            <input
-              type="text"
-              placeholder="Add note"
-              className="w-full border border-gray-200 bg-white rounded-xl p-3.5 text-[13px] outline-none placeholder:text-gray-400"
-            />
           </div>
 
           {/* Buttons */}
@@ -414,7 +336,7 @@ export default function EditTransaction() {
         </div>
         <h3 className="font-bold mb-3 text-foreground">Type</h3>
 
-        <div className="flex gap-2 mb-5">
+        <div className="flex gap-2 mb-7">
           <span
             onClick={() =>
               setForm({
@@ -491,7 +413,7 @@ export default function EditTransaction() {
               Category
             </p>
             <div className="flex items-center justify-between mb-8">
-              <Select
+              <CategoryDropDown
                 value={form.category}
                 onValueChange={(value) => {
                   setForm({
@@ -499,40 +421,13 @@ export default function EditTransaction() {
                     category: value ?? "",
                   });
                 }}
-              >
-                <SelectTrigger className="w-full p-5 outline-none border-2 border-gray-200 dark:border-border bg-white dark:bg-card text-foreground">
-                  <SelectValue placeholder="Select category" />
-                </SelectTrigger>
-
-                <SelectContent>
-                  <SelectSeparator />
-
-                  <SelectGroup>
-                    <SelectLabel>Income</SelectLabel>
-                    {incomes.map((income) => (
-                      <SelectItem key={income.value} value={income.value}>
-                        {income.label}
-                      </SelectItem>
-                    ))}
-                  </SelectGroup>
-
-                  <SelectSeparator />
-
-                  <SelectGroup>
-                    <SelectLabel>Expense</SelectLabel>
-                    {expenses.map((expense) => (
-                      <SelectItem key={expense.value} value={expense.value}>
-                        {expense.label}
-                      </SelectItem>
-                    ))}
-                  </SelectGroup>
-                </SelectContent>
-              </Select>
+                type={form.type as "income" | "expense"}
+              />
             </div>
           </div>
 
           {/* date */}
-          <div className="-mt-[18px] space-y-0.5">
+          <div className="-mt-1.5 space-y-0.5">
             <p className="text-gray-700 dark:text-muted-foreground font-medium text-[13px]">
               Date
             </p>
@@ -542,7 +437,7 @@ export default function EditTransaction() {
                   <Button
                     variant={"outline"}
                     data-empty={!form.date}
-                    className="w-full p-6 justify-between bg-transparent dark:bg-card border-2 border-gray-200 dark:border-border outline-none text-left font-normal text-foreground data-[empty=true]:text-muted-foreground"
+                    className="w-full p-6 justify-between dark:bg-card border-2 bg-white border-gray-200 dark:border-border outline-none text-left font-normal text-foreground data-[empty=true]:text-muted-foreground"
                   >
                     {format(form.date, "MMM dd, yyyy")}
                     <ChevronDownIcon data-icon="inline-end" />
@@ -567,19 +462,8 @@ export default function EditTransaction() {
             </Popover>
           </div>
 
-          <div className="space-y-0.5">
-            <p className="text-gray-700 dark:text-muted-foreground font-medium text-[13px]">
-              Notes(optional)
-            </p>
-            <input
-              type="text"
-              placeholder="Add a note"
-              className="border-2 border-gray-200 dark:border-border bg-white dark:bg-card text-foreground outline-none p-2 rounded-lg w-full"
-            />
-          </div>
-
           {/* buttons */}
-          <div className="flex items-center justify-end gap-4 mt-3">
+          <div className="flex items-center justify-end gap-4 mt-7">
             <button
               type="button"
               className="border-2 border-gray-250 dark:border-border text-foreground rounded-lg cursor-pointer p-1.5 pb-1.5 pl-7 pr-7 dark:bg-card"

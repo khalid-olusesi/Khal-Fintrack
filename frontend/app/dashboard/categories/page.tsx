@@ -4,19 +4,13 @@ import { Menu, Plus, Trash2, Pencil } from "lucide-react";
 import { ModeToggle } from "@/components/toggle";
 import { Button } from "@/components/ui/button";
 import { useSidebar } from "@/context/sidebar-context";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import CardSpacing from "./addCategories/page";
 import { Icons } from "@/components/category-icons";
-
-type Category = {
-  id: number;
-  name: string;
-  type: string;
-  icon: string;
-  color: string;
-};
+import { useCategories, Category } from "@/context/category-context";
 
 export default function Categories() {
+  const { categories, fetchCategories } = useCategories();
   const { toggleSidebar } = useSidebar();
 
   const [showCard, setShowCard] = useState(false);
@@ -24,50 +18,8 @@ export default function Categories() {
   const [selectedCategory, setSelectedCategory] = useState<Category | null>(
     null,
   );
-  const [categories, setCategories] = useState<Category[]>([]);
 
   const [isEditing, setIsEditing] = useState(false);
-
-  const fetchCategory = async () => {
-    try {
-      const token = localStorage.getItem("token");
-
-      const response = await fetch(
-        `${process.env.NEXT_PUBLIC_API_URL}/categories`,
-        {
-          method: "GET",
-          credentials: "include",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${token}`,
-          },
-        },
-      );
-
-      const text = await response.text();
-
-      let data;
-
-      try {
-        data = JSON.parse(text);
-      } catch {
-        data = null;
-      }
-
-      if (!response.ok) {
-        alert(data?.error || text || "failed to get category");
-        return;
-      }
-
-      setCategories(data.categories);
-    } catch (err) {
-      console.error(err);
-    }
-  };
-
-  useEffect(() => {
-    fetchCategory();
-  }, []);
 
   const deleteCategory = async (id: string | number) => {
     try {
@@ -95,9 +47,10 @@ export default function Categories() {
 
       if (!response.ok) {
         alert(data?.error || text || "failed to delete category");
+        return;
       }
 
-      setCategories((prev) => prev.filter((category) => category.id !== id));
+      await fetchCategories();
     } catch (err) {
       console.error(err);
     }
@@ -181,13 +134,13 @@ export default function Categories() {
                         <Pencil className="w-4 h-4 text-blue-600 hover:text-blue-800" />
                       </button>
 
-                      <button className="cursor-pointer">
-                        <Trash2
-                          onClick={() => {
-                            deleteCategory(category.id);
-                          }}
-                          className="w-4 h-4 text-red-500 hover:text-red-700"
-                        />
+                      <button
+                        className="cursor-pointer"
+                        onClick={() => {
+                          deleteCategory(category.id);
+                        }}
+                      >
+                        <Trash2 className="w-4 h-4 text-red-500 hover:text-red-700" />
                       </button>
                     </div>
                   </td>
@@ -210,7 +163,7 @@ export default function Categories() {
             }}
             selectedCategory={selectedCategory}
             isEditing={isEditing}
-            onSuccess={fetchCategory}
+            onSuccess={fetchCategories}
           />
         </div>
       )}

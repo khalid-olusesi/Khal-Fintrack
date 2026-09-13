@@ -76,7 +76,7 @@ func CreateCategory(c *gin.Context) {
 func GetCategories(c *gin.Context) {
 	user, exists := c.Get("user")
 
-	if !exists{
+	if !exists {
 		c.JSON(http.StatusUnauthorized, gin.H{
 			"error": "user unauthorized",
 		})
@@ -97,7 +97,7 @@ func GetCategories(c *gin.Context) {
 	}
 
 	c.JSON(http.StatusOK, gin.H{
-		"message": "categories found successfully",
+		"message":    "categories found successfully",
 		"categories": categories,
 	})
 }
