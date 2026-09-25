@@ -64,7 +64,7 @@ func CreateTransaction(c *gin.Context) {
 	transaction := models.Transaction{
 		UserID:      currentUser.ID,
 		Type:        body.Type,
-		CategoryID:  body.CategoryID,
+		CategoryID:  &body.CategoryID,
 		Amount:      body.Amount,
 		Description: body.Description,
 		Date:        body.Date,
@@ -118,9 +118,114 @@ func GetTransactions(c *gin.Context) {
 
 	// Build a shared base query so COUNT and FIND always use the same filters
 	categoryID := c.Query("categoryId")
+	dateFilter := c.Query("date")
+	search := c.Query("search")
 	baseQuery := initializers.DB.Model(&models.Transaction{}).Where("user_id = ?", currentUser.ID)
 	if categoryID != "" {
 		baseQuery = baseQuery.Where("category_id = ?", categoryID)
+	}
+
+	if search != "" {
+		baseQuery = baseQuery.Where("description ILIKE ?", "%"+search+"%")
+	} //"%"+search+"%"becomes %chicken%, meaning anything can be before and after chicken(i bought chicken today)  ILIKE makes it case-insensitive, so chicken, Chicken, and CHICKEN can all match.
+
+	var startDate time.Time
+	var endDate time.Time
+	if dateFilter != "" {
+		loc, err := time.LoadLocation("Africa/Lagos")
+
+		if err != nil {
+			c.JSON(http.StatusInternalServerError, gin.H{
+				"error": "failed to load the timeZone",
+			})
+			return
+		}
+		now := time.Now().In(loc)
+
+		switch dateFilter {
+		case "Today":
+			startDate = time.Date(
+				now.Year(),
+				now.Month(),
+				now.Day(),
+				0, 0, 0, 0,
+				loc,
+			)
+
+			endDate = startDate.AddDate(0, 0, 1)
+
+		case "This Week":
+			startDate = time.Date(
+				now.Year(),
+				now.Month(),
+				now.Day(),
+				0, 0, 0, 0,
+				loc,
+			)
+
+			daysFromMonday := (int(now.Weekday()) + 6) % 7
+
+			startDate = startDate.AddDate(0, 0, -daysFromMonday)
+			endDate = startDate.AddDate(0, 0, 7)
+
+		case "This Month":
+			startDate = time.Date(
+				now.Year(),
+				now.Month(),
+				1,
+				0, 0, 0, 0,
+				loc,
+			)
+			endDate = startDate.AddDate(0, 1, 0)
+
+		case "Last Month":
+			startDate = time.Date(
+				now.Year(),
+				now.Month(),
+				1,
+				0, 0, 0, 0,
+				loc,
+			).AddDate(0, -1, 0)
+
+			endDate = startDate.AddDate(0, 1, 0)
+
+		case "Last 3 Months":
+			startDate = time.Date(
+				now.Year(),
+				now.Month(),
+				1,
+				0, 0, 0, 0,
+				loc,
+			).AddDate(0, -2, 0)
+
+			endDate = time.Date(
+				now.Year(),
+				now.Month(),
+				1,
+				0, 0, 0, 0,
+				loc,
+			).AddDate(0, 1, 0)
+
+		case "This Year":
+			startDate = time.Date(
+				now.Year(),
+				time.January,
+				1,
+				0, 0, 0, 0,
+				loc,
+			)
+
+			endDate = startDate.AddDate(1, 0, 0)
+		}
+
+		if !startDate.IsZero() && !endDate.IsZero() {
+			baseQuery = baseQuery.Where(
+				"date >= ? AND date < ?",
+				startDate,
+				endDate,
+			)
+		}
+
 	}
 
 	var total int64
@@ -142,6 +247,18 @@ func GetTransactions(c *gin.Context) {
 
 	if categoryID != "" {
 		fetchQuery = fetchQuery.Where("category_id = ?", categoryID)
+	}
+
+	if search != "" {
+		fetchQuery = fetchQuery.Where("description ILIKE ?", "%"+search+"%")
+	}
+
+	if !startDate.IsZero() && !endDate.IsZero() {
+		fetchQuery = fetchQuery.Where(
+			"date >= ? AND date < ?",
+			startDate,
+			endDate,
+		)
 	}
 
 	if err := fetchQuery.Find(&transactions).Error; err != nil {
@@ -261,7 +378,7 @@ func UpdateTransaction(c *gin.Context) {
 	}
 
 	transaction.Type = body.Type
-	transaction.CategoryID = body.CategoryID
+	transaction.CategoryID = &body.CategoryID
 	transaction.Amount = body.Amount
 	transaction.Description = body.Description
 	transaction.Date = body.Date

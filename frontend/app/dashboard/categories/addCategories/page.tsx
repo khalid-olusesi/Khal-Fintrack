@@ -1,5 +1,7 @@
 "use client";
 
+import { toast } from "@/components/ui/toast";
+
 import * as React from "react";
 
 import { Button } from "@/components/ui/button";
@@ -14,7 +16,7 @@ import {
 } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { X } from "lucide-react";
+import { X, Tag, List } from "lucide-react";
 import {
   Select,
   SelectTrigger,
@@ -52,6 +54,8 @@ export default function CardSpacing({
     type: selectedCategory?.type ?? "",
   });
 
+  const [isSaving, setIsSaving] = useState(false);
+
   const handleCancel = () => {
     setForm({
       name: "",
@@ -64,19 +68,21 @@ export default function CardSpacing({
     e.preventDefault();
 
     if (!form.name.trim()) {
-      alert("category name is required");
+      toast.add({ title: "Category name is required", type: "warning" });
       return;
     }
 
     if (!form.icon) {
-      alert("pick an icon");
+      toast.add({ title: "Pick an icon", type: "warning" });
       return;
     }
 
     if (!form.type) {
-      alert("choose a type (income or expense)");
+      toast.add({ title: "Choose a type (income or expense)", type: "warning" });
       return;
     }
+
+    setIsSaving(true);
 
     try {
       const token = localStorage.getItem("token");
@@ -110,17 +116,18 @@ export default function CardSpacing({
       }
 
       if (!response.ok) {
-        alert(data?.error || text || "Something went wrong");
+        toast.add({ title: data?.error || text || "Something went wrong", type: "error" });
         return;
       }
-      onClose();
-      await onSuccess();
 
       if (isEditing) {
-        alert("category updated successfully");
+        toast.add({ title: "Category updated successfully", type: "success" });
       } else {
-        alert("A new category created");
+        toast.add({ title: "A new category created", type: "success" });
       }
+
+      onClose();
+      onSuccess(); // refetch in background, no await
 
       setForm({
         type: "",
@@ -129,7 +136,9 @@ export default function CardSpacing({
       });
     } catch (err) {
       console.error(err);
-      alert("Unable to connect to the server.");
+      toast.add({ title: "Unable to connect to the server.", type: "error" });
+    } finally {
+      setIsSaving(false);
     }
   };
 
@@ -159,19 +168,25 @@ export default function CardSpacing({
                 >
                   Category Name
                 </Label>
-                <Input
-                  id="texts-spacing"
-                  type="text"
-                  placeholder="e.g Groceries"
-                  required
-                  value={form.name}
-                  onChange={(e) => {
-                    setForm({
-                      ...form,
-                      name: e.target.value,
-                    });
-                  }}
-                />
+                <div className="flex w-full">
+                  <div className="flex items-center justify-center w-11 bg-gray-50 dark:bg-zinc-800/50 border border-r-0 border-gray-200 dark:border-border rounded-l-md text-muted-foreground">
+                    <Tag className="w-4 h-4" />
+                  </div>
+                  <Input
+                    id="texts-spacing"
+                    type="text"
+                    placeholder="e.g Groceries"
+                    required
+                    value={form.name}
+                    onChange={(e) => {
+                      setForm({
+                        ...form,
+                        name: e.target.value,
+                      });
+                    }}
+                    className="rounded-l-none"
+                  />
+                </div>
               </div>
               <div className="grid gap-2">
                 <div className="flex items-center">
@@ -182,18 +197,22 @@ export default function CardSpacing({
                     Type
                   </Label>
                 </div>
-                <Select
-                  value={form.type}
-                  onValueChange={(value) => {
-                    setForm({
-                      ...form,
-                      type: value ?? "",
-                    });
-                  }}
-                >
-                  <SelectTrigger className="w-full max-w-full">
-                    <SelectValue placeholder="Select Type" />
-                  </SelectTrigger>
+                <div className="flex w-full">
+                  <div className="flex items-center justify-center w-11 bg-gray-50 dark:bg-zinc-800/50 border border-r-0 border-gray-200 dark:border-border rounded-l-md text-muted-foreground">
+                    <List className="w-4 h-4" />
+                  </div>
+                  <Select
+                    value={form.type}
+                    onValueChange={(value) => {
+                      setForm({
+                        ...form,
+                        type: value ?? "",
+                      });
+                    }}
+                  >
+                    <SelectTrigger className="w-full max-w-full rounded-l-none">
+                      <SelectValue placeholder="Select Type" />
+                    </SelectTrigger>
                   <SelectContent>
                     <SelectGroup>
                       <SelectLabel>Type</SelectLabel>
@@ -204,6 +223,7 @@ export default function CardSpacing({
                   </SelectContent>
                 </Select>
               </div>
+            </div>
             </div>
 
             <div className="mt-5">
@@ -236,8 +256,8 @@ export default function CardSpacing({
               >
                 Cancel
               </Button>
-              <Button type="submit" className="cursor-pointer">
-                {isEditing ? "Update Category" : "Add Category"}
+              <Button type="submit" className="cursor-pointer" disabled={isSaving}>
+                {isSaving ? "Saving..." : isEditing ? "Update Category" : "Add Category"}
               </Button>
             </div>
           </form>

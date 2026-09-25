@@ -1,9 +1,14 @@
 "use client";
+
+import { toast } from "@/components/ui/toast";
 import {
   ArrowLeft,
   Menu,
   ChevronDownIcon,
   Calendar as CalendarIcon,
+  DollarSign,
+  Tag,
+  FileText,
 } from "lucide-react";
 import { useRouter } from "next/navigation";
 import * as React from "react";
@@ -33,6 +38,8 @@ export default function AddTransaction() {
     date: new Date(),
   });
 
+  const [isSaving, setIsSaving] = useState(false);
+
   const handleCancel = () => {
     setForm({
       type: "",
@@ -47,24 +54,26 @@ export default function AddTransaction() {
     e.preventDefault();
 
     if (!form.description.trim()) {
-      alert("Description is required");
+      toast.add({ title: "Description is required", type: "warning" });
       return;
     }
 
     if (!form.category) {
-      alert("Choose a category");
+      toast.add({ title: "Choose a category", type: "warning" });
       return;
     }
 
     if (!form.type) {
-      alert("Choose Income or Expense");
+      toast.add({ title: "Choose Income or Expense", type: "warning" });
       return;
     }
 
     if (Number(form.amount) <= 0) {
-      alert("Amount must be greater than zero");
+      toast.add({ title: "Amount must be greater than zero", type: "warning" });
       return;
     }
+
+    setIsSaving(true);
 
     try {
       const token = localStorage.getItem("token");
@@ -99,24 +108,17 @@ export default function AddTransaction() {
       }
 
       if (!response.ok) {
-        alert(data?.error || text || "Something went wrong");
+        toast.add({ title: data?.error || text || "Something went wrong", type: "error" });
         return;
       }
 
-      alert("Transaction created successfully");
-
-      setForm({
-        type: "",
-        category: "",
-        amount: "",
-        description: "",
-        date: new Date(),
-      });
-
+      toast.add({ title: "Transaction created successfully", type: "success" });
       router.push("/dashboard/transaction");
     } catch (err) {
       console.error(err);
-      alert("Unable to connect to the server.");
+      toast.add({ title: "Unable to connect to the server.", type: "error" });
+    } finally {
+      setIsSaving(false);
     }
   };
 
@@ -193,53 +195,69 @@ export default function AddTransaction() {
             <label className="text-[12px] font-medium text-gray-800 dark:text-muted-foreground">
               Description
             </label>
-            <input
-              value={form.description}
-              onChange={(e) => {
-                setForm({
-                  ...form,
-                  description: e.target.value,
-                });
-              }}
-              type="text"
-              placeholder="Enter description"
-              className="w-full border border-gray-200 dark:border-border bg-white dark:bg-card text-foreground rounded-xl p-3.5 text-[13px] outline-none placeholder:text-gray-400"
-            />
+            <div className="flex w-full">
+              <div className="flex items-center justify-center w-11 bg-gray-50 dark:bg-zinc-800/50 border border-r-0 border-gray-200 dark:border-border rounded-l-xl text-muted-foreground">
+                <FileText className="w-4 h-4" />
+              </div>
+              <input
+                value={form.description}
+                onChange={(e) => {
+                  setForm({
+                    ...form,
+                    description: e.target.value,
+                  });
+                }}
+                type="text"
+                placeholder="Enter description"
+                className="w-full border border-gray-200 dark:border-border bg-white dark:bg-card text-foreground rounded-r-xl p-3.5 text-[13px] outline-none placeholder:text-gray-400"
+              />
+            </div>
           </div>
 
           <div className="space-y-1.5">
             <label className="text-[12px] font-medium text-gray-800 dark:text-muted-foreground">
               Amount
             </label>
-            <input
-              value={form.amount}
-              onChange={(e) => {
-                setForm({
-                  ...form,
-                  amount: e.target.value,
-                });
-              }}
-              type="number"
-              placeholder="Enter amount"
-              className="w-full border border-gray-200 dark:border-border bg-white dark:bg-card text-foreground rounded-xl p-3.5 text-[13px] outline-none placeholder:text-gray-400"
-            />
+            <div className="flex w-full">
+              <div className="flex items-center justify-center w-11 bg-gray-50 dark:bg-zinc-800/50 border border-r-0 border-gray-200 dark:border-border rounded-l-xl text-muted-foreground font-semibold">
+                <DollarSign className="w-4 h-4" />
+              </div>
+              <input
+                value={form.amount}
+                onChange={(e) => {
+                  setForm({
+                    ...form,
+                    amount: e.target.value,
+                  });
+                }}
+                type="number"
+                placeholder="Enter amount"
+                className="w-full border border-gray-200 dark:border-border bg-white dark:bg-card text-foreground rounded-r-xl p-3.5 text-[13px] outline-none placeholder:text-gray-400"
+              />
+            </div>
           </div>
 
           <div className="space-y-1.5">
             <label className="text-[12px] font-medium text-gray-800 dark:text-muted-foreground">
               Category
             </label>
-            <div>
-              <CategoryDropDown
-                value={form.category}
-                onValueChange={(value) => {
-                  setForm({
-                    ...form,
-                    category: value ?? "",
-                  });
-                }}
-                type={form.type as "income" | "expense"}
-              />
+            <div className="flex w-full">
+              <div className="flex items-center justify-center w-11 bg-gray-50 dark:bg-zinc-800/50 border border-r-0 border-gray-200 dark:border-border rounded-l-xl text-muted-foreground">
+                <Tag className="w-4 h-4" />
+              </div>
+              <div className="flex-1">
+                <CategoryDropDown
+                  value={form.category}
+                  onValueChange={(value) => {
+                    setForm({
+                      ...form,
+                      category: value ?? "",
+                    });
+                  }}
+                  type={form.type as "income" | "expense"}
+                  className="rounded-l-none rounded-r-xl w-full h-full !p-3.5 !h-auto bg-white dark:bg-card border-l-0 text-[13px] shadow-none outline-none"
+                />
+              </div>
             </div>
           </div>
 
@@ -247,20 +265,23 @@ export default function AddTransaction() {
             <label className="text-[12px] font-medium text-gray-800 dark:text-muted-foreground">
               Date
             </label>
-            <Popover>
-              <PopoverTrigger
-                render={
-                  <Button
-                    variant="outline"
-                    className="w-full border border-gray-200 dark:border-border bg-white dark:bg-card text-foreground rounded-xl p-3.5 h-auto text-left font-normal text-[13px] text-gray-900 dark:text-foreground flex justify-between items-center hover:bg-white dark:hover:bg-card"
-                  >
-                    {format(form.date, "MMM dd, yyyy")}
-                    <CalendarIcon className="w-4 h-4 text-gray-500" />
-                  </Button>
-                }
-              />
-              <PopoverContent className="w-auto p-0" align="start">
-                <Calendar
+            <div className="flex w-full">
+              <div className="flex items-center justify-center w-11 bg-gray-50 dark:bg-zinc-800/50 border border-r-0 border-gray-200 dark:border-border rounded-l-xl text-muted-foreground">
+                <CalendarIcon className="w-4 h-4" />
+              </div>
+              <Popover>
+                <PopoverTrigger
+                  render={
+                    <Button
+                      variant="outline"
+                      className="flex-1 w-full border border-gray-200 dark:border-border bg-white dark:bg-card text-foreground rounded-l-none rounded-r-xl p-3.5 h-auto text-left font-normal text-[13px] text-gray-900 dark:text-foreground flex justify-between items-center hover:bg-white dark:hover:bg-card"
+                    >
+                      {format(form.date, "MMM dd, yyyy")}
+                    </Button>
+                  }
+                />
+                <PopoverContent className="w-auto p-0" align="start">
+                  <Calendar
                   mode="single"
                   selected={form.date}
                   onSelect={(selectedDate) => {
@@ -275,6 +296,7 @@ export default function AddTransaction() {
                 />
               </PopoverContent>
             </Popover>
+            </div>
           </div>
 
           {/* Buttons */}
@@ -288,9 +310,10 @@ export default function AddTransaction() {
             </button>
             <button
               type="submit"
-              className="flex-[1.2] py-3.5 bg-green-700 rounded-xl font-semibold text-[13px] text-white text-center cursor-pointer"
+              disabled={isSaving}
+              className="flex-[1.2] py-3.5 bg-green-700 rounded-xl font-semibold text-[13px] text-white text-center cursor-pointer disabled:opacity-60 disabled:cursor-not-allowed"
             >
-              Save Transaction
+              {isSaving ? "Saving..." : "Save Transaction"}
             </button>
           </div>
         </form>
@@ -362,36 +385,46 @@ export default function AddTransaction() {
             <p className="text-gray-700 dark:text-muted-foreground font-medium text-[13px]">
               Description
             </p>
-            <input
-              value={form.description}
-              onChange={(e) =>
-                setForm({
-                  ...form,
-                  description: e.target.value,
-                })
-              }
-              type="text"
-              placeholder="e.g Grocery Shopping"
-              className="border-2 border-gray-200 dark:border-border bg-white dark:bg-card text-foreground outline-none p-2 rounded-lg w-full"
-            />
+            <div className="flex w-full">
+              <div className="flex items-center justify-center w-11 bg-gray-50 dark:bg-zinc-800/50 border-2 border-r-0 border-gray-200 dark:border-border rounded-l-lg text-muted-foreground">
+                <FileText className="w-4 h-4" />
+              </div>
+              <input
+                value={form.description}
+                onChange={(e) =>
+                  setForm({
+                    ...form,
+                    description: e.target.value,
+                  })
+                }
+                type="text"
+                placeholder="e.g Grocery Shopping"
+                className="border-2 border-l border-gray-200 dark:border-border bg-white dark:bg-card text-foreground outline-none p-2 rounded-r-lg w-full"
+              />
+            </div>
           </div>
 
           <div className="space-y-0.5">
             <p className="text-gray-700 dark:text-muted-foreground font-medium text-[13px]">
               Amount
             </p>
-            <input
-              value={form.amount}
-              onChange={(e) =>
-                setForm({
-                  ...form,
-                  amount: e.target.value,
-                })
-              }
-              type="number"
-              placeholder="e.g 100.00"
-              className="border-2 border-gray-200 dark:border-border bg-white dark:bg-card text-foreground outline-none p-2 rounded-lg w-full"
-            />
+            <div className="flex w-full">
+              <div className="flex items-center justify-center w-11 bg-gray-50 dark:bg-zinc-800/50 border-2 border-r-0 border-gray-200 dark:border-border rounded-l-lg text-muted-foreground font-semibold">
+                <DollarSign className="w-4 h-4" />
+              </div>
+              <input
+                value={form.amount}
+                onChange={(e) =>
+                  setForm({
+                    ...form,
+                    amount: e.target.value,
+                  })
+                }
+                type="number"
+                placeholder="e.g 100.00"
+                className="border-2 border-l border-gray-200 dark:border-border bg-white dark:bg-card text-foreground outline-none p-2 rounded-r-lg w-full"
+              />
+            </div>
           </div>
 
           {/* category */}
@@ -400,16 +433,24 @@ export default function AddTransaction() {
               Category
             </p>
             <div className="flex items-center justify-between mb-8">
-              <CategoryDropDown
-                value={form.category}
-                onValueChange={(value) => {
-                  setForm({
-                    ...form,
-                    category: value ?? "",
-                  });
-                }}
-                type={form.type as "income" | "expense"}
-              />
+              <div className="flex w-full">
+                <div className="flex items-center justify-center w-11 bg-gray-50 dark:bg-zinc-800/50 border-2 border-r-0 border-gray-200 dark:border-border rounded-l-lg text-muted-foreground">
+                  <Tag className="w-4 h-4" />
+                </div>
+                <div className="flex-1">
+                  <CategoryDropDown
+                    value={form.category}
+                    onValueChange={(value) => {
+                      setForm({
+                        ...form,
+                        category: value ?? "",
+                      });
+                    }}
+                    type={form.type as "income" | "expense"}
+                    className="rounded-l-none rounded-r-lg w-full h-full !p-2 !h-auto bg-white dark:bg-card border-l-0 text-[13px] shadow-none outline-none"
+                  />
+                </div>
+              </div>
             </div>
           </div>
 
@@ -418,22 +459,25 @@ export default function AddTransaction() {
             <p className="text-gray-700 dark:text-muted-foreground font-medium text-[13px]">
               Date
             </p>
-            <Popover>
-              <PopoverTrigger
-                className="bg-white"
-                render={
-                  <Button
-                    variant={"outline"}
-                    data-empty={!form.date}
-                    className="w-full p-6 justify-between bg-transparent dark:bg-card border-2 border-gray-200 dark:border-border outline-none text-left font-normal text-foreground data-[empty=true]:text-muted-foreground"
-                  >
-                    {format(form.date, "MMM dd, yyyy")}
-                    <ChevronDownIcon data-icon="inline-end" />
-                  </Button>
-                }
-              />
-              <PopoverContent className="w-auto p-0" align="start">
-                <Calendar
+            <div className="flex w-full">
+              <div className="flex items-center justify-center w-11 bg-gray-50 dark:bg-zinc-800/50 border-2 border-r-0 border-gray-200 dark:border-border rounded-l-lg text-muted-foreground">
+                <CalendarIcon className="w-4 h-4" />
+              </div>
+              <Popover>
+                <PopoverTrigger
+                  className="bg-white"
+                  render={
+                    <Button
+                      variant={"outline"}
+                      data-empty={!form.date}
+                      className="flex-1 w-full !p-2 !h-auto justify-between bg-transparent dark:bg-card border-2 border-l border-gray-200 dark:border-border outline-none text-left font-normal text-foreground data-[empty=true]:text-muted-foreground rounded-l-none rounded-r-lg"
+                    >
+                      {format(form.date, "MMM dd, yyyy")}
+                    </Button>
+                  }
+                />
+                <PopoverContent className="w-auto p-0" align="start">
+                  <Calendar
                   mode="single"
                   selected={form.date}
                   onSelect={(selectedDate) => {
@@ -448,6 +492,7 @@ export default function AddTransaction() {
                 />
               </PopoverContent>
             </Popover>
+            </div>
           </div>
           {/* buttons */}
           <div className="flex items-center justify-end gap-4 mt-7">
@@ -458,8 +503,11 @@ export default function AddTransaction() {
             >
               Cancel
             </button>
-            <button className="text-white rounded-lg cursor-pointer p-1.5 pb-1.5 pl-7 pr-7 bg-green-700">
-              Save Transaction
+            <button
+              disabled={isSaving}
+              className="text-white rounded-lg cursor-pointer p-1.5 pb-1.5 pl-7 pr-7 bg-green-700 disabled:opacity-60 disabled:cursor-not-allowed"
+            >
+              {isSaving ? "Saving..." : "Save Transaction"}
             </button>
           </div>
         </form>

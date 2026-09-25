@@ -1,5 +1,7 @@
 "use client";
 
+import { toast } from "@/components/ui/toast";
+
 import { MainLogo } from "@/components/logo";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
@@ -67,13 +69,14 @@ export default function Login() {
         if (data.token) {
           localStorage.setItem("token", data.token);
         }
+        toast.add({ title: "Login successful", type: "success" });
         router.push("/dashboard/main");
       } else {
-        alert(data.error || "login failed");
+        toast.add({ title: data.error || "Login failed", type: "error" });
       }
     } catch (error) {
       console.error(error); //prints the erroe in the consoel and this catch statement is used to check for netork failure
-      alert("unable to connect");
+      toast.add({ title: "Unable to connect", type: "error" });
     }
   };
 

@@ -109,7 +109,7 @@ func GetCategory(c *gin.Context) {
 
 	if !exists {
 		c.JSON(http.StatusUnauthorized, gin.H{
-			"error": "user not found",
+			"error": "user unauthorized",
 		})
 		return
 	}
@@ -235,7 +235,7 @@ func DeleteCategory(c *gin.Context) {
 
 	if result.Error != nil {
 		c.JSON(http.StatusBadRequest, gin.H{
-			"error": "failed to delete category",
+			"error": result.Error.Error(),
 		})
 		return
 	}

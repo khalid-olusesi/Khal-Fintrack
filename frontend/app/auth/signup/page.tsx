@@ -1,5 +1,7 @@
 "use client";
 
+import { toast } from "@/components/ui/toast";
+
 import { MainLogo } from "@/components/logo";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
@@ -84,9 +86,10 @@ export default function Signup() {
     const data = await response.json();
 
     if (response.ok) {
+      toast.add({ title: "Account created successfully", type: "success" });
       router.push("/auth/login");
     } else {
-      alert(data.error);
+      toast.add({ title: data.error, type: "error" });
     }
   }; //prevents the page from refreshing whenever i click on the submit button
 

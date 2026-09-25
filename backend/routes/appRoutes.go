@@ -6,4 +6,5 @@ func AppRoute(router *gin.Engine) {
 	RegisterRoutes(router)
 	TransactionRoute(router)
 	CategoryRoute(router)
+	BudgetRoute(router)
 }

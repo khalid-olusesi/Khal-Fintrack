@@ -1,5 +1,7 @@
 "use client";
 
+import { toast } from "@/components/ui/toast";
+
 import { Button } from "@/components/ui/button";
 import { Plus, Search, X, ChevronLeft, ChevronRight, Bell } from "lucide-react";
 import { useSidebar } from "@/context/sidebar-context";
@@ -7,8 +9,9 @@ import { Menu } from "lucide-react";
 import { MainLogo } from "@/components/logo";
 import { ModeToggle } from "@/components/toggle";
 import { Pencil, Trash2 } from "lucide-react";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState, Suspense } from "react";
 import { Icons } from "@/components/category-icons";
+import { Skeleton } from "@/components/ui/skeleton";
 import {
   Select,
   SelectContent,
@@ -18,18 +21,36 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import CategoryDropDown from "@/components/dropdown";
 
-export default function Transaction() {
-  const [currentPage, setCurrentPage] = useState(1);
+function TransactionContent() {
+  type CachedPage = {
+    transactions: Transaction[];
+    totalPages: number;
+  };
   const [totalPages, setTotalPages] = useState(1);
   const [transactions, setTransactions] = useState<Transaction[]>([]);
   const { toggleSidebar } = useSidebar();
   const router = useRouter();
   const [selectedCategory, setSelectedCategory] = useState("all");
-  const [isLoading, setIsLoading] = useState(false);
-  const prefetchCache = useRef<Record<string, Transaction[]>>({});
+  const [isLoading, setIsLoading] = useState(true);
+  const prefetchCache = useRef<Record<string, CachedPage>>({});
+  const searchParams = useSearchParams();
+  const [currentPage, setCurrentPage] = useState(() => {
+    return Number(searchParams.get("page")) || 1;
+  });
+  const [selectedDate, setSelectedDate] = useState("This Month");
+  const [search, setSearch] = useState("");
+  const [debouncedSearch, setDebouncedSearch] = useState("");
+
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setDebouncedSearch(search);
+    }, 400);
+
+    return () => clearTimeout(timer);
+  }, [search]);
 
   type Transaction = {
     id: number;
@@ -45,6 +66,39 @@ export default function Transaction() {
     amount: number;
     date: string;
     type: string;
+  };
+
+  const TransactionSkeleton = () => {
+    return (
+      <tr className="border-b border-gray-200 dark:border-border">
+        <td className="p-4">
+          <Skeleton className="h-4 w-24" />
+        </td>
+
+        <td>
+          <Skeleton className="h-4 w-32" />
+        </td>
+
+        <td>
+          <Skeleton className="h-4 w-24" />
+        </td>
+
+        <td>
+          <Skeleton className="h-4 w-16" />
+        </td>
+
+        <td>
+          <Skeleton className="h-4 w-20" />
+        </td>
+
+        <td>
+          <div className="flex justify-center gap-4">
+            <Skeleton className="h-4 w-4" />
+            <Skeleton className="h-4 w-4" />
+          </div>
+        </td>
+      </tr>
+    );
   };
 
   function CategoryDisplay({
@@ -74,62 +128,134 @@ export default function Transaction() {
     );
   }
 
-  const buildCacheKey = (page: number, category: string) => `${page}__${category}`;
+  const buildCacheKey = (
+    page: number,
+    category: string,
+    date: string,
+    debouncedSearch: string,
+  ) => `${page}__${category}__${date}__${debouncedSearch}`;
 
   useEffect(() => {
     const controller = new AbortController();
 
-    const fetchPage = async (page: number, category: string, signal?: AbortSignal) => {
+    const fetchPage = async (
+      page: number,
+      category: string,
+      date: string,
+      debouncedSearch: string,
+      signal?: AbortSignal,
+    ) => {
       const token = localStorage.getItem("token");
+      if (!token) throw new Error("No token");
       const categoryQuery = category !== "all" ? `&categoryId=${category}` : "";
+      const dateQuery =
+        date !== "This Month" ? `&date=${encodeURIComponent(date)}` : "";
+      //i used encodeURIComponent() because If someone searches (Chicken Republic) i don't want the space to break your URL.It turns it into something like (Chicken%20Republic)
+      const trimmedSearch = debouncedSearch.trim();
+      const searchQuery =
+        trimmedSearch !== ""
+          ? `&search=${encodeURIComponent(trimmedSearch)}`
+          : "";
       const response = await fetch(
-        `${process.env.NEXT_PUBLIC_API_URL}/transactions?page=${page}&limit=10${categoryQuery}`,
+        `${process.env.NEXT_PUBLIC_API_URL}/transactions?page=${page}&limit=10${categoryQuery}${dateQuery}${searchQuery}`,
         {
           credentials: "include",
           headers: { Authorization: `Bearer ${token}` },
           signal,
         },
       );
+      if (!response.ok) throw new Error("Failed to fetch page");
       return response.json();
     };
 
-    const fetchTransactions = async () => {
-      const cacheKey = buildCacheKey(currentPage, selectedCategory);
+    // Silently prefetch a page and store it in cache (does nothing if already cached)
+    const prefetchPage = (
+      page: number,
+      category: string,
+      date: string,
+      debouncedSearch: string,
+    ) => {
+      if (page < 1) return;
+      const key = buildCacheKey(page, category, date, debouncedSearch);
+      if (prefetchCache.current[key]) return; // already cached
+      fetchPage(page, category, date, debouncedSearch)
+        .then((d) => {
+          prefetchCache.current[key] = {
+            transactions: d.transactions || [],
+            totalPages: d.pagination?.totalPages || 1,
+          };
+        })
+        .catch(() => {});
+    };
 
-      // Serve from cache instantly if available
-      if (prefetchCache.current[cacheKey]) {
-        setTransactions(prefetchCache.current[cacheKey]);
+    const fetchTransactions = async () => {
+      const cacheKey = buildCacheKey(
+        currentPage,
+        selectedCategory,
+        selectedDate,
+        debouncedSearch,
+      );
+      const cached = prefetchCache.current[cacheKey];
+
+      // Stale-while-revalidate: show cached data instantly, never block on it
+      if (cached) {
+        setTransactions(cached.transactions);
+        setTotalPages(cached.totalPages);
         setIsLoading(false);
       } else {
         setIsLoading(true);
       }
 
       try {
-        const data = await fetchPage(currentPage, selectedCategory, controller.signal);
+        // Always fetch fresh data — update silently if we already showed cache
+        const data = await fetchPage(
+          currentPage,
+          selectedCategory,
+          selectedDate,
+          debouncedSearch,
+          controller.signal,
+        );
         const fetched: Transaction[] = data.transactions || [];
         const pages: number = data.pagination?.totalPages || 1;
 
-        prefetchCache.current[cacheKey] = fetched;
+        prefetchCache.current[cacheKey] = {
+          transactions: fetched,
+          totalPages: pages,
+        };
+
         setTransactions(fetched);
         setTotalPages(pages);
 
-        // Prefetch next page in background if it exists
-        if (currentPage < pages) {
-          const nextKey = buildCacheKey(currentPage + 1, selectedCategory);
-          if (!prefetchCache.current[nextKey]) {
-            fetchPage(currentPage + 1, selectedCategory)
-              .then((d) => {
-                prefetchCache.current[nextKey] = d.transactions || [];
-              })
-              .catch(() => {}); // silently ignore prefetch errors
-          }
-        }
+        // e xpand prefetch window: next 2 pages + previous 1 page
+        prefetchPage(
+          currentPage + 1,
+          selectedCategory,
+          selectedDate,
+          debouncedSearch,
+        );
+        prefetchPage(
+          currentPage + 2,
+          selectedCategory,
+          selectedDate,
+          debouncedSearch,
+        );
+        prefetchPage(
+          currentPage - 1,
+          selectedCategory,
+          selectedDate,
+          debouncedSearch,
+        );
+        
+        setIsLoading(false);
       } catch (error) {
         if (error instanceof DOMException && error.name === "AbortError") {
           return;
         }
+        if (error instanceof Error && error.message === "No token") {
+          // Do not turn off isLoading, wait for token or redirect
+          return;
+        }
         console.error(error);
-      } finally {
         setIsLoading(false);
       }
     };
@@ -139,9 +265,16 @@ export default function Transaction() {
     return () => {
       controller.abort();
     };
-  }, [currentPage, selectedCategory]);
+  }, [currentPage, selectedCategory, selectedDate, debouncedSearch]);
 
   const deleteTransaction = async (id: string | number) => {
+    // Optimistic: remove from UI immediately
+    const previousTransactions = transactions;
+    setTransactions((prev) =>
+      prev.filter((transaction) => transaction.id !== id),
+    );
+    toast.add({ title: "Transaction deleted successfully", type: "success" });
+
     try {
       const token = localStorage.getItem("token");
       const response = await fetch(
@@ -167,17 +300,19 @@ export default function Transaction() {
       }
 
       if (!response.ok) {
-        alert(data?.error || text || "failed to delete transaction");
+        // Rollback on failure
+        setTransactions(previousTransactions);
+        toast.add({
+          title: data?.error || text || "failed to delete transaction",
+          type: "error",
+        });
         return;
       }
-
-      setTransactions((prev) =>
-        prev.filter((transaction) => transaction.id !== id),
-      ); //removes the deleted transaction from the UI
-      alert("Transaction deleted successfully");
     } catch (err) {
       console.error(err);
-      alert("unable to connect to server");
+      // Rollback on network error
+      setTransactions(previousTransactions);
+      toast.add({ title: "Unable to connect to server", type: "error" });
     }
   };
 
@@ -185,6 +320,7 @@ export default function Transaction() {
     if (page < 1 || page > totalPages) return;
 
     setCurrentPage(page); //this retains the contnet or same page if the condition is not met
+    router.push(`?page=${page}`, { scroll: false });
   };
 
   const dateOptions = [
@@ -194,8 +330,41 @@ export default function Transaction() {
     { label: "Last Month", value: "Last Month" },
     { label: "Last 3 Months", value: "Last 3 Months" },
     { label: "This Year", value: "This Year" },
-    { label: "Custom Range", value: "Custom Range" },
   ];
+
+  //for pagination
+  const getPageNumbers = () => {
+    const pages: (number | string)[] = [];
+
+    if (totalPages <= 7) {
+      for (let page = 1; page <= totalPages; page++) {
+        pages.push(page);
+      }
+
+      return pages;
+    }
+
+    pages.push(1);
+
+    if (currentPage > 4) {
+      pages.push("...");
+    }
+
+    const startPage = Math.max(2, currentPage - 2);
+    const endPage = Math.min(totalPages - 1, currentPage + 2);
+
+    for (let page = startPage; page <= endPage; page++) {
+      pages.push(page);
+    }
+
+    if (currentPage < totalPages - 3) {
+      pages.push("...");
+    }
+
+    pages.push(totalPages);
+
+    return pages;
+  };
 
   return (
     // container
@@ -249,9 +418,15 @@ export default function Transaction() {
           </div>
 
           <div className="flex-1">
-            <Select>
+            <Select
+              value={selectedDate}
+              onValueChange={(value) => {
+                setSelectedDate(value ?? "This Month");
+                setCurrentPage(1);
+              }}
+            >
               <SelectTrigger className="w-full bg-white dark:bg-card border border-gray-200 dark:border-border text-xs py-1.5 px-3 rounded-lg h-9">
-                <SelectValue placeholder="This Month" />
+                <SelectValue />
               </SelectTrigger>
               <SelectContent>
                 {dateOptions.map((date) => (
@@ -268,6 +443,11 @@ export default function Transaction() {
         <div className="relative">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
           <input
+            value={search}
+            onChange={(e) => {
+              setSearch(e.target.value);
+              setCurrentPage(1);
+            }}
             type="text"
             placeholder="Search transaction..."
             className="w-full rounded-lg border border-gray-200 dark:border-border py-2 pl-9 pr-4 text-xs outline-none bg-white dark:bg-card text-foreground"
@@ -287,24 +467,44 @@ export default function Transaction() {
               </tr>
             </thead>
             <tbody className="divide-y divide-gray-50 dark:divide-border">
-              {transactions.map((transaction, index) => (
-                <tr
-                  key={transaction.id || index}
-                  className="border border-gray-100 dark:border-border"
-                >
-                  <td className="py-4 px-2 text-left text-muted-foreground">
-                    {new Date(transaction.date).toLocaleDateString()}
-                  </td>
-                  <td className="py-4 px-2 text-center font-medium">
-                    {transaction.description}
-                  </td>
-                  <td className="py-4 px-2 text-right text-red-500 font-bold">
-                    ₦{(transaction.amount ?? 0).toLocaleString()}
-                  </td>
-                </tr>
-              ))}
+              {isLoading && transactions.length === 0
+                ? Array.from({ length: 8 }).map((_, i) => (
+                    <tr
+                      key={i}
+                      className="border border-gray-100 dark:border-border animate-pulse"
+                    >
+                      <td className="py-4 px-2">
+                        <div className="h-3 bg-gray-200 dark:bg-zinc-700 rounded w-16" />
+                      </td>
+                      <td className="py-4 px-2 flex justify-center">
+                        <div
+                          className="h-3 bg-gray-200 dark:bg-zinc-700 rounded"
+                          style={{ width: `${60 + (i % 4) * 15}px` }}
+                        />
+                      </td>
+                      <td className="py-4 px-2">
+                        <div className="h-3 bg-gray-200 dark:bg-zinc-700 rounded w-14 ml-auto" />
+                      </td>
+                    </tr>
+                  ))
+                : transactions.map((transaction, index) => (
+                    <tr
+                      key={transaction.id || index}
+                      className="border border-gray-100 dark:border-border"
+                    >
+                      <td className="py-4 px-2 text-left text-muted-foreground">
+                        {new Date(transaction.date).toLocaleDateString()}
+                      </td>
+                      <td className="py-4 px-2 text-center font-medium">
+                        {transaction.description}
+                      </td>
+                      <td className="py-4 px-2 text-right text-red-500 font-bold">
+                        {(transaction.amount ?? 0).toLocaleString()}
+                      </td>
+                    </tr>
+                  ))}
 
-              {transactions.length === 0 && (
+              {!isLoading && transactions.length === 0 && (
                 <tr>
                   <td colSpan={3} className="py-10 text-center text-gray-500">
                     No transactions found.
@@ -393,13 +593,19 @@ export default function Transaction() {
             }}
             type="all"
           />
-          <Select>
+          <Select
+            value={selectedDate}
+            onValueChange={(value) => {
+              setSelectedDate(value ?? "This Month");
+              setCurrentPage(1);
+            }}
+          >
             <SelectTrigger className="w-full max-w-48 bg-white">
               <SelectValue placeholder="All Categories" />
             </SelectTrigger>
             <SelectContent>
               <SelectGroup>
-                <SelectLabel>Fruits</SelectLabel>
+                <SelectLabel>Date</SelectLabel>
                 {dateOptions.map((date) => (
                   <SelectItem key={date.value} value={date.value}>
                     {date.label}
@@ -413,14 +619,28 @@ export default function Transaction() {
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
 
             <input
+              value={search}
+              onChange={(e) => {
+                setSearch(e.target.value);
+                setCurrentPage(1);
+              }}
               type="text"
               placeholder="Search transactions..."
               className="w-full rounded-lg border border-gray-200 dark:border-border py-1 pl-10 pr-10 outline-none bg-white dark:bg-card text-foreground"
             />
 
-            <button className="absolute right-3 top-1/2 -translate-y-1/2">
-              <X className="w-4 h-4 text-gray-400 hover:text-gray-700" />
-            </button>
+            {search && (
+              <button
+                type="button"
+                onClick={() => {
+                  setSearch("");
+                  setCurrentPage(1);
+                }}
+                className="absolute right-3 top-1/2 -translate-y-1/2 cursor-pointer"
+              >
+                <X className="w-4 h-4 text-gray-400 hover:text-gray-700" />
+              </button>
+            )}
           </div>
         </div>
 
@@ -439,70 +659,80 @@ export default function Transaction() {
             </thead>
 
             <tbody>
-              {transactions.map((transaction, index) => (
-                <tr
-                  key={transaction.id ?? index}
-                  className="border-b border-gray-200 dark:border-border hover:bg-gray-50 dark:hover:bg-zinc-800/50"
-                >
-                  <td className="p-4">
-                    {new Date(transaction.date).toLocaleDateString()}
-                  </td>
+              {isLoading &&
+                Array.from({ length: 10 }).map((_, index) => (
+                  <TransactionSkeleton key={index} />
+                ))}
 
-                  <td>{transaction.description}</td>
+              {!isLoading &&
+                transactions.map((transaction, index) => (
+                  <tr
+                    key={transaction.id ?? index}
+                    className="border-b border-gray-200 dark:border-border hover:bg-gray-50 dark:hover:bg-zinc-800/50"
+                  >
+                    <td className="p-4">
+                      {new Date(transaction.date).toLocaleDateString()}
+                    </td>
 
-                  <td>
-                    <CategoryDisplay category={transaction.category} />
-                  </td>
+                    <td>{transaction.description}</td>
 
-                  <td>
-                    <span
+                    <td>
+                      <CategoryDisplay category={transaction.category} />
+                    </td>
+
+                    <td>
+                      <span
+                        className={
+                          transaction.type === "income"
+                            ? "text-green-600 font-medium"
+                            : "text-red-500 font-medium"
+                        }
+                      >
+                        {transaction.type}
+                      </span>
+                    </td>
+
+                    <td
                       className={
                         transaction.type === "income"
-                          ? "text-green-600 font-medium"
-                          : "text-red-500 font-medium"
+                          ? "text-green-600 font-semibold"
+                          : "text-red-500 font-semibold"
                       }
                     >
-                      {transaction.type}
-                    </span>
-                  </td>
+                      ₦{(transaction.amount ?? 0).toLocaleString()}
+                    </td>
 
-                  <td
-                    className={
-                      transaction.type === "income"
-                        ? "text-green-600 font-semibold"
-                        : "text-red-500 font-semibold"
-                    }
-                  >
-                    ₦{(transaction.amount ?? 0).toLocaleString()}
-                  </td>
+                    <td className="py-4">
+                      <div className="flex items-center gap-4  justify-evenly">
+                        <button className="cursor-pointer">
+                          <Pencil
+                            onClick={() => {
+                              sessionStorage.setItem(
+                                `editTransaction_${transaction.id}`,
+                                JSON.stringify(transaction),
+                              );
+                              router.push(
+                                `/dashboard/transaction/editTransaction/${transaction.id}`,
+                              );
+                            }}
+                            className="w-4 h-4 text-blue-600 hover:text-blue-800"
+                          />
+                        </button>
 
-                  <td className="py-4">
-                    <div className="flex items-center gap-4  justify-evenly">
-                      <button className="cursor-pointer">
-                        <Pencil
-                          onClick={() => {
-                            router.push(
-                              `/dashboard/transaction/editTransaction/${transaction.id}`,
-                            );
-                          }}
-                          className="w-4 h-4 text-blue-600 hover:text-blue-800"
-                        />
-                      </button>
+                        <button className="cursor-pointer">
+                          <Trash2
+                            onClick={() => {
+                              deleteTransaction(transaction.id);
+                            }}
+                            className="w-4 h-4 text-red-500 hover:text-red-700"
+                          />
+                        </button>
+                      </div>
+                    </td>
+                  </tr>
+                ))}
 
-                      <button className="cursor-pointer">
-                        <Trash2
-                          onClick={() => {
-                            deleteTransaction(transaction.id);
-                          }}
-                          className="w-4 h-4 text-red-500 hover:text-red-700"
-                        />
-                      </button>
-                    </div>
-                  </td>
-                </tr>
-              ))}
-
-              {transactions.length === 0 && (
+              {!isLoading && transactions.length === 0 && (
                 <tr>
                   <td colSpan={6} className="py-10 text-center text-gray-500">
                     No transactions found.
@@ -523,13 +753,19 @@ export default function Transaction() {
             <ChevronLeft className="w-4 h-4" />
           </button>
 
-          {Array.from({ length: totalPages }, (_, index) => {
-            const page = index + 1;
+          {getPageNumbers().map((page, index) => {
+            if (page === "...") {
+              return (
+                <span key={`ellipsis-${index}`} className="px-2">
+                  ...
+                </span>
+              );
+            }
 
             return (
               <button
                 key={page}
-                onClick={() => goToPage(page)}
+                onClick={() => goToPage(page as number)}
                 className={
                   currentPage === page
                     ? "cursor-pointer rounded-lg bg-green-600 text-white px-4 py-1.5"
@@ -551,5 +787,13 @@ export default function Transaction() {
         </div>
       </div>
     </div>
+  );
+}
+
+export default function Transaction() {
+  return (
+    <Suspense>
+      <TransactionContent />
+    </Suspense>
   );
 }

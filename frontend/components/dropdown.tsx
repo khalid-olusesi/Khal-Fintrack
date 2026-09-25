@@ -15,12 +15,14 @@ type CategoryDropDownProps = {
   value?: string;
   onValueChange?: (value: string | null) => void;
   type?: "income" | "expense" | "all";
+  className?: string;
 };
 
 export default function CategoryDropDown({
   value,
   onValueChange,
   type = "all",
+  className,
 }: CategoryDropDownProps) {
   const { categories } = useCategories();
 
@@ -52,7 +54,7 @@ export default function CategoryDropDown({
 
   return (
     <Select value={value} onValueChange={handleValueChange}>
-      <SelectTrigger className=" border-gray-200 border-2">
+      <SelectTrigger className={`border-gray-200 border-2 ${className ?? ""}`}>
         <SelectValue placeholder="All Categories">
           {getDisplayName(internalValue)}
         </SelectValue>

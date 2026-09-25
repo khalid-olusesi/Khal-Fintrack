@@ -12,7 +12,9 @@ export type Category = {
 
 type CategoryContextType = {
   categories: Category[];
+  setCategories: React.Dispatch<React.SetStateAction<Category[]>>;
   fetchCategories: () => Promise<void>;
+  isLoading: boolean;
 };
 
 const CategoryContext = createContext<CategoryContextType | undefined>(
@@ -21,13 +23,18 @@ const CategoryContext = createContext<CategoryContextType | undefined>(
 
 export function CategoryProvider({ children }: { children: React.ReactNode }) {
   const [categories, setCategories] = useState<Category[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
 
   const fetchCategories = useCallback(async () => {
     try {
+      setIsLoading(true);
       const token = localStorage.getItem("token");
 
       // No token yet — skip silently, we'll retry when token appears
-      if (!token) return;
+      if (!token) {
+        setIsLoading(false);
+        return;
+      }
 
       const response = await fetch(
         `${process.env.NEXT_PUBLIC_API_URL}/categories`,
@@ -56,12 +63,15 @@ export function CategoryProvider({ children }: { children: React.ReactNode }) {
         if (response.status !== 401) {
           console.error(data?.error || text || "failed to get category");
         }
+        setIsLoading(false);
         return;
       }
 
       setCategories(data.categories);
     } catch (err) {
       console.error(err);
+    } finally {
+      setIsLoading(false);
     }
   }, []);
 
@@ -86,7 +96,7 @@ export function CategoryProvider({ children }: { children: React.ReactNode }) {
   }, [categories.length, fetchCategories]);
 
   return (
-    <CategoryContext.Provider value={{ categories, fetchCategories }}>
+    <CategoryContext.Provider value={{ categories, setCategories, fetchCategories, isLoading }}>
       {children}
     </CategoryContext.Provider>
   );

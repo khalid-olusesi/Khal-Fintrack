@@ -1,6 +1,9 @@
 "use client";
 
+import { toast } from "@/components/ui/toast";
+
 import { Menu, Plus, Trash2, Pencil } from "lucide-react";
+import { Skeleton } from "@/components/ui/skeleton";
 import { ModeToggle } from "@/components/toggle";
 import { Button } from "@/components/ui/button";
 import { useSidebar } from "@/context/sidebar-context";
@@ -10,8 +13,30 @@ import { Icons } from "@/components/category-icons";
 import { useCategories, Category } from "@/context/category-context";
 
 export default function Categories() {
-  const { categories, fetchCategories } = useCategories();
+  const { categories, setCategories, fetchCategories, isLoading } = useCategories();
   const { toggleSidebar } = useSidebar();
+
+  const CategorySkeleton = () => {
+    return (
+      <tr className="border-b border-gray-200 dark:border-border">
+        <td className="p-4 text-left">
+          <div className="flex items-center gap-4">
+            <Skeleton className="w-8 h-8 rounded-full" />
+            <Skeleton className="h-4 w-24" />
+          </div>
+        </td>
+        <td className="text-left">
+          <Skeleton className="h-4 w-16" />
+        </td>
+        <td className="py-4">
+          <div className="flex items-center justify-end pr-4 gap-10">
+            <Skeleton className="w-4 h-4" />
+            <Skeleton className="w-4 h-4" />
+          </div>
+        </td>
+      </tr>
+    );
+  };
 
   const [showCard, setShowCard] = useState(false);
 
@@ -22,6 +47,11 @@ export default function Categories() {
   const [isEditing, setIsEditing] = useState(false);
 
   const deleteCategory = async (id: string | number) => {
+    // Optimistic: remove from UI immediately
+    const previousCategories = categories;
+    setCategories((prev) => prev.filter((category) => category.id !== id));
+    toast.add({ title: "Category deleted successfully", type: "success" });
+
     try {
       const token = localStorage.getItem("token");
       const response = await fetch(
@@ -46,13 +76,19 @@ export default function Categories() {
       }
 
       if (!response.ok) {
-        alert(data?.error || text || "failed to delete category");
+        // Rollback on failure
+        setCategories(previousCategories);
+        toast.add({ title: data?.error || text || "failed to delete category", type: "error" });
         return;
       }
 
-      await fetchCategories();
+      // Sync with server in background
+      fetchCategories();
     } catch (err) {
       console.error(err);
+      // Rollback on network error
+      setCategories(previousCategories);
+      toast.add({ title: "Unable to connect to server", type: "error" });
     }
   };
 
@@ -92,8 +128,13 @@ export default function Categories() {
           </thead>
 
           <tbody>
-            {categories.map((category) => {
-              const categoryIcon = Icons.find(
+            {isLoading ? (
+              Array.from({ length: 4 }).map((_, idx) => (
+                <CategorySkeleton key={idx} />
+              ))
+            ) : categories.length > 0 ? (
+              categories.map((category) => {
+                const categoryIcon = Icons.find(
                 (item) => item.name === category.icon,
               ); //to get one icon at a time, it gets the icon that matches a name
 
@@ -146,7 +187,14 @@ export default function Categories() {
                   </td>
                 </tr>
               );
-            })}
+            })
+          ) : (
+            <tr>
+              <td colSpan={3} className="py-10 text-center text-gray-500">
+                No categories found.
+              </td>
+            </tr>
+          )}
           </tbody>
         </table>
       </div>
