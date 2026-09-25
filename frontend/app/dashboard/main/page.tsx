@@ -32,7 +32,7 @@ const COLORS = [
 ];
 
 export default function Main() {
-  const { isOpen, toggleSidebar } = useSidebar();
+  const { toggleSidebar } = useSidebar();
   const router = useRouter();
 
   return (
@@ -51,7 +51,9 @@ export default function Main() {
 
         {/* Dashboard Title & Bell */}
         <div className="flex justify-between items-center mb-1">
-          <h1 className="text-xl font-bold text-gray-900 dark:text-gray-100">Dashboard</h1>
+          <h1 className="text-xl font-bold text-gray-900 dark:text-gray-100">
+            Dashboard
+          </h1>
           <button className="p-1 cursor-pointer">
             <Bell className="w-5 h-5 text-gray-700 dark:text-gray-200" />
           </button>
@@ -59,7 +61,9 @@ export default function Main() {
 
         {/* Total Balance Card */}
         <div className="bg-white dark:bg-card shadow-sm border border-gray-100 dark:border-border rounded-xl p-4">
-          <p className="text-[12px] text-muted-foreground uppercase font-medium tracking-wider">Total Balance</p>
+          <p className="text-[12px] text-muted-foreground uppercase font-medium tracking-wider">
+            Total Balance
+          </p>
           <p className="text-2xl font-bold text-gray-900 my-1">$5,231.89</p>
           <p className="text-[12px] text-green-600 flex items-center gap-1 font-medium">
             <span>▲</span> 12.5% from last month
@@ -70,18 +74,37 @@ export default function Main() {
         <div className="grid grid-cols-2 gap-4">
           {/* Income Card */}
           <div className="bg-white dark:bg-card shadow-sm border border-gray-100 dark:border-border rounded-xl p-4">
-            <p className="text-[12px] text-muted-foreground uppercase font-medium tracking-wider">Income</p>
-            <p className="text-lg font-bold text-gray-900 dark:text-foreground my-1">$8,650.00</p>
+            <p className="text-[12px] text-muted-foreground uppercase font-medium tracking-wider">
+              Income
+            </p>
+            <p className="text-lg font-bold text-gray-900 dark:text-foreground my-1">
+              $8,650.00
+            </p>
             <p className="text-[12px] text-green-600 flex items-center gap-1 font-medium">
               <span>▲</span> 8.2%
             </p>
           </div>
           {/* Expenses Card */}
           <div className="bg-white dark:bg-card shadow-sm border border-gray-100 dark:border-border rounded-xl p-4">
-            <p className="text-[12px] text-muted-foreground uppercase font-medium tracking-wider">Expenses</p>
-            <p className="text-lg font-bold text-gray-900 dark:text-foreground my-1">$3,418.11</p>
+            <p className="text-[12px] text-muted-foreground uppercase font-medium tracking-wider">
+              Expenses
+            </p>
+            <p className="text-lg font-bold text-gray-900 dark:text-foreground my-1">
+              $3,418.11
+            </p>
             <p className="text-[12px] text-green-600 flex items-center gap-1 font-medium">
               <span>▲</span> 6.1%
+            </p>
+          </div>
+          <div className="bg-white dark:bg-card shadow-sm border border-gray-100 dark:border-border rounded-xl p-4">
+            <p className="text-[12px] text-muted-foreground uppercase font-medium tracking-wider">
+              Savings
+            </p>
+            <p className="text-lg font-bold text-gray-900 dark:text-foreground my-1">
+              $8,300.60
+            </p>
+            <p className="text-[12px] text-green-600 flex items-center gap-1 font-medium">
+              <span>▲</span> 4.3%
             </p>
           </div>
         </div>
@@ -89,7 +112,9 @@ export default function Main() {
         {/* Spending Overview */}
         <div className="bg-white dark:bg-card shadow-sm border border-gray-100 dark:border-border rounded-xl p-4">
           <div className="flex items-center justify-between mb-4">
-            <p className="font-bold text-sm text-gray-900 dark:text-foreground">Spending Overview</p>
+            <p className="font-bold text-sm text-gray-900 dark:text-foreground">
+              Spending Overview
+            </p>
             <button className="flex items-center gap-1 cursor-pointer p-1 px-2 rounded border border-gray-200 dark:border-border text-[11px] text-muted-foreground bg-gray-50 dark:bg-card">
               This Month
               <ArrowDown className="w-3 h-3 text-gray-500 dark:text-foreground" />
@@ -122,16 +147,27 @@ export default function Main() {
                 { name: "Food & Dining", val: "34%", color: "bg-blue-600" },
                 { name: "Transport", val: "24%", color: "bg-green-500" },
                 { name: "Shopping", val: "16%", color: "bg-yellow-500" },
-                { name: "Bills & Utilities", val: "16%", color: "bg-orange-500" },
+                {
+                  name: "Bills & Utilities",
+                  val: "16%",
+                  color: "bg-orange-500",
+                },
                 { name: "Entertainment", val: "5%", color: "bg-red-500" },
                 { name: "Others", val: "4%", color: "bg-blue-400" },
               ].map((item, i) => (
-                <div key={i} className="flex items-center justify-between text-[11px] text-gray-700">
+                <div
+                  key={i}
+                  className="flex items-center justify-between text-[11px] text-gray-700"
+                >
                   <div className="flex items-center gap-1.5 truncate">
-                    <div className={`${item.color} h-2 w-2 rounded-full shrink-0`}></div>
+                    <div
+                      className={`${item.color} h-2 w-2 rounded-full shrink-0`}
+                    ></div>
                     <span className="truncate">{item.name}</span>
                   </div>
-                  <span className="font-medium text-gray-900 ml-1">{item.val}</span>
+                  <span className="font-medium text-gray-900 ml-1">
+                    {item.val}
+                  </span>
                 </div>
               ))}
             </div>
@@ -141,7 +177,9 @@ export default function Main() {
         {/* Recent Transactions */}
         <div className="bg-white shadow-sm border border-gray-100 rounded-xl p-4">
           <div className="flex justify-between items-center mb-4">
-            <p className="font-bold text-sm text-gray-900">Recent Transactions</p>
+            <p className="font-bold text-sm text-gray-900">
+              Recent Transactions
+            </p>
             <span
               onClick={() => router.push("/dashboard/transaction")}
               className="text-xs text-green-600 font-semibold hover:underline cursor-pointer"
@@ -158,7 +196,9 @@ export default function Main() {
                   <ShoppingCart className="w-4 h-4 text-blue-600" />
                 </div>
                 <div>
-                  <p className="text-xs font-semibold text-gray-900">Grocery Store</p>
+                  <p className="text-xs font-semibold text-gray-900">
+                    Grocery Store
+                  </p>
                   <p className="text-muted-foreground text-[10px]">Today</p>
                 </div>
               </div>
@@ -186,7 +226,9 @@ export default function Main() {
                   <MonitorPlay className="w-4 h-4 text-red-500" />
                 </div>
                 <div>
-                  <p className="text-xs font-semibold text-gray-900">Netflix Subscription</p>
+                  <p className="text-xs font-semibold text-gray-900">
+                    Netflix Subscription
+                  </p>
                   <p className="text-muted-foreground text-[10px]">May 11</p>
                 </div>
               </div>
@@ -199,7 +241,9 @@ export default function Main() {
                   <Laptop className="w-3.5 h-3.5 text-green-500 dark:text-green-400" />
                 </div>
                 <div>
-                  <p className="text-xs font-semibold text-gray-900 dark:text-foreground">Freelance Work</p>
+                  <p className="text-xs font-semibold text-gray-900 dark:text-foreground">
+                    Freelance Work
+                  </p>
                   <p className="text-muted-foreground text-[10px]">May 10</p>
                 </div>
               </div>
@@ -227,7 +271,9 @@ export default function Main() {
           <div className="bg-white dark:bg-card dark:border dark:border-border shadow-lg rounded-lg p-6">
             <p className="text-[14px] text-muted-foreground">Total Balance</p>
             <p className="text-xl pb-1 font-bold">$5,300.20</p>
-            <p className="text-[14px] text-green-600">2% more than last march</p>
+            <p className="text-[14px] text-green-600">
+              2% more than last march
+            </p>
           </div>
 
           <div className="bg-white dark:bg-card dark:border dark:border-border shadow-lg rounded-lg p-6">
@@ -241,7 +287,9 @@ export default function Main() {
           <div className="bg-white dark:bg-card dark:border dark:border-border shadow-lg rounded-lg p-6">
             <p className="text-[14px] text-muted-foreground">Total Expense</p>
             <p className="text-xl pb-1 font-bold">$4,700.80</p>
-            <p className="text-[14px] text-red-600">0.5% less than last march</p>
+            <p className="text-[14px] text-red-600">
+              0.5% less than last march
+            </p>
           </div>
 
           <div className="bg-white dark:bg-card dark:border dark:border-border shadow-lg rounded-lg p-6">
@@ -343,7 +391,9 @@ export default function Main() {
           <div className="bg-white dark:bg-card dark:border dark:border-border p-4 space-y-3 flex-1 rounded-lg shadow-lg justify-between items-center">
             <div className="flex justify-between items-center">
               <p className="font-bold pb-2">Recent Transactions</p>
-              <p className="text-green-600 font-semibold cursor-pointer">View all</p>
+              <p className="text-green-600 font-semibold cursor-pointer">
+                View all
+              </p>
             </div>
 
             {/* subsection */}

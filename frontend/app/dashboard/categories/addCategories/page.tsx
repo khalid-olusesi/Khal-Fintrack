@@ -78,7 +78,10 @@ export default function CardSpacing({
     }
 
     if (!form.type) {
-      toast.add({ title: "Choose a type (income or expense)", type: "warning" });
+      toast.add({
+        title: "Choose a type (income or expense)",
+        type: "warning",
+      });
       return;
     }
 
@@ -116,7 +119,10 @@ export default function CardSpacing({
       }
 
       if (!response.ok) {
-        toast.add({ title: data?.error || text || "Something went wrong", type: "error" });
+        toast.add({
+          title: data?.error || text || "Something went wrong",
+          type: "error",
+        });
         return;
       }
 
@@ -143,10 +149,12 @@ export default function CardSpacing({
   };
 
   return (
-    <div className="mx-auto h95 grid w-full max-w-2xl gap-4">
+    <div className="mx-auto grid max-h-[calc(100dvh-1.5rem)] w-full max-w-2xl gap-4 overflow-y-auto">
       <Card>
         <CardHeader>
-          <CardTitle className="mt-3">Add Category</CardTitle>
+          <CardTitle className="mt-2 text-sm sm:mt-3 sm:text-base">
+            {isEditing ? "Edit Category" : "Add Category"}
+          </CardTitle>
           <CardAction>
             <Button
               type="button"
@@ -160,11 +168,11 @@ export default function CardSpacing({
         </CardHeader>
         <CardContent>
           <form onSubmit={handleSubmit}>
-            <div className="flex flex-col gap-6">
+            <div className="flex flex-col gap-4 sm:gap-6">
               <div className="grid gap-2">
                 <Label
                   htmlFor="texts-spacing"
-                  className="text-muted-foreground"
+                  className="text-sm text-muted-foreground"
                 >
                   Category Name
                 </Label>
@@ -184,7 +192,7 @@ export default function CardSpacing({
                         name: e.target.value,
                       });
                     }}
-                    className="rounded-l-none"
+                    className="rounded-l-none text-sm"
                   />
                 </div>
               </div>
@@ -192,7 +200,7 @@ export default function CardSpacing({
                 <div className="flex items-center">
                   <Label
                     htmlFor="texts-spacing"
-                    className="text-muted-foreground"
+                    className="text-sm text-muted-foreground"
                   >
                     Type
                   </Label>
@@ -210,29 +218,29 @@ export default function CardSpacing({
                       });
                     }}
                   >
-                    <SelectTrigger className="w-full max-w-full rounded-l-none">
+                    <SelectTrigger className="w-full max-w-full rounded-l-none text-sm">
                       <SelectValue placeholder="Select Type" />
                     </SelectTrigger>
-                  <SelectContent>
-                    <SelectGroup>
-                      <SelectLabel>Type</SelectLabel>
+                    <SelectContent>
+                      <SelectGroup>
+                        <SelectLabel>Type</SelectLabel>
 
-                      <SelectItem value="expense">Expense</SelectItem>
-                      <SelectItem value="income">Income</SelectItem>
-                    </SelectGroup>
-                  </SelectContent>
-                </Select>
+                        <SelectItem value="expense">Expense</SelectItem>
+                        <SelectItem value="income">Income</SelectItem>
+                      </SelectGroup>
+                    </SelectContent>
+                  </Select>
+                </div>
               </div>
             </div>
-            </div>
 
-            <div className="mt-5">
-              <p className="mb-3 text-muted-foreground text-sm">Icon</p>
-              <div className="flex items-center justify-between">
+            <div className="mt-4 sm:mt-5">
+              <p className="mb-2 text-sm text-muted-foreground sm:mb-3">Icon</p>
+              <div className="flex flex-wrap items-center justify-start gap-2 sm:justify-between">
                 {Icons.map(
                   ({ name, icon: Icon, textColor, hoverBg, selectedBg }) => (
                     <div
-                      className={`border-2 rounded-lg cursor-pointer p-3  ${textColor} ${hoverBg}  ${form.icon === name ? selectedBg : ""} `}
+                      className={`border-2 rounded-lg cursor-pointer p-2 sm:p-3 ${textColor} ${hoverBg} ${form.icon === name ? selectedBg : ""} `}
                       key={name}
                       onClick={() => {
                         setForm({
@@ -241,23 +249,34 @@ export default function CardSpacing({
                         });
                       }}
                     >
-                      <Icon className="w-5 h-5" />
+                      <Icon className="h-4 w-4 sm:h-5 sm:w-5" />
                     </div>
                   ),
                 )}
               </div>
             </div>
 
-            <div className="flex justify-end gap-3 border-none mt-7 bg-none">
+            <div className="flex justify-end gap-2 border-none mt-5 bg-none sm:mt-7 sm:gap-3">
               <Button
-                type="submit"
-                className="cursor-pointer bg-0 border-xl text-black hover:opacity-100 hover:text-white"
-                onClick={handleCancel}
+                type="button"
+                className="cursor-pointer bg-0 border-xl text-sm text-black hover:opacity-100 hover:text-white"
+                onClick={() => {
+                  handleCancel();
+                  onClose();
+                }}
               >
                 Cancel
               </Button>
-              <Button type="submit" className="cursor-pointer" disabled={isSaving}>
-                {isSaving ? "Saving..." : isEditing ? "Update Category" : "Add Category"}
+              <Button
+                type="submit"
+                className="cursor-pointer text-sm"
+                disabled={isSaving}
+              >
+                {isSaving
+                  ? "Saving..."
+                  : isEditing
+                    ? "Update Category"
+                    : "Add Category"}
               </Button>
             </div>
           </form>

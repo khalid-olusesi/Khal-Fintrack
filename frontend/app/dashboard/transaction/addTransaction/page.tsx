@@ -4,7 +4,6 @@ import { toast } from "@/components/ui/toast";
 import {
   ArrowLeft,
   Menu,
-  ChevronDownIcon,
   Calendar as CalendarIcon,
   DollarSign,
   Tag,
@@ -108,7 +107,10 @@ export default function AddTransaction() {
       }
 
       if (!response.ok) {
-        toast.add({ title: data?.error || text || "Something went wrong", type: "error" });
+        toast.add({
+          title: data?.error || text || "Something went wrong",
+          type: "error",
+        });
         return;
       }
 
@@ -125,13 +127,13 @@ export default function AddTransaction() {
   return (
     // container
     <div
-      className="bg-white dark:bg-background md:bg-gray-100 md:dark:bg-background w-full h-full p-4 md:p-6 overflow-y-auto scroll-smooth"
+      className="bg-white dark:bg-background md:bg-gray-100 md:dark:bg-background w-full h-full p-3 md:p-6 overflow-y-auto scroll-smooth"
       style={{ WebkitOverflowScrolling: "touch" }}
     >
       {/* Mobile view */}
       <div className="block md:hidden">
         {/* Mobile Header */}
-        <div className="flex justify-between items-center mb-6">
+        <div className="flex justify-between items-center mb-4">
           <button
             onClick={() => router.back()}
             className="p-2 -ml-2 cursor-pointer"
@@ -144,18 +146,14 @@ export default function AddTransaction() {
           <ModeToggle />
         </div>
 
-        <div className="flex justify-between items-center mb-5">
-          <h1 className="text-[18px] font-bold text-gray-900 dark:text-foreground">
+        <div className="mb-4">
+          <h1 className="text-base font-bold text-gray-900 dark:text-foreground">
             Add Transaction
           </h1>
-          <div className="text-gray-500 text-[13px] flex items-center gap-1">
-            <ChevronDownIcon className="w-3.5 h-3.5" />
-            Save
-          </div>
         </div>
 
         {/* Type Toggle */}
-        <div className="flex bg-gray-50 dark:bg-card border border-gray-100 dark:border-border p-1 rounded-xl mb-6">
+        <div className="flex bg-gray-50 dark:bg-card border border-gray-100 dark:border-border p-1 rounded-xl mb-4">
           <button
             onClick={() =>
               setForm({
@@ -163,7 +161,7 @@ export default function AddTransaction() {
                 type: "income",
               })
             }
-            className={`flex-1 py-2.5 rounded-lg font-medium text-[13px] text-center ${
+            className={`flex-1 py-2 rounded-lg font-medium text-sm text-center ${
               form.type === "income"
                 ? "bg-green-600 text-white border-gray-100"
                 : "bg-transparent text-gray-800"
@@ -179,7 +177,7 @@ export default function AddTransaction() {
                 type: "expense",
               })
             }
-            className={`flex-1 py-2.5 rounded-lg font-medium text-[13px] text-center ${
+            className={`flex-1 py-2 rounded-lg font-medium text-sm text-center ${
               form.type === "expense"
                 ? "bg-red-600 text-white border-gray-100"
                 : "bg-transparent text-gray-800 dark:text-muted-foreground"
@@ -190,13 +188,13 @@ export default function AddTransaction() {
         </div>
 
         {/* Form */}
-        <form onSubmit={handleSubmit} className="space-y-4">
-          <div className="space-y-1.5">
-            <label className="text-[12px] font-medium text-gray-800 dark:text-muted-foreground">
+        <form onSubmit={handleSubmit} className="space-y-3">
+          <div className="space-y-1">
+            <label className="text-[11px] font-medium text-gray-800 dark:text-muted-foreground">
               Description
             </label>
             <div className="flex w-full">
-              <div className="flex items-center justify-center w-11 bg-gray-50 dark:bg-zinc-800/50 border border-r-0 border-gray-200 dark:border-border rounded-l-xl text-muted-foreground">
+              <div className="flex w-10 shrink-0 items-center justify-center bg-gray-50 dark:bg-zinc-800/50 border border-r-0 border-gray-200 dark:border-border rounded-l-xl text-muted-foreground">
                 <FileText className="w-4 h-4" />
               </div>
               <input
@@ -209,17 +207,17 @@ export default function AddTransaction() {
                 }}
                 type="text"
                 placeholder="Enter description"
-                className="w-full border border-gray-200 dark:border-border bg-white dark:bg-card text-foreground rounded-r-xl p-3.5 text-[13px] outline-none placeholder:text-gray-400"
+                className="min-w-0 w-full border border-gray-200 dark:border-border bg-white dark:bg-card text-foreground rounded-r-xl p-2.5 text-sm outline-none placeholder:text-gray-400"
               />
             </div>
           </div>
 
-          <div className="space-y-1.5">
-            <label className="text-[12px] font-medium text-gray-800 dark:text-muted-foreground">
+          <div className="space-y-1">
+            <label className="text-[11px] font-medium text-gray-800 dark:text-muted-foreground">
               Amount
             </label>
             <div className="flex w-full">
-              <div className="flex items-center justify-center w-11 bg-gray-50 dark:bg-zinc-800/50 border border-r-0 border-gray-200 dark:border-border rounded-l-xl text-muted-foreground font-semibold">
+              <div className="flex w-10 shrink-0 items-center justify-center bg-gray-50 dark:bg-zinc-800/50 border border-r-0 border-gray-200 dark:border-border rounded-l-xl text-muted-foreground font-semibold">
                 <DollarSign className="w-4 h-4" />
               </div>
               <input
@@ -232,17 +230,17 @@ export default function AddTransaction() {
                 }}
                 type="number"
                 placeholder="Enter amount"
-                className="w-full border border-gray-200 dark:border-border bg-white dark:bg-card text-foreground rounded-r-xl p-3.5 text-[13px] outline-none placeholder:text-gray-400"
+                className="min-w-0 w-full border border-gray-200 dark:border-border bg-white dark:bg-card text-foreground rounded-r-xl p-2.5 text-sm outline-none placeholder:text-gray-400"
               />
             </div>
           </div>
 
-          <div className="space-y-1.5">
-            <label className="text-[12px] font-medium text-gray-800 dark:text-muted-foreground">
+          <div className="space-y-1">
+            <label className="text-[11px] font-medium text-gray-800 dark:text-muted-foreground">
               Category
             </label>
             <div className="flex w-full">
-              <div className="flex items-center justify-center w-11 bg-gray-50 dark:bg-zinc-800/50 border border-r-0 border-gray-200 dark:border-border rounded-l-xl text-muted-foreground">
+              <div className="flex w-10 shrink-0 items-center justify-center bg-gray-50 dark:bg-zinc-800/50 border border-r-0 border-gray-200 dark:border-border rounded-l-xl text-muted-foreground">
                 <Tag className="w-4 h-4" />
               </div>
               <div className="flex-1">
@@ -255,18 +253,18 @@ export default function AddTransaction() {
                     });
                   }}
                   type={form.type as "income" | "expense"}
-                  className="rounded-l-none rounded-r-xl w-full h-full !p-3.5 !h-auto bg-white dark:bg-card border-l-0 text-[13px] shadow-none outline-none"
+                  className="rounded-l-none rounded-r-xl w-full p-2.5! h-auto! bg-white dark:bg-card border-l-0 text-sm shadow-none outline-none"
                 />
               </div>
             </div>
           </div>
 
-          <div className="space-y-1.5">
-            <label className="text-[12px] font-medium text-gray-800 dark:text-muted-foreground">
+          <div className="space-y-1">
+            <label className="text-[11px] font-medium text-gray-800 dark:text-muted-foreground">
               Date
             </label>
             <div className="flex w-full">
-              <div className="flex items-center justify-center w-11 bg-gray-50 dark:bg-zinc-800/50 border border-r-0 border-gray-200 dark:border-border rounded-l-xl text-muted-foreground">
+              <div className="flex w-10 shrink-0 items-center justify-center bg-gray-50 dark:bg-zinc-800/50 border border-r-0 border-gray-200 dark:border-border rounded-l-xl text-muted-foreground">
                 <CalendarIcon className="w-4 h-4" />
               </div>
               <Popover>
@@ -274,7 +272,7 @@ export default function AddTransaction() {
                   render={
                     <Button
                       variant="outline"
-                      className="flex-1 w-full border border-gray-200 dark:border-border bg-white dark:bg-card text-foreground rounded-l-none rounded-r-xl p-3.5 h-auto text-left font-normal text-[13px] text-gray-900 dark:text-foreground flex justify-between items-center hover:bg-white dark:hover:bg-card"
+                      className="flex-1 w-full border border-gray-200 dark:border-border bg-white dark:bg-card text-foreground rounded-l-none rounded-r-xl p-2.5 h-auto text-left font-normal text-sm dark:text-foreground flex justify-between items-center hover:bg-white dark:hover:bg-card"
                     >
                       {format(form.date, "MMM dd, yyyy")}
                     </Button>
@@ -282,36 +280,36 @@ export default function AddTransaction() {
                 />
                 <PopoverContent className="w-auto p-0" align="start">
                   <Calendar
-                  mode="single"
-                  selected={form.date}
-                  onSelect={(selectedDate) => {
-                    if (!selectedDate) {
-                      return;
-                    }
-                    setForm({
-                      ...form,
-                      date: selectedDate,
-                    });
-                  }}
-                />
-              </PopoverContent>
-            </Popover>
+                    mode="single"
+                    selected={form.date}
+                    onSelect={(selectedDate) => {
+                      if (!selectedDate) {
+                        return;
+                      }
+                      setForm({
+                        ...form,
+                        date: selectedDate,
+                      });
+                    }}
+                  />
+                </PopoverContent>
+              </Popover>
             </div>
           </div>
 
           {/* Buttons */}
-          <div className="flex items-center gap-3 pt-4 pb-8">
+          <div className="flex items-center gap-2 pt-2 pb-5">
             <button
               type="button"
               onClick={() => router.back()}
-              className="flex-[0.8] py-3.5 border border-gray-200 dark:border-border bg-white dark:bg-card text-foreground rounded-xl font-semibold text-[13px] text-gray-800 dark:text-muted-foreground text-center cursor-pointer"
+              className="flex-[0.8] py-2.5 border border-gray-200 dark:border-border bg-white dark:bg-card rounded-lg font-semibold text-sm text-gray-800 dark:text-muted-foreground text-center cursor-pointer"
             >
               Cancel
             </button>
             <button
               type="submit"
               disabled={isSaving}
-              className="flex-[1.2] py-3.5 bg-green-700 rounded-xl font-semibold text-[13px] text-white text-center cursor-pointer disabled:opacity-60 disabled:cursor-not-allowed"
+              className="flex-[1.2] py-2.5 bg-green-700 rounded-lg font-semibold text-sm text-white text-center cursor-pointer disabled:opacity-60 disabled:cursor-not-allowed"
             >
               {isSaving ? "Saving..." : "Save Transaction"}
             </button>
@@ -478,20 +476,20 @@ export default function AddTransaction() {
                 />
                 <PopoverContent className="w-auto p-0" align="start">
                   <Calendar
-                  mode="single"
-                  selected={form.date}
-                  onSelect={(selectedDate) => {
-                    if (!selectedDate) {
-                      return;
-                    }
-                    setForm({
-                      ...form,
-                      date: selectedDate,
-                    });
-                  }}
-                />
-              </PopoverContent>
-            </Popover>
+                    mode="single"
+                    selected={form.date}
+                    onSelect={(selectedDate) => {
+                      if (!selectedDate) {
+                        return;
+                      }
+                      setForm({
+                        ...form,
+                        date: selectedDate,
+                      });
+                    }}
+                  />
+                </PopoverContent>
+              </Popover>
             </div>
           </div>
           {/* buttons */}

@@ -7,6 +7,9 @@ import { useEffect, useState } from "react";
 import CategoryDropDown from "@/components/dropdown";
 import { toast } from "@/components/ui/toast";
 import { Skeleton } from "@/components/ui/skeleton";
+import { Menu } from "lucide-react";
+import { ModeToggle } from "@/components/toggle";
+import { useSidebar } from "@/context/sidebar-context";
 import {
   Card,
   CardAction,
@@ -29,6 +32,7 @@ type Budget = {
 };
 
 export default function Budgets() {
+  const { toggleSidebar } = useSidebar();
   const [budgets, setBudgets] = useState<Budget[]>([]);
   const [showCard, setShowCard] = useState(false);
   const [form, setForm] = useState({
@@ -187,7 +191,7 @@ export default function Budgets() {
     const Icon = categoryIcon?.icon;
 
     return (
-      <div className="flex items-center gap-6">
+      <div className="flex items-center gap-3">
         {Icon && (
           <Icon className={`w-4 h-4 ${categoryIcon?.textColor ?? ""}`} />
         )}
@@ -235,23 +239,38 @@ export default function Budgets() {
     <div className="bg-gray-100 dark:bg-background w-full h-full p-4 md:p-6 overflow-y-auto scroll-smooth">
       {/*headers*/}
       <div className="flex justify-between items-center mb-4">
-        <h1 className="text-xl font-bold">Budgets</h1>
-        <Button
-          onClick={() => {
-            setForm({ budgeted: "", category: "" });
-            setIsEditing(false);
-            setSelectedBudget(null);
-            setShowCard(true);
-          }}
-          className="cursor-pointer flex justify-between items-center"
-        >
-          <Plus />
-          <span> Add Budget</span>
-        </Button>
+        <div className="flex min-w-0 items-center gap-3">
+          <button
+            type="button"
+            onClick={toggleSidebar}
+            className="cursor-pointer rounded-md p-2 hover:bg-muted"
+            aria-label="Open navigation menu"
+          >
+            <Menu className="h-4 w-4" />
+          </button>
+          <h1 className="text-base font-bold sm:text-xl">Budgets</h1>
+        </div>
+        <div className="flex items-center gap-2">
+          <ModeToggle />
+          <Button
+            onClick={() => {
+              setForm({ budgeted: "", category: "" });
+              setIsEditing(false);
+              setSelectedBudget(null);
+              setShowCard(true);
+            }}
+            className="cursor-pointer flex items-center"
+            aria-label="Add budget"
+            title="Add budget"
+          >
+            <Plus className="h-4 w-4 sm:mr-1" />
+            <span className="hidden sm:inline">Add Budget</span>
+          </Button>
+        </div>
       </div>
 
       {/*main contents*/}
-      <div>
+      <div className="hidden md:block overflow-x-auto">
         <div>
           <table className="w-full bg-white dark:bg-card border border-gray-200 dark:border-border shadow-lg text-foreground">
             <thead className="bg-gray-200 dark:bg-zinc-800/80">
@@ -345,9 +364,104 @@ export default function Budgets() {
         </div>
       </div>
 
+      <div className="space-y-3 md:hidden">
+        {isLoading ? (
+          Array.from({ length: 4 }).map((_, index) => (
+            <div
+              key={index}
+              className="h-28 animate-pulse rounded-xl border border-border bg-card p-4"
+            >
+              <Skeleton className="h-4 w-2/5" />
+              <Skeleton className="mt-3 h-3 w-3/5" />
+              <Skeleton className="mt-4 h-2 w-full rounded-full" />
+            </div>
+          ))
+        ) : budgets.length > 0 ? (
+          budgets.map((budget) => {
+            const progress = (budget.spent / budget.budgeted) * 100;
+            const progressWidth = Math.min(progress, 100);
+            const isOverBudget = budget.spent > budget.budgeted;
+
+            return (
+              <article
+                key={budget.id}
+                className="rounded-xl border border-gray-200 bg-white p-4 shadow-sm dark:border-border dark:bg-card"
+              >
+                <div className="flex min-w-0 items-center justify-between gap-3">
+                  <div className="min-w-0">
+                    <div className="truncate text-sm font-semibold leading-5">
+                      <CategoryDisplay category={budget.category} />
+                    </div>
+                    <div className="mt-2 flex flex-wrap items-center gap-x-4 gap-y-1 text-xs leading-5 text-muted-foreground">
+                      <span>
+                        Spent{" "}
+                        <span className="font-medium text-foreground">
+                          ₦{budget.spent.toLocaleString()}
+                        </span>
+                      </span>
+                      <span>
+                        Budget{" "}
+                        <span className="font-medium text-foreground">
+                          ₦{budget.budgeted.toLocaleString()}
+                        </span>
+                      </span>
+                    </div>
+                  </div>
+                  <div className="flex shrink-0 items-center gap-2">
+                    <button
+                      type="button"
+                      aria-label={`Edit ${budget.category?.name ?? "budget"} budget`}
+                      title="Edit budget"
+                      onClick={() => {
+                        setSelectedBudget(budget);
+                        setForm({
+                          budgeted: String(budget.budgeted),
+                          category: String(budget.category_id),
+                        });
+                        setIsEditing(true);
+                        setShowCard(true);
+                      }}
+                      className="rounded-md p-2.5 text-blue-600 hover:bg-blue-50 dark:hover:bg-blue-950/30"
+                    >
+                      <Pencil className="h-4 w-4" />
+                    </button>
+                    <button
+                      type="button"
+                      aria-label={`Delete ${budget.category?.name ?? "budget"} budget`}
+                      title="Delete budget"
+                      onClick={() => deleteBudget(budget.id)}
+                      className="rounded-md p-2.5 text-red-500 hover:bg-red-50 dark:hover:bg-red-950/30"
+                    >
+                      <Trash2 className="h-4 w-4" />
+                    </button>
+                  </div>
+                </div>
+                <div className="mt-5 flex items-center gap-3">
+                  <div className="h-2 min-w-0 flex-1 overflow-hidden rounded-full bg-muted">
+                    <div
+                      className={`h-full rounded-full ${isOverBudget ? "bg-red-500" : "bg-primary"}`}
+                      style={{ width: `${progressWidth}%` }}
+                    />
+                  </div>
+                  <span
+                    className={`w-10 shrink-0 text-right text-xs font-medium ${isOverBudget ? "text-red-500" : "text-muted-foreground"}`}
+                  >
+                    {progress.toFixed(0)}%
+                  </span>
+                </div>
+              </article>
+            );
+          })
+        ) : (
+          <p className="rounded-xl border border-border bg-card py-10 text-center text-sm text-muted-foreground">
+            No budget found.
+          </p>
+        )}
+      </div>
+
       {showCard && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/30">
-          <div className="mx-auto h-85 grid w-full max-w-2xl gap-4">
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/30 p-3">
+          <div className="mx-auto grid max-h-[calc(100dvh-1.5rem)] w-full max-w-2xl gap-4 overflow-y-auto">
             <Card>
               <CardHeader>
                 <CardTitle className="mt-3">

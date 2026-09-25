@@ -245,7 +245,7 @@ function TransactionContent() {
           selectedDate,
           debouncedSearch,
         );
-        
+
         setIsLoading(false);
       } catch (error) {
         if (error instanceof DOMException && error.name === "AbortError") {
@@ -454,65 +454,83 @@ function TransactionContent() {
           />
         </div>
 
-        {/* Mobile Table List */}
-        <div className="bg-white dark:bg-card rounded-xl border border-gray-100 dark:border-border shadow-sm p-2 text-foreground">
-          <table className="w-full text-xs">
-            <thead>
-              <tr className="border-b border-gray-100 dark:border-border text-muted-foreground">
-                <th className="py-3 px-2 text-left font-semibold">Date</th>
-                <th className="py-3 px-2 text-center font-semibold">
-                  Description
-                </th>
-                <th className="py-3 px-2 text-right font-semibold">Amount</th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-gray-50 dark:divide-border">
-              {isLoading && transactions.length === 0
-                ? Array.from({ length: 8 }).map((_, i) => (
-                    <tr
-                      key={i}
-                      className="border border-gray-100 dark:border-border animate-pulse"
-                    >
-                      <td className="py-4 px-2">
-                        <div className="h-3 bg-gray-200 dark:bg-zinc-700 rounded w-16" />
-                      </td>
-                      <td className="py-4 px-2 flex justify-center">
-                        <div
-                          className="h-3 bg-gray-200 dark:bg-zinc-700 rounded"
-                          style={{ width: `${60 + (i % 4) * 15}px` }}
-                        />
-                      </td>
-                      <td className="py-4 px-2">
-                        <div className="h-3 bg-gray-200 dark:bg-zinc-700 rounded w-14 ml-auto" />
-                      </td>
-                    </tr>
-                  ))
-                : transactions.map((transaction, index) => (
-                    <tr
-                      key={transaction.id || index}
-                      className="border border-gray-100 dark:border-border"
-                    >
-                      <td className="py-4 px-2 text-left text-muted-foreground">
-                        {new Date(transaction.date).toLocaleDateString()}
-                      </td>
-                      <td className="py-4 px-2 text-center font-medium">
+        {/* Mobile transaction list */}
+        <div className="space-y-2 text-foreground">
+          {isLoading && transactions.length === 0
+            ? Array.from({ length: 5 }).map((_, index) => (
+                <div
+                  key={index}
+                  className="h-24 rounded-xl border border-gray-100 bg-white p-4 shadow-sm animate-pulse dark:border-border dark:bg-card"
+                >
+                  <div className="h-3 w-2/5 rounded bg-gray-200 dark:bg-zinc-700" />
+                  <div className="mt-3 h-3 w-3/5 rounded bg-gray-200 dark:bg-zinc-700" />
+                </div>
+              ))
+            : transactions.map((transaction, index) => (
+                <article
+                  key={transaction.id || index}
+                  className="rounded-xl border border-gray-100 bg-white p-3 shadow-sm dark:border-border dark:bg-card"
+                >
+                  <div className="flex min-w-0 items-start justify-between gap-2">
+                    <div className="min-w-0">
+                      <p className="truncate text-sm font-semibold">
                         {transaction.description}
-                      </td>
-                      <td className="py-4 px-2 text-right text-red-500 font-bold">
-                        {(transaction.amount ?? 0).toLocaleString()}
-                      </td>
-                    </tr>
-                  ))}
+                      </p>
+                      <p className="mt-1 text-[11px] text-muted-foreground">
+                        {new Date(transaction.date).toLocaleDateString()}
+                      </p>
+                    </div>
+                    <p
+                      className={`shrink-0 text-sm font-bold ${transaction.type === "income" ? "text-green-600" : "text-red-500"}`}
+                    >
+                      {transaction.type === "income" ? "+" : "-"}₦
+                      {(transaction.amount ?? 0).toLocaleString()}
+                    </p>
+                  </div>
+                  <div className="mt-3 flex items-center justify-between gap-2 border-t border-gray-100 pt-2 dark:border-border">
+                    <div className="flex min-w-0 items-center gap-2 text-[11px] text-muted-foreground">
+                      <CategoryDisplay category={transaction.category} />
+                      <span className="shrink-0 rounded-full bg-muted px-2 py-0.5 capitalize">
+                        {transaction.type}
+                      </span>
+                    </div>
+                    <div className="flex shrink-0 items-center gap-1">
+                      <button
+                        type="button"
+                        aria-label={`Edit ${transaction.description}`}
+                        title="Edit transaction"
+                        onClick={() => {
+                          sessionStorage.setItem(
+                            `editTransaction_${transaction.id}`,
+                            JSON.stringify(transaction),
+                          );
+                          router.push(
+                            `/dashboard/transaction/editTransaction/${transaction.id}`,
+                          );
+                        }}
+                        className="rounded-md p-2 text-blue-600 hover:bg-blue-50 dark:hover:bg-blue-950/30"
+                      >
+                        <Pencil className="h-4 w-4" />
+                      </button>
+                      <button
+                        type="button"
+                        aria-label={`Delete ${transaction.description}`}
+                        title="Delete transaction"
+                        onClick={() => deleteTransaction(transaction.id)}
+                        className="rounded-md p-2 text-red-500 hover:bg-red-50 dark:hover:bg-red-950/30"
+                      >
+                        <Trash2 className="h-4 w-4" />
+                      </button>
+                    </div>
+                  </div>
+                </article>
+              ))}
 
-              {!isLoading && transactions.length === 0 && (
-                <tr>
-                  <td colSpan={3} className="py-10 text-center text-gray-500">
-                    No transactions found.
-                  </td>
-                </tr>
-              )}
-            </tbody>
-          </table>
+          {!isLoading && transactions.length === 0 && (
+            <p className="rounded-xl border border-gray-100 bg-white py-10 text-center text-sm text-muted-foreground dark:border-border dark:bg-card">
+              No transactions found.
+            </p>
+          )}
         </div>
 
         {/* Mobile Pagination */}
