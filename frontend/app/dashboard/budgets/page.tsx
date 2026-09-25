@@ -533,7 +533,8 @@ export default function Budgets() {
                   <div className="flex justify-end gap-3 border-none mt-7 bg-none">
                     <Button
                       type="button"
-                      className="cursor-pointer bg-0 border-xl text-black hover:opacity-100 hover:text-white"
+                      variant="outline"
+                      className="cursor-pointer border-border bg-white text-gray-800 shadow-sm hover:bg-gray-100 active:bg-gray-200 dark:bg-card dark:text-foreground dark:hover:bg-muted dark:active:bg-muted/80"
                       onClick={() => {
                         setForm({ budgeted: "", category: "" });
                         setIsEditing(false);

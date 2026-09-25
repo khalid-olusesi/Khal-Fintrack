@@ -64,7 +64,9 @@ export default function Main() {
           <p className="text-[12px] text-muted-foreground uppercase font-medium tracking-wider">
             Total Balance
           </p>
-          <p className="text-2xl font-bold text-gray-900 my-1">$5,231.89</p>
+          <p className="text-2xl font-bold text-gray-900 dark:text-foreground my-1">
+            $5,231.89
+          </p>
           <p className="text-[12px] text-green-600 flex items-center gap-1 font-medium">
             <span>▲</span> 12.5% from last month
           </p>
@@ -157,7 +159,7 @@ export default function Main() {
               ].map((item, i) => (
                 <div
                   key={i}
-                  className="flex items-center justify-between text-[11px] text-gray-700"
+                  className="flex items-center justify-between text-[11px] text-gray-700 dark:text-muted-foreground"
                 >
                   <div className="flex items-center gap-1.5 truncate">
                     <div
@@ -165,7 +167,7 @@ export default function Main() {
                     ></div>
                     <span className="truncate">{item.name}</span>
                   </div>
-                  <span className="font-medium text-gray-900 ml-1">
+                  <span className="font-medium text-gray-900 dark:text-foreground ml-1">
                     {item.val}
                   </span>
                 </div>
@@ -175,9 +177,9 @@ export default function Main() {
         </div>
 
         {/* Recent Transactions */}
-        <div className="bg-white shadow-sm border border-gray-100 rounded-xl p-4">
+        <div className="bg-white dark:bg-card shadow-sm border border-gray-100 dark:border-border rounded-xl p-4">
           <div className="flex justify-between items-center mb-4">
-            <p className="font-bold text-sm text-gray-900">
+            <p className="font-bold text-sm text-gray-900 dark:text-foreground">
               Recent Transactions
             </p>
             <span
@@ -192,11 +194,11 @@ export default function Main() {
             {/* Transaction 1 */}
             <div className="flex justify-between items-center">
               <div className="flex items-center gap-3">
-                <div className="bg-blue-50 flex justify-center items-center rounded-full w-9 h-9 shrink-0">
+                <div className="bg-blue-50 dark:bg-blue-950/30 flex justify-center items-center rounded-full w-9 h-9 shrink-0">
                   <ShoppingCart className="w-4 h-4 text-blue-600" />
                 </div>
                 <div>
-                  <p className="text-xs font-semibold text-gray-900">
+                  <p className="text-xs font-semibold text-gray-900 dark:text-foreground">
                     Grocery Store
                   </p>
                   <p className="text-muted-foreground text-[10px]">Today</p>
@@ -208,11 +210,13 @@ export default function Main() {
             {/* Transaction 2 */}
             <div className="flex justify-between items-center">
               <div className="flex items-center gap-3">
-                <div className="bg-yellow-50 flex justify-center items-center rounded-full w-9 h-9 shrink-0">
+                <div className="bg-yellow-50 dark:bg-yellow-950/30 flex justify-center items-center rounded-full w-9 h-9 shrink-0">
                   <BriefcaseBusiness className="w-4 h-4 text-yellow-600" />
                 </div>
                 <div>
-                  <p className="text-xs font-semibold text-gray-900">Salary</p>
+                  <p className="text-xs font-semibold text-gray-900 dark:text-foreground">
+                    Salary
+                  </p>
                   <p className="text-muted-foreground text-[10px]">May 12</p>
                 </div>
               </div>
@@ -222,11 +226,11 @@ export default function Main() {
             {/* Transaction 3 */}
             <div className="flex justify-between items-center">
               <div className="flex items-center gap-3">
-                <div className="bg-red-50 flex justify-center items-center rounded-full w-9 h-9 shrink-0">
+                <div className="bg-red-50 dark:bg-red-950/30 flex justify-center items-center rounded-full w-9 h-9 shrink-0">
                   <MonitorPlay className="w-4 h-4 text-red-500" />
                 </div>
                 <div>
-                  <p className="text-xs font-semibold text-gray-900">
+                  <p className="text-xs font-semibold text-gray-900 dark:text-foreground">
                     Netflix Subscription
                   </p>
                   <p className="text-muted-foreground text-[10px]">May 11</p>

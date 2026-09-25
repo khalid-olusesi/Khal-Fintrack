@@ -259,7 +259,8 @@ export default function CardSpacing({
             <div className="flex justify-end gap-2 border-none mt-5 bg-none sm:mt-7 sm:gap-3">
               <Button
                 type="button"
-                className="cursor-pointer bg-0 border-xl text-sm text-black hover:opacity-100 hover:text-white"
+                variant="outline"
+                className="cursor-pointer border-border bg-white text-gray-800 shadow-sm hover:bg-gray-100 active:bg-gray-200 dark:bg-card dark:text-foreground dark:hover:bg-muted dark:active:bg-muted/80"
                 onClick={() => {
                   handleCancel();
                   onClose();

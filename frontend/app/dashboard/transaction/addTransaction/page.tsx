@@ -302,7 +302,7 @@ export default function AddTransaction() {
             <button
               type="button"
               onClick={() => router.back()}
-              className="flex-[0.8] py-2.5 border border-gray-200 dark:border-border bg-white dark:bg-card rounded-lg font-semibold text-sm text-gray-800 dark:text-muted-foreground text-center cursor-pointer"
+              className="flex-[0.8] py-2.5 border border-gray-200 dark:border-border bg-white text-gray-800 rounded-lg font-semibold text-sm text-center cursor-pointer hover:bg-gray-100 active:bg-gray-200 dark:bg-card dark:text-foreground dark:hover:bg-muted dark:active:bg-muted/80"
             >
               Cancel
             </button>
@@ -496,7 +496,7 @@ export default function AddTransaction() {
           <div className="flex items-center justify-end gap-4 mt-7">
             <button
               type="button"
-              className="border-2 border-gray-250 dark:border-border text-foreground rounded-lg cursor-pointer p-1.5 pb-1.5 pl-7 pr-7 dark:bg-card"
+              className="border border-border bg-white text-gray-800 rounded-lg cursor-pointer px-7 py-2 text-sm font-medium shadow-sm hover:bg-gray-100 active:bg-gray-200 dark:bg-card dark:text-foreground dark:hover:bg-muted dark:active:bg-muted/80"
               onClick={handleCancel}
             >
               Cancel
