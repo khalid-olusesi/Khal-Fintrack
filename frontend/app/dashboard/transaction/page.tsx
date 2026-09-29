@@ -12,15 +12,7 @@ import { Pencil, Trash2 } from "lucide-react";
 import { useEffect, useRef, useState, Suspense } from "react";
 import { Icons } from "@/components/category-icons";
 import { Skeleton } from "@/components/ui/skeleton";
-import {
-  Select,
-  SelectContent,
-  SelectGroup,
-  SelectItem,
-  SelectLabel,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
+import DateFilter from "@/components/date-filter";
 import { useRouter, useSearchParams } from "next/navigation";
 import CategoryDropDown from "@/components/dropdown";
 
@@ -323,15 +315,6 @@ function TransactionContent() {
     router.push(`?page=${page}`, { scroll: false });
   };
 
-  const dateOptions = [
-    { label: "Today", value: "Today" },
-    { label: "This Week", value: "This Week" },
-    { label: "This Month", value: "This Month" },
-    { label: "Last Month", value: "Last Month" },
-    { label: "Last 3 Months", value: "Last 3 Months" },
-    { label: "This Year", value: "This Year" },
-  ];
-
   //for pagination
   const getPageNumbers = () => {
     const pages: (number | string)[] = [];
@@ -418,24 +401,13 @@ function TransactionContent() {
           </div>
 
           <div className="flex-1">
-            <Select
+            <DateFilter
               value={selectedDate}
               onValueChange={(value) => {
                 setSelectedDate(value ?? "This Month");
                 setCurrentPage(1);
               }}
-            >
-              <SelectTrigger className="w-full bg-white dark:bg-card border border-gray-200 dark:border-border text-xs py-1.5 px-3 rounded-lg h-9">
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent>
-                {dateOptions.map((date) => (
-                  <SelectItem key={date.value} value={date.value}>
-                    {date.label}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
+            />
           </div>
         </div>
 
@@ -578,21 +550,23 @@ function TransactionContent() {
       {/* --- DESKTOP VIEW --- */}
       <div className="hidden md:block">
         {/* header */}
-        <div className="flex items-center justify-between mb-4">
-          <div className="flex gap-4 items-center">
-            <button className="cursor-pointer" onClick={toggleSidebar}>
+        <div className="flex items-center justify-between mb-6">
+          <div className="flex gap-3 items-center">
+            <button
+              className="cursor-pointer rounded-md p-2 hover:bg-muted"
+              onClick={toggleSidebar}
+              aria-label="Open navigation menu"
+            >
               <Menu className="w-4 h-4" />
             </button>
-            <h1 className="text-xl font-bold">Transaction</h1>
+            <h1 className="text-base font-bold sm:text-xl">Transactions</h1>
           </div>
 
           <div className="flex items-center gap-3">
             <ModeToggle />
             <Button
               type="submit"
-              onClick={() => {
-                router.push("/dashboard/transaction/addTransaction");
-              }}
+              onClick={() => router.push("/dashboard/transaction/addTransaction")}
               className="cursor-pointer flex items-center"
             >
               <span>Add Transaction</span>
@@ -601,8 +575,8 @@ function TransactionContent() {
           </div>
         </div>
 
-        {/* dropdowns */}
-        <div className="flex items-center justify-between mt-5 mb-10">
+        {/* Filters row */}
+        <div className="flex items-center justify-between mb-5 gap-3">
           <CategoryDropDown
             value={selectedCategory}
             onValueChange={(value) => {
@@ -611,68 +585,45 @@ function TransactionContent() {
             }}
             type="all"
           />
-          <Select
+          <DateFilter
             value={selectedDate}
             onValueChange={(value) => {
               setSelectedDate(value ?? "This Month");
               setCurrentPage(1);
             }}
-          >
-            <SelectTrigger className="w-full max-w-48 bg-white">
-              <SelectValue placeholder="All Categories" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectGroup>
-                <SelectLabel>Date</SelectLabel>
-                {dateOptions.map((date) => (
-                  <SelectItem key={date.value} value={date.value}>
-                    {date.label}
-                  </SelectItem>
-                ))}
-              </SelectGroup>
-            </SelectContent>
-          </Select>
-
+          />
           <div className="relative">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
-
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
             <input
               value={search}
-              onChange={(e) => {
-                setSearch(e.target.value);
-                setCurrentPage(1);
-              }}
+              onChange={(e) => { setSearch(e.target.value); setCurrentPage(1); }}
               type="text"
               placeholder="Search transactions..."
-              className="w-full rounded-lg border border-gray-200 dark:border-border py-1 pl-10 pr-10 outline-none bg-white dark:bg-card text-foreground"
+              className="w-full rounded-lg border border-border py-2 pl-10 pr-10 outline-none bg-white dark:bg-card text-foreground text-sm  transition"
             />
-
             {search && (
               <button
                 type="button"
-                onClick={() => {
-                  setSearch("");
-                  setCurrentPage(1);
-                }}
+                onClick={() => { setSearch(""); setCurrentPage(1); }}
                 className="absolute right-3 top-1/2 -translate-y-1/2 cursor-pointer"
               >
-                <X className="w-4 h-4 text-gray-400 hover:text-gray-700" />
+                <X className="w-4 h-4 text-muted-foreground hover:text-foreground" />
               </button>
             )}
           </div>
         </div>
 
-        {/* tables */}
-        <div>
-          <table className="w-full bg-white dark:bg-card border border-gray-200 dark:border-border shadow-lg text-foreground">
-            <thead className="bg-gray-200 dark:bg-zinc-800/80">
+        {/* Table card */}
+        <div className="bg-white dark:bg-card rounded-2xl shadow-sm border border-border overflow-hidden">
+          <table className="w-full text-foreground">
+            <thead className="bg-gray-50 dark:bg-zinc-800/60 border-b border-border">
               <tr>
-                <th className="p-4 text-left">Date</th>
-                <th className="text-left">Description</th>
-                <th className="text-left">Category</th>
-                <th className="text-left">Type</th>
-                <th className="text-left">Amount</th>
-                <th className="text-center">Action</th>
+                <th className="p-4 text-left text-xs font-medium text-muted-foreground uppercase tracking-wide">Date</th>
+                <th className="text-left text-xs font-medium text-muted-foreground uppercase tracking-wide">Description</th>
+                <th className="text-left text-xs font-medium text-muted-foreground uppercase tracking-wide">Category</th>
+                <th className="text-left text-xs font-medium text-muted-foreground uppercase tracking-wide">Type</th>
+                <th className="text-left text-xs font-medium text-muted-foreground uppercase tracking-wide">Amount</th>
+                <th className="text-center text-xs font-medium text-muted-foreground uppercase tracking-wide">Action</th>
               </tr>
             </thead>
 
@@ -686,13 +637,13 @@ function TransactionContent() {
                 transactions.map((transaction, index) => (
                   <tr
                     key={transaction.id ?? index}
-                    className="border-b border-gray-200 dark:border-border hover:bg-gray-50 dark:hover:bg-zinc-800/50"
+                    className="border-b border-border last:border-0 hover:bg-gray-50 dark:hover:bg-zinc-800/40 transition-colors text-sm"
                   >
                     <td className="p-4">
                       {new Date(transaction.date).toLocaleDateString()}
                     </td>
 
-                    <td>{transaction.description}</td>
+                    <td className="font-medium">{transaction.description}</td>
 
                     <td>
                       <CategoryDisplay category={transaction.category} />
@@ -700,49 +651,49 @@ function TransactionContent() {
 
                     <td>
                       <span
-                        className={
+                        className={`inline-flex items-center rounded-full px-2 py-0.5 text-xs font-medium ${
                           transaction.type === "income"
-                            ? "text-green-600 font-medium"
-                            : "text-red-500 font-medium"
-                        }
+                            ? "bg-green-50 text-green-700 dark:bg-green-950/40 dark:text-green-400"
+                            : "bg-red-50 text-red-700 dark:bg-red-950/40 dark:text-red-400"
+                        }`}
                       >
                         {transaction.type}
                       </span>
                     </td>
 
                     <td
-                      className={
-                        transaction.type === "income"
-                          ? "text-green-600 font-semibold"
-                          : "text-red-500 font-semibold"
-                      }
+                      className={`font-semibold ${
+                        transaction.type === "income" ? "text-green-600" : "text-red-500"
+                      }`}
                     >
                       ₦{(transaction.amount ?? 0).toLocaleString()}
                     </td>
 
                     <td className="py-4">
-                      <div className="flex items-center gap-4  justify-evenly">
-                        <button className="cursor-pointer">
+                      <div className="flex items-center gap-2 justify-center">
+                        <button
+                          className="cursor-pointer rounded-md p-1.5 text-blue-600 hover:bg-blue-50 dark:hover:bg-blue-950/30 transition-colors"
+                          aria-label="Edit transaction"
+                        >
                           <Pencil
                             onClick={() => {
                               sessionStorage.setItem(
                                 `editTransaction_${transaction.id}`,
                                 JSON.stringify(transaction),
                               );
-                              router.push(
-                                `/dashboard/transaction/editTransaction/${transaction.id}`,
-                              );
+                              router.push(`/dashboard/transaction/editTransaction/${transaction.id}`);
                             }}
-                            className="w-4 h-4 text-blue-600 hover:text-blue-800"
+                            className="w-4 h-4"
                           />
                         </button>
 
-                        <button className="cursor-pointer">
+                        <button
+                          className="cursor-pointer rounded-md p-1.5 text-red-500 hover:bg-red-50 dark:hover:bg-red-950/30 transition-colors"
+                          aria-label="Delete transaction"
+                        >
                           <Trash2
-                            onClick={() => {
-                              deleteTransaction(transaction.id);
-                            }}
-                            className="w-4 h-4 text-red-500 hover:text-red-700"
+                            onClick={() => deleteTransaction(transaction.id)}
+                            className="w-4 h-4"
                           />
                         </button>
                       </div>
@@ -752,7 +703,7 @@ function TransactionContent() {
 
               {!isLoading && transactions.length === 0 && (
                 <tr>
-                  <td colSpan={6} className="py-10 text-center text-gray-500">
+                  <td colSpan={6} className="py-16 text-center text-sm text-muted-foreground">
                     No transactions found.
                   </td>
                 </tr>

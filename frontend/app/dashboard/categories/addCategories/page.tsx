@@ -169,15 +169,15 @@ export default function CardSpacing({
         <CardContent>
           <form onSubmit={handleSubmit}>
             <div className="flex flex-col gap-4 sm:gap-6">
-              <div className="grid gap-2">
+              <div className="grid gap-1.5">
                 <Label
                   htmlFor="texts-spacing"
-                  className="text-sm text-muted-foreground"
+                  className="text-sm font-medium text-gray-700 dark:text-muted-foreground"
                 >
                   Category Name
                 </Label>
-                <div className="flex w-full">
-                  <div className="flex items-center justify-center w-11 bg-gray-50 dark:bg-zinc-800/50 border border-r-0 border-gray-200 dark:border-border rounded-l-md text-muted-foreground">
+                <div className="flex w-full shadow-sm rounded-xl overflow-hidden border border-border bg-white dark:bg-card transition-all">
+                  <div className="flex items-center justify-center w-12 bg-gray-50 dark:bg-zinc-800/50 border-r border-border text-muted-foreground">
                     <Tag className="w-4 h-4" />
                   </div>
                   <Input
@@ -192,21 +192,21 @@ export default function CardSpacing({
                         name: e.target.value,
                       });
                     }}
-                    className="rounded-l-none text-sm"
+                    className="w-full bg-transparent border-none text-sm shadow-none outline-none rounded-none rounded-r-xl"
                   />
                 </div>
               </div>
-              <div className="grid gap-2">
+              <div className="grid gap-1.5">
                 <div className="flex items-center">
                   <Label
                     htmlFor="texts-spacing"
-                    className="text-sm text-muted-foreground"
+                    className="text-sm font-medium text-gray-700 dark:text-muted-foreground"
                   >
                     Type
                   </Label>
                 </div>
-                <div className="flex w-full">
-                  <div className="flex items-center justify-center w-11 bg-gray-50 dark:bg-zinc-800/50 border border-r-0 border-gray-200 dark:border-border rounded-l-md text-muted-foreground">
+                <div className="flex w-full shadow-sm rounded-xl overflow-hidden border border-border bg-white dark:bg-card transition-all">
+                  <div className="flex items-center justify-center w-12 bg-gray-50 dark:bg-zinc-800/50 border-r border-border text-muted-foreground">
                     <List className="w-4 h-4" />
                   </div>
                   <Select
@@ -218,7 +218,7 @@ export default function CardSpacing({
                       });
                     }}
                   >
-                    <SelectTrigger className="w-full max-w-full rounded-l-none text-sm">
+                    <SelectTrigger className="w-full bg-transparent border-none text-sm shadow-none outline-none rounded-none rounded-r-xl">
                       <SelectValue placeholder="Select Type" />
                     </SelectTrigger>
                     <SelectContent>
@@ -256,11 +256,11 @@ export default function CardSpacing({
               </div>
             </div>
 
-            <div className="flex justify-end gap-2 border-none mt-5 bg-none sm:mt-7 sm:gap-3">
+            <div className="flex justify-end gap-3 border-t border-border pt-5 mt-5 sm:mt-7">
               <Button
                 type="button"
                 variant="outline"
-                className="cursor-pointer border-border bg-white text-gray-800 shadow-sm hover:bg-gray-100 active:bg-gray-200 dark:bg-card dark:text-foreground dark:hover:bg-muted dark:active:bg-muted/80"
+                className="cursor-pointer rounded-xl border-border bg-white text-gray-800 shadow-sm hover:bg-gray-50 active:bg-gray-100 dark:bg-card dark:text-foreground dark:hover:bg-zinc-800/40 transition-colors"
                 onClick={() => {
                   handleCancel();
                   onClose();
@@ -270,7 +270,7 @@ export default function CardSpacing({
               </Button>
               <Button
                 type="submit"
-                className="cursor-pointer text-sm"
+                className="cursor-pointer rounded-xl text-sm font-medium shadow-sm transition-colors"
                 disabled={isSaving}
               >
                 {isSaving

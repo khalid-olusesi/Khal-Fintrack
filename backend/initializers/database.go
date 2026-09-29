@@ -31,6 +31,6 @@ func ConnectToDB() {
 	DB, err = gorm.Open(postgres.Open(dsn), &gorm.Config{}) //This opens the connection to Neon.
 
 	if err != nil {
-		panic("failed to connect DB")
+		panic("failed to connect ")
 	}
 } //connecting to the database

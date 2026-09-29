@@ -14,7 +14,7 @@ func init() {
 	initializers.LoadEnvVariables() //displaying the loaded env file in the main project
 	initializers.ConnectToDB()
 	initializers.SyncDatabase()
-
+	initializers.ConnectCloudinary()
 }
 
 func main() {

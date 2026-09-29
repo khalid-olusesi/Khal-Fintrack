@@ -100,9 +100,13 @@ export default function Categories() {
     // container
     <div className="relative bg-gray-100 dark:bg-background w-full h-full p-4 md:p-6 overflow-y-auto scroll-smooth">
       {/*header*/}
-      <div className="flex items-center justify-between mb-4">
-        <div className="flex gap-4 items-center">
-          <button className="cursor-pointer" onClick={toggleSidebar}>
+      <div className="flex items-center justify-between mb-6">
+        <div className="flex gap-3 items-center">
+          <button
+            className="cursor-pointer rounded-md p-2 hover:bg-muted"
+            onClick={toggleSidebar}
+            aria-label="Open navigation menu"
+          >
             <Menu className="w-4 h-4" />
           </button>
           <h1 className="text-base font-bold sm:text-xl">Categories</h1>
@@ -122,87 +126,97 @@ export default function Categories() {
         </div>
       </div>
 
-      {/* tables */}
-      <div className="mt-5 md:mt-10 hidden md:block overflow-x-auto">
-        <table className="w-full bg-white dark:bg-card border border-gray-200 dark:border-border shadow-lg text-foreground">
-          <thead className="bg-gray-200 dark:bg-zinc-800/80">
-            <tr>
-              <th className="p-4 text-left">Category</th>
-              <th className="text-left">Type</th>
-              <th className="text-end pr-6">Action</th>
-            </tr>
-          </thead>
-
-          <tbody>
-            {isLoading ? (
-              Array.from({ length: 4 }).map((_, idx) => (
-                <CategorySkeleton key={idx} />
-              ))
-            ) : categories.length > 0 ? (
-              categories.map((category) => {
-                const categoryIcon = Icons.find(
-                  (item) => item.name === category.icon,
-                ); //to get one icon at a time, it gets the icon that matches a name
-
-                const Icon = categoryIcon?.icon;
-
-                return (
-                  <tr
-                    key={category.id}
-                    className="border-b border-gray-200 dark:border-border hover:bg-gray-50 dark:hover:bg-zinc-800/50"
-                  >
-                    <td className="p-4">
-                      <div className="flex items-center gap-4">
-                        {Icon && (
-                          <div
-                            className={`rounded-full p-2 border-2 ${categoryIcon?.selectedBg}`}
-                          >
-                            <Icon
-                              className={`w-3.5 h-3.5 ${categoryIcon?.textColor}`}
-                            />
-                          </div>
-                        )}
-                        <span>{category.name}</span>
-                      </div>
-                    </td>
-
-                    <td>{category.type}</td>
-
-                    <td className="py-4">
-                      <div className="flex items-center justify-end pr-4 gap-10">
-                        <button
-                          onClick={() => {
-                            setSelectedCategory(category);
-                            setShowCard(true);
-                            setIsEditing(true);
-                          }}
-                          className="cursor-pointer"
-                        >
-                          <Pencil className="w-4 h-4 text-blue-600 hover:text-blue-800" />
-                        </button>
-
-                        <button
-                          className="cursor-pointer"
-                          onClick={() => {
-                            deleteCategory(category.id);
-                          }}
-                        >
-                          <Trash2 className="w-4 h-4 text-red-500 hover:text-red-700" />
-                        </button>
-                      </div>
-                    </td>
-                  </tr>
-                );
-              })
-            ) : (
+      {/* Desktop card */}
+      <div className="hidden md:block">
+        <div className="bg-white dark:bg-card rounded-2xl shadow-sm border border-border overflow-hidden">
+          <table className="w-full text-foreground">
+            <thead className="bg-gray-50 dark:bg-zinc-800/60 border-b border-border">
               <tr>
-                <td colSpan={3} className="py-10 text-center text-gray-500">
-                  No categories found.
-                </td>
+                <th className="p-4 text-left text-xs font-medium text-muted-foreground uppercase tracking-wide">Category</th>
+                <th className="text-left text-xs font-medium text-muted-foreground uppercase tracking-wide">Type</th>
+                <th className="text-end pr-6 text-xs font-medium text-muted-foreground uppercase tracking-wide">Action</th>
               </tr>
-            )}
-          </tbody>
-        </table>
+            </thead>
+
+            <tbody>
+              {isLoading ? (
+                Array.from({ length: 4 }).map((_, idx) => (
+                  <CategorySkeleton key={idx} />
+                ))
+              ) : categories.length > 0 ? (
+                categories.map((category) => {
+                  const categoryIcon = Icons.find(
+                    (item) => item.name === category.icon,
+                  );
+
+                  const Icon = categoryIcon?.icon;
+
+                  return (
+                    <tr
+                      key={category.id}
+                      className="border-b border-border last:border-0 hover:bg-gray-50 dark:hover:bg-zinc-800/40 transition-colors text-sm"
+                    >
+                      <td className="p-4">
+                        <div className="flex items-center gap-4">
+                          {Icon && (
+                            <div
+                              className={`rounded-full p-2 border-2 ${categoryIcon?.selectedBg}`}
+                            >
+                              <Icon
+                                className={`w-3.5 h-3.5 ${categoryIcon?.textColor}`}
+                              />
+                            </div>
+                          )}
+                          <span className="font-medium">{category.name}</span>
+                        </div>
+                      </td>
+
+                      <td>
+                        <span
+                          className={`inline-flex items-center rounded-full px-2 py-0.5 text-xs font-medium capitalize ${
+                            category.type === "income"
+                              ? "bg-green-50 text-green-700 dark:bg-green-950/40 dark:text-green-400"
+                              : "bg-red-50 text-red-700 dark:bg-red-950/40 dark:text-red-400"
+                          }`}
+                        >
+                          {category.type}
+                        </span>
+                      </td>
+
+                      <td className="py-4">
+                        <div className="flex items-center justify-end pr-4 gap-6">
+                          <button
+                            onClick={() => {
+                              setSelectedCategory(category);
+                              setShowCard(true);
+                              setIsEditing(true);
+                            }}
+                            className="cursor-pointer rounded-md p-1.5 text-blue-600 hover:bg-blue-50 dark:hover:bg-blue-950/30 transition-colors"
+                          >
+                            <Pencil className="w-4 h-4" />
+                          </button>
+
+                          <button
+                            className="cursor-pointer rounded-md p-1.5 text-red-500 hover:bg-red-50 dark:hover:bg-red-950/30 transition-colors"
+                            onClick={() => deleteCategory(category.id)}
+                          >
+                            <Trash2 className="w-4 h-4" />
+                          </button>
+                        </div>
+                      </td>
+                    </tr>
+                  );
+                })
+              ) : (
+                <tr>
+                  <td colSpan={3} className="py-16 text-center text-sm text-muted-foreground">
+                    No categories found.
+                  </td>
+                </tr>
+              )}
+            </tbody>
+          </table>
+        </div>
       </div>
 
       <div className="mt-5 space-y-3 md:hidden">

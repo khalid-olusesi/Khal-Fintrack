@@ -134,7 +134,7 @@ export default function Login() {
                     email: e.target.value,
                   })
                 }
-                className="border rounded-[8px] outline-0 p-2.5 text-[13px] md:text-[14px] w-[100%] pl-3 bg-white dark:bg-card border-gray-200 dark:border-border text-foreground dark:placeholder-gray-500"
+                className="border rounded-xl outline-none p-3 text-[13px] md:text-[14px] w-[100%] pl-3 bg-white dark:bg-card border-border shadow-sm text-foreground dark:placeholder-gray-500 transition-colors focus:border-gray-300 dark:focus:border-gray-700"
                 type="email"
                 placeholder="john@example.com"
               />
@@ -156,7 +156,7 @@ export default function Login() {
                       password: e.target.value,
                     })
                   }
-                  className="border rounded-[8px] outline-0 p-2.5 text-[13px] md:text-[14px] w-[100%] pl-3 pr-10 mb-2 bg-white dark:bg-card border-gray-200 dark:border-border text-foreground dark:placeholder-gray-500"
+                  className="border rounded-xl outline-none p-3 text-[13px] md:text-[14px] w-[100%] pl-3 pr-10 mb-2 bg-white dark:bg-card border-border shadow-sm text-foreground dark:placeholder-gray-500 transition-colors focus:border-gray-300 dark:focus:border-gray-700"
                   type="password"
                   placeholder="********"
                 />
@@ -174,7 +174,7 @@ export default function Login() {
             <div className="mt-6">
               <Button
                 type="submit"
-                className="cursor-pointer w-[100%] p-5 mb-1.5 rounded-xl md:rounded-lg"
+                className="cursor-pointer w-[100%] p-5 mb-1.5 rounded-xl font-semibold shadow-sm"
               >
                 Login
               </Button>

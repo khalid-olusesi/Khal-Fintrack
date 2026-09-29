@@ -7,6 +7,7 @@ import (
 	"os"
 	"time"
 
+	"github.com/cloudinary/cloudinary-go/v2/api/uploader"
 	"github.com/gin-gonic/gin"
 	"github.com/golang-jwt/jwt/v5"
 	"golang.org/x/crypto/bcrypt"
@@ -188,6 +189,222 @@ func Validate(c *gin.Context) {
 		})
 		return
 	}
+}
+
+func GetProfile(c *gin.Context) {
+	user, exists := c.Get("user")
+
+	if !exists {
+		c.JSON(http.StatusUnauthorized, gin.H{
+			"error": "user unauthorized",
+		})
+		return
+	}
+
+	currentUser := user.(*models.User)
+
+	c.JSON(http.StatusOK, gin.H{
+		"user": gin.H{
+			"id":    currentUser.ID,
+			"name":  currentUser.Name,
+			"email": currentUser.Email,
+			"avatar_url": currentUser.AvatarURL,
+		},
+	})
+}
+
+func UpdateProfile(c *gin.Context) {
+	user, exists := c.Get("user")
+
+	if !exists {
+		c.JSON(http.StatusUnauthorized, gin.H{
+			"error": "user unauthorized",
+		})
+		return
+	}
+
+	currentUser := user.(*models.User)
+
+	var body struct {
+		Name string `json:"name"`
+	}
+
+	err := c.ShouldBindJSON(&body)
+
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"error": "failed to read the request body",
+		})
+		return
+	}
+
+	currentUser.Name = body.Name
+
+	results := initializers.DB.Save(currentUser)
+
+	if results.Error != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"error": "failed to update profile",
+		})
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{
+		"message": "Profile updated successfully",
+		"user": gin.H{
+			"id":         currentUser.ID,
+			"name":       currentUser.Name,
+			"email":      currentUser.Email,
+			"avatar_url": currentUser.AvatarURL,
+		},
+	})
+}
+
+func ChangePassword(c *gin.Context) {
+	user, exists := c.Get("user")
+
+	if !exists {
+		c.JSON(http.StatusUnauthorized, gin.H{
+			"error": "user unauthorized",
+		})
+		return
+	}
+
+	currentUser := user.(*models.User)
+
+	var body struct {
+		CurrentPassword string `json:"current_password"`
+		NewPassword     string `json:"new_password"`
+		ConfirmPassword string `json:"confirm_password"`
+	}
+
+	err := c.ShouldBindJSON(&body)
+
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"error": "Failed to read the request body",
+		})
+		return
+	}
+
+	if body.CurrentPassword == "" ||
+		body.NewPassword == "" ||
+		body.ConfirmPassword == "" {
+		c.JSON(http.StatusBadRequest, gin.H{
+			"error": "All password fields are required",
+		})
+		return
+	}
+
+	if body.NewPassword != body.ConfirmPassword {
+		c.JSON(http.StatusBadRequest, gin.H{
+			"error": "passwords do not match",
+		})
+		return
+	}
+
+	err = bcrypt.CompareHashAndPassword(
+		[]byte(currentUser.Password),
+		[]byte(body.CurrentPassword),
+	)
+
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{
+			"error": "incorrect password",
+		})
+		return
+	}
+
+	hash, err := bcrypt.GenerateFromPassword(
+		[]byte(body.NewPassword),
+		10,
+	)
+
+	if err != nil {
+    c.JSON(http.StatusInternalServerError, gin.H{
+        "error": "Failed to hash new password",
+    })
+    return
+}
+
+	currentUser.Password = string(hash)
+
+	results := initializers.DB.Save(currentUser)
+
+	if results.Error != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"error": "failed to update password",
+		})
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{
+		"message": "password changed successfully",
+	})
+
+}
+
+func UpdateAvatar(c *gin.Context) {
+	user, exists := c.Get("user")
+
+	if !exists {
+		c.JSON(http.StatusUnauthorized, gin.H{
+			"error": "user unauthorized",
+		})
+		return
+	}
+
+	currentUser := user.(*models.User)
+
+	file, err := c.FormFile("avatar")
+
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{
+			"error": "Profile picture is required",
+		})
+		return
+	}
+
+	src, err := file.Open()
+
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"error": "Failed to open profile picture",
+		})
+		return
+	}
+
+	defer src.Close()
+
+	uploadResult, err := initializers.Cloudinary.Upload.Upload(
+		c,
+		src,
+		uploader.UploadParams{
+			Folder: "khal-fintrack/avatars",
+		},
+	)
+
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"error": "Failed to upload profile picture",
+		})
+		return
+	}
+
+	currentUser.AvatarURL = uploadResult.SecureURL
+
+	result := initializers.DB.Save(currentUser)
+
+	if result.Error != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"error": "Failed to save profile picture",
+		})
+		return
+	}
+	c.JSON(http.StatusOK, gin.H{
+		"message":    "Profile picture updated successfully",
+		"avatar_url": currentUser.AvatarURL,
+	})
 }
 
 /*token → the JWT you just created.

@@ -238,7 +238,7 @@ export default function Budgets() {
     // container
     <div className="bg-gray-100 dark:bg-background w-full h-full p-4 md:p-6 overflow-y-auto scroll-smooth">
       {/*headers*/}
-      <div className="flex justify-between items-center mb-4">
+      <div className="flex justify-between items-center mb-6">
         <div className="flex min-w-0 items-center gap-3">
           <button
             type="button"
@@ -269,17 +269,27 @@ export default function Budgets() {
         </div>
       </div>
 
-      {/*main contents*/}
-      <div className="hidden md:block overflow-x-auto">
-        <div>
-          <table className="w-full bg-white dark:bg-card border border-gray-200 dark:border-border shadow-lg text-foreground">
-            <thead className="bg-gray-200 dark:bg-zinc-800/80">
+      {/* Desktop card */}
+      <div className="hidden md:block">
+        <div className="bg-white dark:bg-card rounded-2xl shadow-sm border border-border overflow-hidden">
+          {/* Card header */}
+          <div className="flex items-center gap-2 p-5 border-b border-border">
+            <div className="h-8 w-8 rounded-lg bg-green-50 dark:bg-green-950 flex items-center justify-center">
+              <DollarSign className="h-4 w-4 text-green-600" />
+            </div>
+            <div>
+              <h2 className="text-sm font-semibold">Budget Overview</h2>
+              <p className="text-xs text-muted-foreground">Track spending against your limits</p>
+            </div>
+          </div>
+          <table className="w-full text-foreground">
+            <thead className="bg-gray-50 dark:bg-zinc-800/60 border-b border-border">
               <tr>
-                <th className="p-4 text-left">Category</th>
-                <th className="text-left">Budgeted</th>
-                <th className="text-right pr-3">Spent</th>
-                <th className="text-end pr-6">Progress</th>
-                <th className="text-end pr-6">Action</th>
+                <th className="p-4 text-left text-xs font-medium text-muted-foreground uppercase tracking-wide">Category</th>
+                <th className="text-left text-xs font-medium text-muted-foreground uppercase tracking-wide">Budgeted</th>
+                <th className="text-right pr-3 text-xs font-medium text-muted-foreground uppercase tracking-wide">Spent</th>
+                <th className="text-end pr-6 text-xs font-medium text-muted-foreground uppercase tracking-wide">Progress</th>
+                <th className="text-end pr-6 text-xs font-medium text-muted-foreground uppercase tracking-wide">Action</th>
               </tr>
             </thead>
 
@@ -296,15 +306,15 @@ export default function Budgets() {
                   return (
                     <tr
                       key={budget.id ?? index}
-                      className="border-b border-gray-200 dark:border-border hover:bg-gray-50 dark:hover:bg-zinc-800/50"
+                      className="border-b border-border last:border-0 hover:bg-gray-50 dark:hover:bg-zinc-800/40 transition-colors"
                     >
                       <td className="text-left p-4">
                         <CategoryDisplay category={budget.category} />
                       </td>
 
-                      <td className="text-left">{budget.budgeted}</td>
+                      <td className="text-left text-sm">₦{budget.budgeted.toLocaleString()}</td>
 
-                      <td className="text-right pr-3">₦{budget.spent}</td>
+                      <td className="text-right pr-3 text-sm">₦{budget.spent.toLocaleString()}</td>
 
                       <td className="pr-6">
                         <div className="flex items-center justify-end gap-3">
@@ -316,14 +326,14 @@ export default function Budgets() {
                               style={{ width: `${progressWidth}%` }}
                             />
                           </div>
-                          <div className="w-9 text-right">
+                          <div className={`w-9 text-right text-xs font-medium ${ isOverBudget ? "text-red-500" : ""}`}>
                             {progress.toFixed(0)}%
                           </div>
                         </div>
                       </td>
 
                       <td className="py-4">
-                        <div className="flex items-center justify-end pr-4 gap-10">
+                        <div className="flex items-center justify-end pr-4 gap-6">
                           <button
                             onClick={() => {
                               setSelectedBudget(budget);
@@ -334,18 +344,16 @@ export default function Budgets() {
                               setIsEditing(true);
                               setShowCard(true);
                             }}
-                            className="cursor-pointer"
+                            className="cursor-pointer rounded-md p-1.5 text-blue-600 hover:bg-blue-50 dark:hover:bg-blue-950/30 transition-colors"
                           >
-                            <Pencil className="w-4 h-4 text-blue-600 hover:text-blue-800" />
+                            <Pencil className="w-4 h-4" />
                           </button>
 
                           <button
-                            className="cursor-pointer"
-                            onClick={() => {
-                              deleteBudget(budget.id);
-                            }}
+                            className="cursor-pointer rounded-md p-1.5 text-red-500 hover:bg-red-50 dark:hover:bg-red-950/30 transition-colors"
+                            onClick={() => deleteBudget(budget.id)}
                           >
-                            <Trash2 className="w-4 h-4 text-red-500 hover:text-red-700" />
+                            <Trash2 className="w-4 h-4" />
                           </button>
                         </div>
                       </td>
@@ -354,8 +362,8 @@ export default function Budgets() {
                 })
               ) : (
                 <tr>
-                  <td colSpan={6} className="py-10 text-center text-gray-500">
-                    No budget found.
+                  <td colSpan={6} className="py-16 text-center text-sm text-muted-foreground">
+                    No budgets yet. Click "Add Budget" to get started.
                   </td>
                 </tr>
               )}
@@ -364,6 +372,7 @@ export default function Budgets() {
         </div>
       </div>
 
+      {/* Mobile card list */}
       <div className="space-y-3 md:hidden">
         {isLoading ? (
           Array.from({ length: 4 }).map((_, index) => (

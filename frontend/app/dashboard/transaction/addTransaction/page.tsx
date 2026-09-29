@@ -130,202 +130,15 @@ export default function AddTransaction() {
       className="bg-white dark:bg-background md:bg-gray-100 md:dark:bg-background w-full h-full p-3 md:p-6 overflow-y-auto scroll-smooth"
       style={{ WebkitOverflowScrolling: "touch" }}
     >
-      {/* Mobile view */}
-      <div className="block md:hidden">
-        {/* Mobile Header */}
-        <div className="flex justify-between items-center mb-4">
-          <button
-            onClick={() => router.back()}
-            className="p-2 -ml-2 cursor-pointer"
-          >
-            <ArrowLeft className="w-5 h-5 text-gray-800 dark:text-gray-200" />
-          </button>
-          <div className="flex justify-center items-center">
-            <MainLogo />
-          </div>
-          <ModeToggle />
-        </div>
-
-        <div className="mb-4">
-          <h1 className="text-base font-bold text-gray-900 dark:text-foreground">
-            Add Transaction
-          </h1>
-        </div>
-
-        {/* Type Toggle */}
-        <div className="flex bg-gray-50 dark:bg-card border border-gray-100 dark:border-border p-1 rounded-xl mb-4">
-          <button
-            onClick={() =>
-              setForm({
-                ...form,
-                type: "income",
-              })
-            }
-            className={`flex-1 py-2 rounded-lg font-medium text-sm text-center ${
-              form.type === "income"
-                ? "bg-green-600 text-white border-gray-100"
-                : "bg-transparent text-gray-800"
-            }`}
-          >
-            Income
-          </button>
-
-          <button
-            onClick={() =>
-              setForm({
-                ...form,
-                type: "expense",
-              })
-            }
-            className={`flex-1 py-2 rounded-lg font-medium text-sm text-center ${
-              form.type === "expense"
-                ? "bg-red-600 text-white border-gray-100"
-                : "bg-transparent text-gray-800 dark:text-muted-foreground"
-            }`}
-          >
-            Expense
-          </button>
-        </div>
-
-        {/* Form */}
-        <form onSubmit={handleSubmit} className="space-y-3">
-          <div className="space-y-1">
-            <label className="text-[11px] font-medium text-gray-800 dark:text-muted-foreground">
-              Description
-            </label>
-            <div className="flex w-full">
-              <div className="flex w-10 shrink-0 items-center justify-center bg-gray-50 dark:bg-zinc-800/50 border border-r-0 border-gray-200 dark:border-border rounded-l-xl text-muted-foreground">
-                <FileText className="w-4 h-4" />
-              </div>
-              <input
-                value={form.description}
-                onChange={(e) => {
-                  setForm({
-                    ...form,
-                    description: e.target.value,
-                  });
-                }}
-                type="text"
-                placeholder="Enter description"
-                className="min-w-0 w-full border border-gray-200 dark:border-border bg-white dark:bg-card text-foreground rounded-r-xl p-2.5 text-sm outline-none placeholder:text-gray-400"
-              />
-            </div>
-          </div>
-
-          <div className="space-y-1">
-            <label className="text-[11px] font-medium text-gray-800 dark:text-muted-foreground">
-              Amount
-            </label>
-            <div className="flex w-full">
-              <div className="flex w-10 shrink-0 items-center justify-center bg-gray-50 dark:bg-zinc-800/50 border border-r-0 border-gray-200 dark:border-border rounded-l-xl text-muted-foreground font-semibold">
-                <DollarSign className="w-4 h-4" />
-              </div>
-              <input
-                value={form.amount}
-                onChange={(e) => {
-                  setForm({
-                    ...form,
-                    amount: e.target.value,
-                  });
-                }}
-                type="number"
-                placeholder="Enter amount"
-                className="min-w-0 w-full border border-gray-200 dark:border-border bg-white dark:bg-card text-foreground rounded-r-xl p-2.5 text-sm outline-none placeholder:text-gray-400"
-              />
-            </div>
-          </div>
-
-          <div className="space-y-1">
-            <label className="text-[11px] font-medium text-gray-800 dark:text-muted-foreground">
-              Category
-            </label>
-            <div className="flex w-full">
-              <div className="flex w-10 shrink-0 items-center justify-center bg-gray-50 dark:bg-zinc-800/50 border border-r-0 border-gray-200 dark:border-border rounded-l-xl text-muted-foreground">
-                <Tag className="w-4 h-4" />
-              </div>
-              <div className="flex-1">
-                <CategoryDropDown
-                  value={form.category}
-                  onValueChange={(value) => {
-                    setForm({
-                      ...form,
-                      category: value ?? "",
-                    });
-                  }}
-                  type={form.type as "income" | "expense"}
-                  className="rounded-l-none rounded-r-xl w-full p-2.5! h-auto! bg-white dark:bg-card border-l-0 text-sm shadow-none outline-none"
-                />
-              </div>
-            </div>
-          </div>
-
-          <div className="space-y-1">
-            <label className="text-[11px] font-medium text-gray-800 dark:text-muted-foreground">
-              Date
-            </label>
-            <div className="flex w-full">
-              <div className="flex w-10 shrink-0 items-center justify-center bg-gray-50 dark:bg-zinc-800/50 border border-r-0 border-gray-200 dark:border-border rounded-l-xl text-muted-foreground">
-                <CalendarIcon className="w-4 h-4" />
-              </div>
-              <Popover>
-                <PopoverTrigger
-                  render={
-                    <Button
-                      variant="outline"
-                      className="flex-1 w-full border border-gray-200 dark:border-border bg-white dark:bg-card text-foreground rounded-l-none rounded-r-xl p-2.5 h-auto text-left font-normal text-sm dark:text-foreground flex justify-between items-center hover:bg-white dark:hover:bg-card"
-                    >
-                      {format(form.date, "MMM dd, yyyy")}
-                    </Button>
-                  }
-                />
-                <PopoverContent className="w-auto p-0" align="start">
-                  <Calendar
-                    mode="single"
-                    selected={form.date}
-                    onSelect={(selectedDate) => {
-                      if (!selectedDate) {
-                        return;
-                      }
-                      setForm({
-                        ...form,
-                        date: selectedDate,
-                      });
-                    }}
-                  />
-                </PopoverContent>
-              </Popover>
-            </div>
-          </div>
-
-          {/* Buttons */}
-          <div className="flex items-center gap-2 pt-2 pb-5">
-            <button
-              type="button"
-              onClick={() => router.back()}
-              className="flex-[0.8] py-2.5 border border-gray-200 dark:border-border bg-white text-gray-800 rounded-lg font-semibold text-sm text-center cursor-pointer hover:bg-gray-100 active:bg-gray-200 dark:bg-card dark:text-foreground dark:hover:bg-muted dark:active:bg-muted/80"
-            >
-              Cancel
-            </button>
-            <button
-              type="submit"
-              disabled={isSaving}
-              className="flex-[1.2] py-2.5 bg-green-700 rounded-lg font-semibold text-sm text-white text-center cursor-pointer disabled:opacity-60 disabled:cursor-not-allowed"
-            >
-              {isSaving ? "Saving..." : "Save Transaction"}
-            </button>
-          </div>
-        </form>
-      </div>
-
-      {/* Desktop view */}
-      <div className="hidden md:block">
+      {/* Responsive view */}
+      <div className="flex flex-col min-h-full">
         {/* header */}
-        <div className="flex items-center justify-between mb-4">
-          <div className="flex gap-4 items-center">
-            <button className="cursor-pointer" onClick={toggleSidebar}>
+        <div className="flex items-center justify-between mb-6">
+          <div className="flex gap-3 items-center">
+            <button className="cursor-pointer rounded-md p-2 hover:bg-muted" onClick={toggleSidebar}>
               <Menu className="w-4 h-4 text-foreground" />
             </button>
-            <h1 className="text-xl font-bold text-foreground">
+            <h1 className="text-base font-bold sm:text-xl text-foreground">
               Add Transaction
             </h1>
           </div>
@@ -335,180 +148,106 @@ export default function AddTransaction() {
             <button
               type="button"
               onClick={() => router.push("/dashboard/transaction")}
-              className="flex items-center border outline-none border-gray-400 dark:border-border text-foreground cursor-pointer p-2 rounded-lg gap-2 dark:bg-card"
+              className="flex items-center border outline-none border-border text-foreground cursor-pointer p-2 rounded-lg gap-2 bg-white dark:bg-card shadow-sm hover:bg-muted transition-colors"
             >
               <ArrowLeft className="w-4 h-4" />
               Back
             </button>
           </div>
         </div>
-        <h3 className="font-bold mb-3 text-foreground">Type</h3>
 
-        <div className="flex gap-2 mb-7">
-          <span
-            onClick={() =>
-              setForm({
-                ...form,
-                type: "income",
-              })
-            }
-            className={`pt-2 pb-2 pl-10 pr-12 rounded-lg border-2 cursor-pointer text-center ${
-              form.type === "income"
-                ? "bg-green-600 text-white border-gray-100"
-                : "bg-transparent text-gray-800"
-            }`}
-          >
-            Income
-          </span>
-          <span
-            onClick={() =>
-              setForm({
-                ...form,
-                type: "expense",
-              })
-            }
-            className={`pt-2 pb-2 pl-10 pr-12 rounded-lg border-2 cursor-pointer text-center ${
-              form.type === "expense"
-                ? "bg-red-600 text-white border-gray-100"
-                : "bg-transparent text-gray-800 dark:text-muted-foreground"
-            }`}
-          >
-            Expense
-          </span>
+        {/* Centered form card */}
+        <div className="flex-1 flex items-start justify-center pt-4 lg:pt-10">
+          <div className="bg-white dark:bg-card rounded-2xl shadow-sm border border-border w-full max-w-3xl">
+            {/* Card header with type toggle */}
+            <div className="p-6 pb-0">
+              <h3 className="text-sm font-semibold text-foreground mb-4">Transaction Type</h3>
+              <div className="flex bg-gray-100 dark:bg-zinc-800/50 p-1 rounded-xl">
+                <button
+                  type="button"
+                  onClick={() => setForm({ ...form, type: "income" })}
+                  className={`flex-1 py-2.5 rounded-lg text-sm font-medium text-center cursor-pointer transition-all ${
+                    form.type === "income"
+                      ? "bg-green-600 text-white shadow-sm"
+                      : "text-gray-500 dark:text-muted-foreground hover:text-gray-700 dark:hover:text-foreground"
+                  }`}
+                >
+                  Income
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setForm({ ...form, type: "expense" })}
+                  className={`flex-1 py-2.5 rounded-lg text-sm font-medium text-center cursor-pointer transition-all ${
+                    form.type === "expense"
+                      ? "bg-red-600 text-white shadow-sm"
+                      : "text-gray-500 dark:text-muted-foreground hover:text-gray-700 dark:hover:text-foreground"
+                  }`}
+                >
+                  Expense
+                </button>
+              </div>
+            </div>
+
+            <div className="border-t border-border mx-6 mt-6" />
+
+            {/* Form fields */}
+            <form onSubmit={handleSubmit} className="p-6 pt-5">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+                <div className="space-y-1.5">
+                  <label className="text-sm font-medium text-gray-700 dark:text-muted-foreground">Description</label>
+                  <div className="flex w-full rounded-xl overflow-hidden border border-border bg-white dark:bg-zinc-900/30 transition-all">
+                    <div className="flex items-center justify-center w-11 bg-gray-50 dark:bg-zinc-800/50 border-r border-border text-muted-foreground">
+                      <FileText className="w-4 h-4" />
+                    </div>
+                    <input value={form.description} onChange={(e) => setForm({ ...form, description: e.target.value })} type="text" placeholder="e.g Grocery Shopping" className="bg-transparent text-foreground outline-none p-3 w-full text-sm placeholder:text-gray-400 dark:placeholder:text-gray-500" />
+                  </div>
+                </div>
+
+                <div className="space-y-1.5">
+                  <label className="text-sm font-medium text-gray-700 dark:text-muted-foreground">Amount (₦)</label>
+                  <div className="flex w-full rounded-xl overflow-hidden border border-border bg-white dark:bg-zinc-900/30 transition-all">
+                    <div className="flex items-center justify-center w-11 bg-gray-50 dark:bg-zinc-800/50 border-r border-border text-muted-foreground">
+                      <DollarSign className="w-4 h-4" />
+                    </div>
+                    <input value={form.amount} onChange={(e) => setForm({ ...form, amount: e.target.value })} type="number" placeholder="e.g 100.00" className="bg-transparent text-foreground outline-none p-3 w-full text-sm placeholder:text-gray-400 dark:placeholder:text-gray-500" />
+                  </div>
+                </div>
+
+                <div className="space-y-1.5">
+                  <label className="text-sm font-medium text-gray-700 dark:text-muted-foreground">Category</label>
+                  <div className="flex w-full rounded-xl overflow-hidden border border-border bg-white dark:bg-zinc-900/30 transition-all">
+                    <div className="flex items-center justify-center w-11 bg-gray-50 dark:bg-zinc-800/50 border-r border-border text-muted-foreground">
+                      <Tag className="w-4 h-4" />
+                    </div>
+                    <div className="flex-1">
+                      <CategoryDropDown value={form.category} onValueChange={(value) => setForm({ ...form, category: value ?? "" })} type={form.type as "income" | "expense"} className="w-full h-full p-3 bg-transparent border-none text-sm shadow-none outline-none rounded-none rounded-r-xl" />
+                    </div>
+                  </div>
+                </div>
+
+                <div className="space-y-1.5">
+                  <label className="text-sm font-medium text-gray-700 dark:text-muted-foreground">Date</label>
+                  <div className="flex w-full rounded-xl overflow-hidden border border-border bg-white dark:bg-zinc-900/30 transition-all">
+                    <div className="flex items-center justify-center w-11 bg-gray-50 dark:bg-zinc-800/50 border-r border-border text-muted-foreground">
+                      <CalendarIcon className="w-4 h-4" />
+                    </div>
+                    <Popover>
+                      <PopoverTrigger className="bg-transparent" render={<Button variant={"ghost"} data-empty={!form.date} className="flex-1 w-full p-3 h-auto justify-between bg-transparent hover:bg-transparent border-none outline-none text-left font-normal text-foreground data-[empty=true]:text-muted-foreground rounded-none rounded-r-xl ">{format(form.date, "MMM dd, yyyy")}</Button>} />
+                      <PopoverContent className="w-auto p-0" align="start">
+                        <Calendar mode="single" selected={form.date} onSelect={(selectedDate) => { if (!selectedDate) return; setForm({ ...form, date: selectedDate }); }} />
+                      </PopoverContent>
+                    </Popover>
+                  </div>
+                </div>
+              </div>
+
+              <div className="flex items-center justify-end gap-3 mt-8 pt-5 border-t border-border">
+                <button type="button" className="border border-border bg-white text-gray-700 rounded-xl cursor-pointer px-6 py-2.5 text-sm font-medium hover:bg-gray-50 dark:bg-zinc-800/30 dark:text-foreground dark:hover:bg-zinc-800/60 transition-colors" onClick={handleCancel}>Cancel</button>
+                <button disabled={isSaving} className="text-white font-medium rounded-xl cursor-pointer px-8 py-2.5 bg-green-600 hover:bg-green-700 shadow-sm disabled:opacity-60 disabled:cursor-not-allowed transition-colors text-sm">{isSaving ? "Saving..." : "Save Transaction"}</button>
+              </div>
+            </form>
+          </div>
         </div>
-
-        {/* forms */}
-        <form onSubmit={handleSubmit} className="space-y-6">
-          <div className="space-y-0.5">
-            <p className="text-gray-700 dark:text-muted-foreground font-medium text-[13px]">
-              Description
-            </p>
-            <div className="flex w-full">
-              <div className="flex items-center justify-center w-11 bg-gray-50 dark:bg-zinc-800/50 border-2 border-r-0 border-gray-200 dark:border-border rounded-l-lg text-muted-foreground">
-                <FileText className="w-4 h-4" />
-              </div>
-              <input
-                value={form.description}
-                onChange={(e) =>
-                  setForm({
-                    ...form,
-                    description: e.target.value,
-                  })
-                }
-                type="text"
-                placeholder="e.g Grocery Shopping"
-                className="border-2 border-l border-gray-200 dark:border-border bg-white dark:bg-card text-foreground outline-none p-2 rounded-r-lg w-full"
-              />
-            </div>
-          </div>
-
-          <div className="space-y-0.5">
-            <p className="text-gray-700 dark:text-muted-foreground font-medium text-[13px]">
-              Amount
-            </p>
-            <div className="flex w-full">
-              <div className="flex items-center justify-center w-11 bg-gray-50 dark:bg-zinc-800/50 border-2 border-r-0 border-gray-200 dark:border-border rounded-l-lg text-muted-foreground font-semibold">
-                <DollarSign className="w-4 h-4" />
-              </div>
-              <input
-                value={form.amount}
-                onChange={(e) =>
-                  setForm({
-                    ...form,
-                    amount: e.target.value,
-                  })
-                }
-                type="number"
-                placeholder="e.g 100.00"
-                className="border-2 border-l border-gray-200 dark:border-border bg-white dark:bg-card text-foreground outline-none p-2 rounded-r-lg w-full"
-              />
-            </div>
-          </div>
-
-          {/* category */}
-          <div className="space-y-0.5">
-            <p className="text-gray-700 dark:text-muted-foreground font-medium text-[13px]">
-              Category
-            </p>
-            <div className="flex items-center justify-between mb-8">
-              <div className="flex w-full">
-                <div className="flex items-center justify-center w-11 bg-gray-50 dark:bg-zinc-800/50 border-2 border-r-0 border-gray-200 dark:border-border rounded-l-lg text-muted-foreground">
-                  <Tag className="w-4 h-4" />
-                </div>
-                <div className="flex-1">
-                  <CategoryDropDown
-                    value={form.category}
-                    onValueChange={(value) => {
-                      setForm({
-                        ...form,
-                        category: value ?? "",
-                      });
-                    }}
-                    type={form.type as "income" | "expense"}
-                    className="rounded-l-none rounded-r-lg w-full h-full !p-2 !h-auto bg-white dark:bg-card border-l-0 text-[13px] shadow-none outline-none"
-                  />
-                </div>
-              </div>
-            </div>
-          </div>
-
-          {/* date */}
-          <div className="-mt-[6px] space-y-0.5">
-            <p className="text-gray-700 dark:text-muted-foreground font-medium text-[13px]">
-              Date
-            </p>
-            <div className="flex w-full">
-              <div className="flex items-center justify-center w-11 bg-gray-50 dark:bg-zinc-800/50 border-2 border-r-0 border-gray-200 dark:border-border rounded-l-lg text-muted-foreground">
-                <CalendarIcon className="w-4 h-4" />
-              </div>
-              <Popover>
-                <PopoverTrigger
-                  className="bg-white"
-                  render={
-                    <Button
-                      variant={"outline"}
-                      data-empty={!form.date}
-                      className="flex-1 w-full !p-2 !h-auto justify-between bg-transparent dark:bg-card border-2 border-l border-gray-200 dark:border-border outline-none text-left font-normal text-foreground data-[empty=true]:text-muted-foreground rounded-l-none rounded-r-lg"
-                    >
-                      {format(form.date, "MMM dd, yyyy")}
-                    </Button>
-                  }
-                />
-                <PopoverContent className="w-auto p-0" align="start">
-                  <Calendar
-                    mode="single"
-                    selected={form.date}
-                    onSelect={(selectedDate) => {
-                      if (!selectedDate) {
-                        return;
-                      }
-                      setForm({
-                        ...form,
-                        date: selectedDate,
-                      });
-                    }}
-                  />
-                </PopoverContent>
-              </Popover>
-            </div>
-          </div>
-          {/* buttons */}
-          <div className="flex items-center justify-end gap-4 mt-7">
-            <button
-              type="button"
-              className="border border-border bg-white text-gray-800 rounded-lg cursor-pointer px-7 py-2 text-sm font-medium shadow-sm hover:bg-gray-100 active:bg-gray-200 dark:bg-card dark:text-foreground dark:hover:bg-muted dark:active:bg-muted/80"
-              onClick={handleCancel}
-            >
-              Cancel
-            </button>
-            <button
-              disabled={isSaving}
-              className="text-white rounded-lg cursor-pointer p-1.5 pb-1.5 pl-7 pr-7 bg-green-700 disabled:opacity-60 disabled:cursor-not-allowed"
-            >
-              {isSaving ? "Saving..." : "Save Transaction"}
-            </button>
-          </div>
-        </form>
       </div>
     </div>
   );
