@@ -8,7 +8,7 @@ import Link from "next/link";
 import Image from "next/image";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { ChevronLeft } from "lucide-react";
+import { ChevronLeft, LoaderCircle } from "lucide-react";
 import { ModeToggle } from "@/components/toggle";
 
 export default function Login() {
@@ -21,6 +21,7 @@ export default function Login() {
     email: "",
     password: "",
   });
+  const [isLoggingIn, setIsLoggingIn] = useState(false);
 
   const router = useRouter();
 
@@ -49,6 +50,7 @@ export default function Login() {
       return;
     }
 
+    setIsLoggingIn(true);
     try {
       console.log("API URL:", `${process.env.NEXT_PUBLIC_API_URL}/login`);
 
@@ -77,6 +79,8 @@ export default function Login() {
     } catch (error) {
       console.error(error); //prints the erroe in the consoel and this catch statement is used to check for netork failure
       toast.add({ title: "Unable to connect", type: "error" });
+    } finally {
+      setIsLoggingIn(false);
     }
   };
 
@@ -174,9 +178,18 @@ export default function Login() {
             <div className="mt-6">
               <Button
                 type="submit"
+                disabled={isLoggingIn}
+                aria-busy={isLoggingIn}
                 className="cursor-pointer w-[100%] p-5 mb-1.5 rounded-xl font-semibold shadow-sm"
               >
-                Login
+                {isLoggingIn ? (
+                  <>
+                    <LoaderCircle className="h-4 w-4 animate-spin" />
+                    Logging in...
+                  </>
+                ) : (
+                  "Login"
+                )}
               </Button>
               <p className="text-muted-foreground text-[13px] md:text-[14px] text-center mt-3">
                 Don't have an account?

@@ -34,12 +34,7 @@ export default function RootLayout({
     >
       <body className="h-screen flex flex-col">
         {" "}
-        <ThemeProvider
-          attribute="class"
-          defaultTheme="system"
-          enableSystem
-          disableTransitionOnChange
-        >
+        <ThemeProvider>
           <CurrencyProvider>
             <CategoryProvider>
               <Toaster>{children}</Toaster>

@@ -410,6 +410,62 @@ func UpdateAvatar(c *gin.Context) {
 	})
 }
 
+func DeleteAccount(c *gin.Context) {
+    user, exists := c.Get("user")
+
+    if !exists {
+        c.JSON(http.StatusUnauthorized, gin.H{
+            "error": "Unauthorized",
+        })
+        return
+    }
+
+	currentUser := user.(*models.User)
+
+    err := initializers.DB.Transaction(func(tx *gorm.DB) error {
+        // Delete user's transactions
+        if err := tx.
+            Where("user_id = ?", currentUser.ID).
+            Delete(&models.Transaction{}).Error; err != nil {
+            return err
+        }
+
+        // Delete user's budgets
+        if err := tx.
+            Where("user_id = ?", currentUser.ID).
+            Delete(&models.Budget{}).Error; err != nil {
+            return err
+        }
+
+        // Delete user's categories
+        if err := tx.
+            Where("user_id = ?", currentUser.ID).
+            Delete(&models.Category{}).Error; err != nil {
+            return err
+        }
+
+        // Finally delete the user
+        if err := tx.Delete(&currentUser).Error; err != nil {
+            return err
+        }
+
+        return nil
+    })
+
+    if err != nil {
+        c.JSON(http.StatusInternalServerError, gin.H{
+            "error": "Failed to delete account",
+        })
+        return
+    }
+
+	c.SetCookie("Authorization", "", -1, "/", "", true, true)
+
+    c.JSON(http.StatusOK, gin.H{
+        "message": "Account deleted successfully",
+    })
+}
+
 /*token → the JWT you just created.
 SignedString(...) → signs it with your secret key.
 os.Getenv("JWT_SECRET") → reads the secret from your .env.

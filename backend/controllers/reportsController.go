@@ -45,7 +45,6 @@ func GetReports(c *gin.Context) {
 	results := initializers.DB.
 		Preload("Category").
 		Where("user_id = ?", currentUser.ID).
-		Where("type = ?", "expense").
 		Where("date >= ? AND date < ?", startDate, endDate).
 		Find(&transactions)
 
@@ -59,13 +58,17 @@ func GetReports(c *gin.Context) {
 	categoryTotals := make(map[uint]float64)
 	categoryInfo := make(map[uint]*models.Category)
 	chartTotals := make(map[string]float64)
+	type periodTotals struct {
+		Income   float64
+		Expenses float64
+	}
+	comparisonTotals := make(map[string]periodTotals)
 
 	var totalExpenses float64
+	var totalIncome float64
 	var uncategorizedExpenses float64
 
 	for _, transaction := range transactions {
-		totalExpenses += transaction.Amount
-
 		var label string
 
 		switch date {
@@ -87,7 +90,23 @@ func GetReports(c *gin.Context) {
 			label = transaction.Date.Format("Jan")
 		}
 
+		if transaction.Type == "income" {
+			totalIncome += transaction.Amount
+			period := comparisonTotals[label]
+			period.Income += transaction.Amount
+			comparisonTotals[label] = period
+			continue
+		}
+
+		if transaction.Type != "expense" {
+			continue
+		}
+
+		totalExpenses += transaction.Amount
 		chartTotals[label] += transaction.Amount
+		period := comparisonTotals[label]
+		period.Expenses += transaction.Amount
+		comparisonTotals[label] = period
 
 		if transaction.CategoryID == nil || transaction.Category == nil {
 			uncategorizedExpenses += transaction.Amount
@@ -158,6 +177,7 @@ func GetReports(c *gin.Context) {
 	}
 
 	expenseOverview := []gin.H{}
+	incomeVsExpenses := []gin.H{}
 
 	var labels []string
 
@@ -202,12 +222,20 @@ func GetReports(c *gin.Context) {
 			"week":  label,
 			"total": chartTotals[label],
 		})
+		period := comparisonTotals[label]
+		incomeVsExpenses = append(incomeVsExpenses, gin.H{
+			"period":   label,
+			"income":   period.Income,
+			"expenses": period.Expenses,
+		})
 	}
 
 	c.JSON(http.StatusOK, gin.H{
 		"top_categories":   topCategories,
 		"expense_overview": expenseOverview,
 		"total_expenses":   totalExpenses,
+		"total_income":     totalIncome,
+		"income_vs_expenses": incomeVsExpenses,
 	})
 }
 

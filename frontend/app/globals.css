@@ -138,6 +138,10 @@ body {
   * {
     @apply border-border outline-ring/50;
   }
+  .recharts-wrapper:focus:not(:focus-visible),
+  .recharts-surface:focus:not(:focus-visible) {
+    outline: none;
+  }
   body {
     @apply bg-background text-foreground;
   }

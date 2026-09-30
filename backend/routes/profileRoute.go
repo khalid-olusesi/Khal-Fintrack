@@ -12,4 +12,5 @@ func ProfileRoute(router *gin.Engine) {
 	router.PATCH("/profile", middleware.RequireAuth, controllers.UpdateProfile)
 	router.PATCH("/profile/password", middleware.RequireAuth, controllers.ChangePassword)
 	router.PATCH("/profile/avatar", middleware.RequireAuth, controllers.UpdateAvatar)
+	router.DELETE("/profile/account", middleware.RequireAuth, controllers.DeleteAccount)
 }

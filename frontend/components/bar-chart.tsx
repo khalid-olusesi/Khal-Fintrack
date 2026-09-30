@@ -4,6 +4,7 @@ import {
   Bar,
   BarChart,
   CartesianGrid,
+  Legend,
   ResponsiveContainer,
   Tooltip,
   XAxis,
@@ -12,16 +13,17 @@ import {
 import { formatCurrency } from "@/lib/currency";
 import { useCurrency } from "@/context/currency-context";
 
-interface WeeklyTotal {
-  week: string;
-  total: number;
+interface PeriodTotals {
+  period: string;
+  income: number;
+  expenses: number;
 }
 
-export default function ExpensesOverviewChart({
+export default function IncomeExpensesChart({
   data,
   hideTitle = false,
 }: {
-  data: WeeklyTotal[];
+  data: PeriodTotals[];
   hideTitle?: boolean;
 }) {
   const { currency } = useCurrency();
@@ -29,25 +31,41 @@ export default function ExpensesOverviewChart({
     <ResponsiveContainer width="100%" height={350}>
       <BarChart data={data} margin={{ top: 0, right: 10, left: 0, bottom: 0 }}>
         <CartesianGrid vertical={false} stroke="var(--border)" />
-        <XAxis dataKey="week" axisLine={false} tickLine={false} fontSize={12} />
+        <XAxis
+          dataKey="period"
+          axisLine={false}
+          tickLine={false}
+          fontSize={12}
+        />
         <YAxis
+          width={115}
           axisLine={false}
           tickLine={false}
           fontSize={12}
           tickFormatter={(value) => formatCurrency(Number(value), currency)}
         />
         <Tooltip
-          formatter={(value) => [
+          cursor={false}
+          formatter={(value, name) => [
             formatCurrency(Number(value), currency),
-            "Spent",
+            name,
           ]}
         />
         <Bar
-          dataKey="total"
-          fill="#22c55e"
+          dataKey="income"
+          name="Income"
+          fill="#16a34a"
           radius={[4, 4, 0, 0]}
-          barSize={36}
+          barSize={24}
         />
+        <Bar
+          dataKey="expenses"
+          name="Expenses"
+          fill="#e11d48"
+          radius={[4, 4, 0, 0]}
+          barSize={24}
+        />
+        <Legend />
       </BarChart>
     </ResponsiveContainer>
   );
@@ -56,7 +74,7 @@ export default function ExpensesOverviewChart({
 
   return (
     <div className="bg-white dark:bg-card shadow-sm rounded-2xl border border-border p-4 md:p-6 flex-1">
-      <h2 className="font-semibold mb-4">Expenses Overview</h2>
+      <h2 className="font-semibold mb-4">Income vs Expenses</h2>
       {chart}
     </div>
   );

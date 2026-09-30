@@ -8,7 +8,7 @@ import Link from "next/link";
 import Image from "next/image";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { ChevronLeft } from "lucide-react";
+import { ChevronLeft, LoaderCircle } from "lucide-react";
 import { ModeToggle } from "@/components/toggle";
 
 export default function Signup() {
@@ -26,6 +26,7 @@ export default function Signup() {
     password: "",
     confirmPassword: "",
   });
+  const [isSigningUp, setIsSigningUp] = useState(false);
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -70,26 +71,37 @@ export default function Signup() {
       return;
     } //if there is an error in any one of the following, stop the program from running
 
-    const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/signup`, {
-      method: "POST",
-      credentials: "include",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        name: form.name,
-        email: form.email,
-        password: form.password,
-      }),
-    });
+    setIsSigningUp(true);
+    try {
+      const response = await fetch(
+        `${process.env.NEXT_PUBLIC_API_URL}/signup`,
+        {
+          method: "POST",
+          credentials: "include",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            name: form.name,
+            email: form.email,
+            password: form.password,
+          }),
+        },
+      );
 
-    const data = await response.json();
+      const data = await response.json();
 
-    if (response.ok) {
-      toast.add({ title: "Account created successfully", type: "success" });
-      router.push("/auth/login");
-    } else {
-      toast.add({ title: data.error, type: "error" });
+      if (response.ok) {
+        toast.add({ title: "Account created successfully", type: "success" });
+        router.push("/auth/login");
+      } else {
+        toast.add({ title: data.error || "Sign up failed", type: "error" });
+      }
+    } catch (error) {
+      console.error(error);
+      toast.add({ title: "Unable to connect", type: "error" });
+    } finally {
+      setIsSigningUp(false);
     }
   }; //prevents the page from refreshing whenever i click on the submit button
 
@@ -222,9 +234,18 @@ export default function Signup() {
             <div>
               <Button
                 type="submit"
+                disabled={isSigningUp}
+                aria-busy={isSigningUp}
                 className="cursor-pointer w-[100%] p-5 mb-1.5 rounded-xl font-semibold shadow-sm"
               >
-                Sign Up
+                {isSigningUp ? (
+                  <>
+                    <LoaderCircle className="h-4 w-4 animate-spin" />
+                    Creating account...
+                  </>
+                ) : (
+                  "Sign Up"
+                )}
               </Button>
               <p className="text-muted-foreground text-[13px] md:text-[14px] text-center mt-2">
                 Already have an account?

@@ -288,6 +288,7 @@ export default function Main() {
                       ))}
                     </Pie>
                     <Tooltip
+                      cursor={false}
                       formatter={(value) =>
                         formatCurrency(Number(value), currency)
                       }
