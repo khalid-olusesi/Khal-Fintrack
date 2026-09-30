@@ -19,6 +19,8 @@ import {
 } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
+import { formatCurrency } from "@/lib/currency";
+import { useCurrency } from "@/context/currency-context";
 
 type Budget = {
   id: number;
@@ -33,6 +35,7 @@ type Budget = {
 
 export default function Budgets() {
   const { toggleSidebar } = useSidebar();
+  const { currency } = useCurrency();
   const [budgets, setBudgets] = useState<Budget[]>([]);
   const [showCard, setShowCard] = useState(false);
   const [form, setForm] = useState({
@@ -279,17 +282,29 @@ export default function Budgets() {
             </div>
             <div>
               <h2 className="text-sm font-semibold">Budget Overview</h2>
-              <p className="text-xs text-muted-foreground">Track spending against your limits</p>
+              <p className="text-xs text-muted-foreground">
+                Track spending against your limits
+              </p>
             </div>
           </div>
           <table className="w-full text-foreground">
             <thead className="bg-gray-50 dark:bg-zinc-800/60 border-b border-border">
               <tr>
-                <th className="p-4 text-left text-xs font-medium text-muted-foreground uppercase tracking-wide">Category</th>
-                <th className="text-left text-xs font-medium text-muted-foreground uppercase tracking-wide">Budgeted</th>
-                <th className="text-right pr-3 text-xs font-medium text-muted-foreground uppercase tracking-wide">Spent</th>
-                <th className="text-end pr-6 text-xs font-medium text-muted-foreground uppercase tracking-wide">Progress</th>
-                <th className="text-end pr-6 text-xs font-medium text-muted-foreground uppercase tracking-wide">Action</th>
+                <th className="p-4 text-left text-xs font-medium text-muted-foreground uppercase tracking-wide">
+                  Category
+                </th>
+                <th className="text-left text-xs font-medium text-muted-foreground uppercase tracking-wide">
+                  Budgeted
+                </th>
+                <th className="text-right pr-3 text-xs font-medium text-muted-foreground uppercase tracking-wide">
+                  Spent
+                </th>
+                <th className="text-end pr-6 text-xs font-medium text-muted-foreground uppercase tracking-wide">
+                  Progress
+                </th>
+                <th className="text-end pr-6 text-xs font-medium text-muted-foreground uppercase tracking-wide">
+                  Action
+                </th>
               </tr>
             </thead>
 
@@ -312,9 +327,13 @@ export default function Budgets() {
                         <CategoryDisplay category={budget.category} />
                       </td>
 
-                      <td className="text-left text-sm">₦{budget.budgeted.toLocaleString()}</td>
+                      <td className="text-left text-sm">
+                        {formatCurrency(budget.budgeted, currency)}
+                      </td>
 
-                      <td className="text-right pr-3 text-sm">₦{budget.spent.toLocaleString()}</td>
+                      <td className="text-right pr-3 text-sm">
+                        {formatCurrency(budget.spent, currency)}
+                      </td>
 
                       <td className="pr-6">
                         <div className="flex items-center justify-end gap-3">
@@ -326,7 +345,9 @@ export default function Budgets() {
                               style={{ width: `${progressWidth}%` }}
                             />
                           </div>
-                          <div className={`w-9 text-right text-xs font-medium ${ isOverBudget ? "text-red-500" : ""}`}>
+                          <div
+                            className={`w-9 text-right text-xs font-medium ${isOverBudget ? "text-red-500" : ""}`}
+                          >
                             {progress.toFixed(0)}%
                           </div>
                         </div>
@@ -362,7 +383,10 @@ export default function Budgets() {
                 })
               ) : (
                 <tr>
-                  <td colSpan={6} className="py-16 text-center text-sm text-muted-foreground">
+                  <td
+                    colSpan={6}
+                    className="py-16 text-center text-sm text-muted-foreground"
+                  >
                     No budgets yet. Click "Add Budget" to get started.
                   </td>
                 </tr>
@@ -405,13 +429,13 @@ export default function Budgets() {
                       <span>
                         Spent{" "}
                         <span className="font-medium text-foreground">
-                          ₦{budget.spent.toLocaleString()}
+                          {formatCurrency(budget.spent, currency)}
                         </span>
                       </span>
                       <span>
                         Budget{" "}
                         <span className="font-medium text-foreground">
-                          ₦{budget.budgeted.toLocaleString()}
+                          {formatCurrency(budget.budgeted, currency)}
                         </span>
                       </span>
                     </div>
@@ -518,7 +542,7 @@ export default function Budgets() {
                     </div>
                     <div className="grid gap-2">
                       <Label className="text-muted-foreground">
-                        Budgeted Amount
+                        Budgeted Amount ({currency})
                       </Label>
                       <div className="flex w-full">
                         <div className="flex items-center justify-center w-11 bg-gray-50 dark:bg-zinc-800/50 border border-r-0 border-gray-200 dark:border-border rounded-l-md text-muted-foreground font-semibold">

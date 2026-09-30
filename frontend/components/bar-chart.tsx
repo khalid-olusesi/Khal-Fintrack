@@ -9,6 +9,8 @@ import {
   XAxis,
   YAxis,
 } from "recharts";
+import { formatCurrency } from "@/lib/currency";
+import { useCurrency } from "@/context/currency-context";
 
 interface WeeklyTotal {
   week: string;
@@ -22,21 +24,24 @@ export default function ExpensesOverviewChart({
   data: WeeklyTotal[];
   hideTitle?: boolean;
 }) {
+  const { currency } = useCurrency();
   const chart = (
     <ResponsiveContainer width="100%" height={350}>
-      <BarChart
-        data={data}
-        margin={{ top: 0, right: 10, left: 0, bottom: 0 }}
-      >
+      <BarChart data={data} margin={{ top: 0, right: 10, left: 0, bottom: 0 }}>
         <CartesianGrid vertical={false} stroke="var(--border)" />
         <XAxis dataKey="week" axisLine={false} tickLine={false} fontSize={12} />
         <YAxis
           axisLine={false}
           tickLine={false}
           fontSize={12}
-          tickFormatter={(v) => `₦${v.toLocaleString()}`}
+          tickFormatter={(value) => formatCurrency(Number(value), currency)}
         />
-        <Tooltip formatter={(value) => [`₦${Number(value).toLocaleString()}`, "Spent"]} />
+        <Tooltip
+          formatter={(value) => [
+            formatCurrency(Number(value), currency),
+            "Spent",
+          ]}
+        />
         <Bar
           dataKey="total"
           fill="#22c55e"

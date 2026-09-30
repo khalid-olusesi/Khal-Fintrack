@@ -3,6 +3,7 @@ import { Geist, Geist_Mono } from "next/font/google";
 import { ThemeProvider } from "@/components/theme-provider";
 import "./globals.css";
 import { CategoryProvider } from "@/context/category-context";
+import { CurrencyProvider } from "@/context/currency-context";
 import { Toaster } from "@/components/ui/toast";
 
 const geistSans = Geist({
@@ -39,9 +40,11 @@ export default function RootLayout({
           enableSystem
           disableTransitionOnChange
         >
-          <CategoryProvider>
-            <Toaster>{children}</Toaster>
-          </CategoryProvider>
+          <CurrencyProvider>
+            <CategoryProvider>
+              <Toaster>{children}</Toaster>
+            </CategoryProvider>
+          </CurrencyProvider>
         </ThemeProvider>
       </body>
     </html>

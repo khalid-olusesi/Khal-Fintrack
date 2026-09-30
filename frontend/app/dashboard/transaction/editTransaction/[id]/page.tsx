@@ -26,12 +26,14 @@ import {
 } from "@/components/ui/popover";
 import CategoryDropDown from "@/components/dropdown";
 import { Skeleton } from "@/components/ui/skeleton";
+import { useCurrency } from "@/context/currency-context";
 
 export default function EditTransaction() {
   const params = useParams();
   const router = useRouter();
   const id = params.id;
   const { toggleSidebar } = useSidebar();
+  const { currency } = useCurrency();
 
   // Try to read cached transaction data so the form renders instantly
   const cachedTransaction = (() => {
@@ -184,7 +186,10 @@ export default function EditTransaction() {
         {/* header */}
         <div className="flex items-center justify-between mb-6">
           <div className="flex gap-3 items-center">
-            <button className="cursor-pointer rounded-md p-2 hover:bg-muted" onClick={toggleSidebar}>
+            <button
+              className="cursor-pointer rounded-md p-2 hover:bg-muted"
+              onClick={toggleSidebar}
+            >
               <Menu className="w-4 h-4 text-foreground" />
             </button>
             <h1 className="text-base font-bold sm:text-xl text-foreground">
@@ -245,7 +250,9 @@ export default function EditTransaction() {
               <>
                 {/* Card header with type toggle */}
                 <div className="p-6 pb-0">
-                  <h3 className="text-sm font-semibold text-foreground mb-4">Transaction Type</h3>
+                  <h3 className="text-sm font-semibold text-foreground mb-4">
+                    Transaction Type
+                  </h3>
                   <div className="flex bg-gray-100 dark:bg-zinc-800/50 p-1 rounded-xl">
                     <button
                       type="button"
@@ -278,47 +285,96 @@ export default function EditTransaction() {
                 <form onSubmit={handleSubmit} className="p-6 pt-5">
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
                     <div className="space-y-1.5">
-                      <label className="text-sm font-medium text-gray-700 dark:text-muted-foreground">Description</label>
+                      <label className="text-sm font-medium text-gray-700 dark:text-muted-foreground">
+                        Description
+                      </label>
                       <div className="flex w-full rounded-xl overflow-hidden border border-border bg-white dark:bg-zinc-900/30 transition-all">
                         <div className="flex items-center justify-center w-11 bg-gray-50 dark:bg-zinc-800/50 border-r border-border text-muted-foreground">
                           <FileText className="w-4 h-4" />
                         </div>
-                        <input value={form.description} onChange={(e) => setForm({ ...form, description: e.target.value })} type="text" placeholder="e.g Grocery Shopping" className="bg-transparent text-foreground outline-none p-3 w-full text-sm placeholder:text-gray-400 dark:placeholder:text-gray-500" />
+                        <input
+                          value={form.description}
+                          onChange={(e) =>
+                            setForm({ ...form, description: e.target.value })
+                          }
+                          type="text"
+                          placeholder="e.g Grocery Shopping"
+                          className="bg-transparent text-foreground outline-none p-3 w-full text-sm placeholder:text-gray-400 dark:placeholder:text-gray-500"
+                        />
                       </div>
                     </div>
 
                     <div className="space-y-1.5">
-                      <label className="text-sm font-medium text-gray-700 dark:text-muted-foreground">Amount (₦)</label>
+                      <label className="text-sm font-medium text-gray-700 dark:text-muted-foreground">
+                        Amount ({currency})
+                      </label>
                       <div className="flex w-full rounded-xl overflow-hidden border border-border bg-white dark:bg-zinc-900/30 transition-all">
                         <div className="flex items-center justify-center w-11 bg-gray-50 dark:bg-zinc-800/50 border-r border-border text-muted-foreground">
                           <DollarSign className="w-4 h-4" />
                         </div>
-                        <input value={form.amount} onChange={(e) => setForm({ ...form, amount: e.target.value })} type="number" placeholder="e.g 100.00" className="bg-transparent text-foreground outline-none p-3 w-full text-sm placeholder:text-gray-400 dark:placeholder:text-gray-500" />
+                        <input
+                          value={form.amount}
+                          onChange={(e) =>
+                            setForm({ ...form, amount: e.target.value })
+                          }
+                          type="number"
+                          placeholder="e.g 100.00"
+                          className="bg-transparent text-foreground outline-none p-3 w-full text-sm placeholder:text-gray-400 dark:placeholder:text-gray-500"
+                        />
                       </div>
                     </div>
 
                     <div className="space-y-1.5">
-                      <label className="text-sm font-medium text-gray-700 dark:text-muted-foreground">Category</label>
+                      <label className="text-sm font-medium text-gray-700 dark:text-muted-foreground">
+                        Category
+                      </label>
                       <div className="flex w-full rounded-xl overflow-hidden border border-border bg-white dark:bg-zinc-900/30 transition-all">
                         <div className="flex items-center justify-center w-11 bg-gray-50 dark:bg-zinc-800/50 border-r border-border text-muted-foreground">
                           <Tag className="w-4 h-4" />
                         </div>
                         <div className="flex-1">
-                          <CategoryDropDown value={form.category} onValueChange={(value) => setForm({ ...form, category: value ?? "" })} type={form.type as "income" | "expense"} className="w-full h-full p-3 bg-transparent border-none text-sm shadow-none outline-none rounded-none rounded-r-xl" />
+                          <CategoryDropDown
+                            value={form.category}
+                            onValueChange={(value) =>
+                              setForm({ ...form, category: value ?? "" })
+                            }
+                            type={form.type as "income" | "expense"}
+                            className="w-full h-full p-3 bg-transparent border-none text-sm shadow-none outline-none rounded-none rounded-r-xl"
+                          />
                         </div>
                       </div>
                     </div>
 
                     <div className="space-y-1.5">
-                      <label className="text-sm font-medium text-gray-700 dark:text-muted-foreground">Date</label>
+                      <label className="text-sm font-medium text-gray-700 dark:text-muted-foreground">
+                        Date
+                      </label>
                       <div className="flex w-full rounded-xl overflow-hidden border border-border bg-white dark:bg-zinc-900/30 transition-all">
                         <div className="flex items-center justify-center w-11 bg-gray-50 dark:bg-zinc-800/50 border-r border-border text-muted-foreground">
                           <CalendarIcon className="w-4 h-4" />
                         </div>
                         <Popover>
-                          <PopoverTrigger className="bg-transparent" render={<Button variant={"ghost"} data-empty={!form.date} className="flex-1 w-full p-3 h-auto justify-between bg-transparent hover:bg-transparent border-none outline-none text-left font-normal text-foreground data-[empty=true]:text-muted-foreground rounded-none rounded-r-xl ">{format(form.date, "MMM dd, yyyy")}</Button>} />
+                          <PopoverTrigger
+                            className="bg-transparent"
+                            render={
+                              <Button
+                                variant={"ghost"}
+                                data-empty={!form.date}
+                                className="flex-1 w-full p-3 h-auto justify-between bg-transparent hover:bg-transparent border-none outline-none text-left font-normal text-foreground data-[empty=true]:text-muted-foreground rounded-none rounded-r-xl "
+                              >
+                                {format(form.date, "MMM dd, yyyy")}
+                              </Button>
+                            }
+                          />
                           <PopoverContent className="w-auto p-0" align="start">
-                            <Calendar mode="single" selected={form.date} onSelect={(selectedDate) => { if (!selectedDate) return; setForm({ ...form, date: selectedDate }); }} />
+                            <Calendar
+                              mode="single"
+                              selected={form.date}
+                              onSelect={(selectedDate) => {
+                                if (!selectedDate) return;
+                                setForm({ ...form, date: selectedDate });
+                              }}
+                            />
                           </PopoverContent>
                         </Popover>
                       </div>
@@ -326,8 +382,19 @@ export default function EditTransaction() {
                   </div>
 
                   <div className="flex items-center justify-end gap-3 mt-8 pt-5 border-t border-border">
-                    <button type="button" onClick={() => router.push("/dashboard/transaction")} className="border border-border bg-white text-gray-700 rounded-xl cursor-pointer px-6 py-2.5 text-sm font-medium hover:bg-gray-50 dark:bg-zinc-800/30 dark:text-foreground dark:hover:bg-zinc-800/60 transition-colors">Cancel</button>
-                    <button disabled={isSaving} className="text-white font-medium rounded-xl cursor-pointer px-8 py-2.5 bg-green-600 hover:bg-green-700 shadow-sm disabled:opacity-60 disabled:cursor-not-allowed transition-colors text-sm">{isSaving ? "Saving..." : "Update Transaction"}</button>
+                    <button
+                      type="button"
+                      onClick={() => router.push("/dashboard/transaction")}
+                      className="border border-border bg-white text-gray-700 rounded-xl cursor-pointer px-6 py-2.5 text-sm font-medium hover:bg-gray-50 dark:bg-zinc-800/30 dark:text-foreground dark:hover:bg-zinc-800/60 transition-colors"
+                    >
+                      Cancel
+                    </button>
+                    <button
+                      disabled={isSaving}
+                      className="text-white font-medium rounded-xl cursor-pointer px-8 py-2.5 bg-green-600 hover:bg-green-700 shadow-sm disabled:opacity-60 disabled:cursor-not-allowed transition-colors text-sm"
+                    >
+                      {isSaving ? "Saving..." : "Update Transaction"}
+                    </button>
                   </div>
                 </form>
               </>

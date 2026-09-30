@@ -3,11 +3,13 @@ package models
 import "time"
 
 type User struct {
-	ID        uint
-	Name      string
-	Email     string `gorm:"unique"`
-	Password  string
-	AvatarURL string
-	CreatedAt time.Time
-	UpdatedAt time.Time
+    ID        uint      `json:"id"`
+    Name      string    `json:"name"`
+    Email     string    `json:"email"`
+    Password  string    `json:"-"`
+    AvatarURL string    `json:"avatar_url"`
+    Currency  string    `json:"currency"`
+    CreatedAt time.Time `json:"created_at"`
+    UpdatedAt time.Time `json:"updated_at"`
 }
+

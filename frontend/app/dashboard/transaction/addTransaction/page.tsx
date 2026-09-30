@@ -15,19 +15,20 @@ import { format } from "date-fns";
 import { Button } from "@/components/ui/button";
 import { Calendar } from "@/components/ui/calendar";
 import { useSidebar } from "@/context/sidebar-context";
-import { MainLogo } from "@/components/logo";
 import { ModeToggle } from "@/components/toggle";
-import { useState } from "react";
+import { useRef, useState } from "react";
 import {
   Popover,
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover";
 import CategoryDropDown from "@/components/dropdown";
+import { useCurrency } from "@/context/currency-context";
 
 export default function AddTransaction() {
   const router = useRouter();
   const { toggleSidebar } = useSidebar();
+  const { currency } = useCurrency();
 
   const [form, setForm] = useState({
     type: "",
@@ -38,6 +39,7 @@ export default function AddTransaction() {
   });
 
   const [isSaving, setIsSaving] = useState(false);
+  const isSubmitting = useRef(false);
 
   const handleCancel = () => {
     setForm({
@@ -51,6 +53,7 @@ export default function AddTransaction() {
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
+    if (isSubmitting.current) return;
 
     if (!form.description.trim()) {
       toast.add({ title: "Description is required", type: "warning" });
@@ -72,6 +75,7 @@ export default function AddTransaction() {
       return;
     }
 
+    isSubmitting.current = true;
     setIsSaving(true);
 
     try {
@@ -120,6 +124,7 @@ export default function AddTransaction() {
       console.error(err);
       toast.add({ title: "Unable to connect to the server.", type: "error" });
     } finally {
+      isSubmitting.current = false;
       setIsSaving(false);
     }
   };
@@ -135,7 +140,10 @@ export default function AddTransaction() {
         {/* header */}
         <div className="flex items-center justify-between mb-6">
           <div className="flex gap-3 items-center">
-            <button className="cursor-pointer rounded-md p-2 hover:bg-muted" onClick={toggleSidebar}>
+            <button
+              className="cursor-pointer rounded-md p-2 hover:bg-muted"
+              onClick={toggleSidebar}
+            >
               <Menu className="w-4 h-4 text-foreground" />
             </button>
             <h1 className="text-base font-bold sm:text-xl text-foreground">
@@ -161,7 +169,9 @@ export default function AddTransaction() {
           <div className="bg-white dark:bg-card rounded-2xl shadow-sm border border-border w-full max-w-3xl">
             {/* Card header with type toggle */}
             <div className="p-6 pb-0">
-              <h3 className="text-sm font-semibold text-foreground mb-4">Transaction Type</h3>
+              <h3 className="text-sm font-semibold text-foreground mb-4">
+                Transaction Type
+              </h3>
               <div className="flex bg-gray-100 dark:bg-zinc-800/50 p-1 rounded-xl">
                 <button
                   type="button"
@@ -194,47 +204,96 @@ export default function AddTransaction() {
             <form onSubmit={handleSubmit} className="p-6 pt-5">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
                 <div className="space-y-1.5">
-                  <label className="text-sm font-medium text-gray-700 dark:text-muted-foreground">Description</label>
+                  <label className="text-sm font-medium text-gray-700 dark:text-muted-foreground">
+                    Description
+                  </label>
                   <div className="flex w-full rounded-xl overflow-hidden border border-border bg-white dark:bg-zinc-900/30 transition-all">
                     <div className="flex items-center justify-center w-11 bg-gray-50 dark:bg-zinc-800/50 border-r border-border text-muted-foreground">
                       <FileText className="w-4 h-4" />
                     </div>
-                    <input value={form.description} onChange={(e) => setForm({ ...form, description: e.target.value })} type="text" placeholder="e.g Grocery Shopping" className="bg-transparent text-foreground outline-none p-3 w-full text-sm placeholder:text-gray-400 dark:placeholder:text-gray-500" />
+                    <input
+                      value={form.description}
+                      onChange={(e) =>
+                        setForm({ ...form, description: e.target.value })
+                      }
+                      type="text"
+                      placeholder="e.g Grocery Shopping"
+                      className="bg-transparent text-foreground outline-none p-3 w-full text-sm placeholder:text-gray-400 dark:placeholder:text-gray-500"
+                    />
                   </div>
                 </div>
 
                 <div className="space-y-1.5">
-                  <label className="text-sm font-medium text-gray-700 dark:text-muted-foreground">Amount (₦)</label>
+                  <label className="text-sm font-medium text-gray-700 dark:text-muted-foreground">
+                    Amount ({currency})
+                  </label>
                   <div className="flex w-full rounded-xl overflow-hidden border border-border bg-white dark:bg-zinc-900/30 transition-all">
                     <div className="flex items-center justify-center w-11 bg-gray-50 dark:bg-zinc-800/50 border-r border-border text-muted-foreground">
                       <DollarSign className="w-4 h-4" />
                     </div>
-                    <input value={form.amount} onChange={(e) => setForm({ ...form, amount: e.target.value })} type="number" placeholder="e.g 100.00" className="bg-transparent text-foreground outline-none p-3 w-full text-sm placeholder:text-gray-400 dark:placeholder:text-gray-500" />
+                    <input
+                      value={form.amount}
+                      onChange={(e) =>
+                        setForm({ ...form, amount: e.target.value })
+                      }
+                      type="number"
+                      placeholder="e.g 100.00"
+                      className="bg-transparent text-foreground outline-none p-3 w-full text-sm placeholder:text-gray-400 dark:placeholder:text-gray-500"
+                    />
                   </div>
                 </div>
 
                 <div className="space-y-1.5">
-                  <label className="text-sm font-medium text-gray-700 dark:text-muted-foreground">Category</label>
+                  <label className="text-sm font-medium text-gray-700 dark:text-muted-foreground">
+                    Category
+                  </label>
                   <div className="flex w-full rounded-xl overflow-hidden border border-border bg-white dark:bg-zinc-900/30 transition-all">
                     <div className="flex items-center justify-center w-11 bg-gray-50 dark:bg-zinc-800/50 border-r border-border text-muted-foreground">
                       <Tag className="w-4 h-4" />
                     </div>
                     <div className="flex-1">
-                      <CategoryDropDown value={form.category} onValueChange={(value) => setForm({ ...form, category: value ?? "" })} type={form.type as "income" | "expense"} className="w-full h-full p-3 bg-transparent border-none text-sm shadow-none outline-none rounded-none rounded-r-xl" />
+                      <CategoryDropDown
+                        value={form.category}
+                        onValueChange={(value) =>
+                          setForm({ ...form, category: value ?? "" })
+                        }
+                        type={form.type as "income" | "expense"}
+                        className="w-full h-full p-3 bg-transparent border-none text-sm shadow-none outline-none rounded-none rounded-r-xl"
+                      />
                     </div>
                   </div>
                 </div>
 
                 <div className="space-y-1.5">
-                  <label className="text-sm font-medium text-gray-700 dark:text-muted-foreground">Date</label>
+                  <label className="text-sm font-medium text-gray-700 dark:text-muted-foreground">
+                    Date
+                  </label>
                   <div className="flex w-full rounded-xl overflow-hidden border border-border bg-white dark:bg-zinc-900/30 transition-all">
                     <div className="flex items-center justify-center w-11 bg-gray-50 dark:bg-zinc-800/50 border-r border-border text-muted-foreground">
                       <CalendarIcon className="w-4 h-4" />
                     </div>
                     <Popover>
-                      <PopoverTrigger className="bg-transparent" render={<Button variant={"ghost"} data-empty={!form.date} className="flex-1 w-full p-3 h-auto justify-between bg-transparent hover:bg-transparent border-none outline-none text-left font-normal text-foreground data-[empty=true]:text-muted-foreground rounded-none rounded-r-xl ">{format(form.date, "MMM dd, yyyy")}</Button>} />
+                      <PopoverTrigger
+                        className="bg-transparent"
+                        render={
+                          <Button
+                            variant={"ghost"}
+                            data-empty={!form.date}
+                            className="flex-1 w-full p-3 h-auto justify-between bg-transparent hover:bg-transparent border-none outline-none text-left font-normal text-foreground data-[empty=true]:text-muted-foreground rounded-none rounded-r-xl "
+                          >
+                            {format(form.date, "MMM dd, yyyy")}
+                          </Button>
+                        }
+                      />
                       <PopoverContent className="w-auto p-0" align="start">
-                        <Calendar mode="single" selected={form.date} onSelect={(selectedDate) => { if (!selectedDate) return; setForm({ ...form, date: selectedDate }); }} />
+                        <Calendar
+                          mode="single"
+                          selected={form.date}
+                          onSelect={(selectedDate) => {
+                            if (!selectedDate) return;
+                            setForm({ ...form, date: selectedDate });
+                          }}
+                        />
                       </PopoverContent>
                     </Popover>
                   </div>
@@ -242,8 +301,19 @@ export default function AddTransaction() {
               </div>
 
               <div className="flex items-center justify-end gap-3 mt-8 pt-5 border-t border-border">
-                <button type="button" className="border border-border bg-white text-gray-700 rounded-xl cursor-pointer px-6 py-2.5 text-sm font-medium hover:bg-gray-50 dark:bg-zinc-800/30 dark:text-foreground dark:hover:bg-zinc-800/60 transition-colors" onClick={handleCancel}>Cancel</button>
-                <button disabled={isSaving} className="text-white font-medium rounded-xl cursor-pointer px-8 py-2.5 bg-green-600 hover:bg-green-700 shadow-sm disabled:opacity-60 disabled:cursor-not-allowed transition-colors text-sm">{isSaving ? "Saving..." : "Save Transaction"}</button>
+                <button
+                  type="button"
+                  className="border border-border bg-white text-gray-700 rounded-xl cursor-pointer px-6 py-2.5 text-sm font-medium hover:bg-gray-50 dark:bg-zinc-800/30 dark:text-foreground dark:hover:bg-zinc-800/60 transition-colors"
+                  onClick={handleCancel}
+                >
+                  Cancel
+                </button>
+                <button
+                  disabled={isSaving}
+                  className="text-white font-medium rounded-xl cursor-pointer px-8 py-2.5 bg-green-600 hover:bg-green-700 shadow-sm disabled:opacity-60 disabled:cursor-not-allowed transition-colors text-sm"
+                >
+                  {isSaving ? "Saving..." : "Save Transaction"}
+                </button>
               </div>
             </form>
           </div>

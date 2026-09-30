@@ -38,10 +38,11 @@ func Signup(c *gin.Context) {
 	}
 
 	user := models.User{
-		Name:     body.Name,
-		Email:    body.Email,
-		Password: string(hash),
-	}
+	Name:     body.Name,
+	Email:    body.Email,
+	Password: string(hash),
+	Currency: "NGN",
+}
 
 	err = initializers.DB.Transaction(func(tx *gorm.DB) error {
 		result := tx.Create(&user)
@@ -205,11 +206,12 @@ func GetProfile(c *gin.Context) {
 
 	c.JSON(http.StatusOK, gin.H{
 		"user": gin.H{
-			"id":    currentUser.ID,
-			"name":  currentUser.Name,
-			"email": currentUser.Email,
-			"avatar_url": currentUser.AvatarURL,
-		},
+	"id":         currentUser.ID,
+	"name":       currentUser.Name,
+	"email":      currentUser.Email,
+	"avatar_url": currentUser.AvatarURL,
+	"currency":   currentUser.Currency,
+},
 	})
 }
 
@@ -256,6 +258,7 @@ func UpdateProfile(c *gin.Context) {
 			"name":       currentUser.Name,
 			"email":      currentUser.Email,
 			"avatar_url": currentUser.AvatarURL,
+			"currency": currentUser.Currency,
 		},
 	})
 }

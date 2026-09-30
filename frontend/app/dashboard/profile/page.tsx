@@ -2,6 +2,7 @@
 
 import { ModeToggle } from "@/components/toggle";
 import { useSidebar } from "@/context/sidebar-context";
+import { useCurrency } from "@/context/currency-context";
 import {
   Menu,
   Pencil,
@@ -23,6 +24,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 
 export default function Profile() {
   const { toggleSidebar } = useSidebar();
+  const { setCurrency } = useCurrency();
 
   const [isLoading, setIsLoading] = useState(true);
   const [isSavingName, setIsSavingName] = useState(false);
@@ -73,6 +75,7 @@ export default function Profile() {
       const data = await response.json();
       setProfile(data.user);
       setEditedName(data.user.name);
+      setCurrency(data.user.currency || "NGN");
     } catch (error) {
       console.error(error);
       toast.add({

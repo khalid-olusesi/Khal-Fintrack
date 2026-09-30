@@ -15,6 +15,8 @@ import { Skeleton } from "@/components/ui/skeleton";
 import DateFilter from "@/components/date-filter";
 import { useRouter, useSearchParams } from "next/navigation";
 import CategoryDropDown from "@/components/dropdown";
+import { formatCurrency } from "@/lib/currency";
+import { useCurrency } from "@/context/currency-context";
 
 function TransactionContent() {
   type CachedPage = {
@@ -23,6 +25,7 @@ function TransactionContent() {
   };
   const [totalPages, setTotalPages] = useState(1);
   const [transactions, setTransactions] = useState<Transaction[]>([]);
+  const { currency } = useCurrency();
   const { toggleSidebar } = useSidebar();
   const router = useRouter();
   const [selectedCategory, setSelectedCategory] = useState("all");
@@ -455,8 +458,9 @@ function TransactionContent() {
                     <p
                       className={`shrink-0 text-sm font-bold ${transaction.type === "income" ? "text-green-600" : "text-red-500"}`}
                     >
-                      {transaction.type === "income" ? "+" : "-"}₦
-                      {(transaction.amount ?? 0).toLocaleString()}
+                      {transaction.type === "income"
+                        ? `+${formatCurrency(transaction.amount ?? 0, currency)}`
+                        : formatCurrency(-(transaction.amount ?? 0), currency)}
                     </p>
                   </div>
                   <div className="mt-3 flex items-center justify-between gap-2 border-t border-gray-100 pt-2 dark:border-border">
@@ -566,7 +570,9 @@ function TransactionContent() {
             <ModeToggle />
             <Button
               type="submit"
-              onClick={() => router.push("/dashboard/transaction/addTransaction")}
+              onClick={() =>
+                router.push("/dashboard/transaction/addTransaction")
+              }
               className="cursor-pointer flex items-center"
             >
               <span>Add Transaction</span>
@@ -596,7 +602,10 @@ function TransactionContent() {
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
             <input
               value={search}
-              onChange={(e) => { setSearch(e.target.value); setCurrentPage(1); }}
+              onChange={(e) => {
+                setSearch(e.target.value);
+                setCurrentPage(1);
+              }}
               type="text"
               placeholder="Search transactions..."
               className="w-full rounded-lg border border-border py-2 pl-10 pr-10 outline-none bg-white dark:bg-card text-foreground text-sm  transition"
@@ -604,7 +613,10 @@ function TransactionContent() {
             {search && (
               <button
                 type="button"
-                onClick={() => { setSearch(""); setCurrentPage(1); }}
+                onClick={() => {
+                  setSearch("");
+                  setCurrentPage(1);
+                }}
                 className="absolute right-3 top-1/2 -translate-y-1/2 cursor-pointer"
               >
                 <X className="w-4 h-4 text-muted-foreground hover:text-foreground" />
@@ -618,12 +630,24 @@ function TransactionContent() {
           <table className="w-full text-foreground">
             <thead className="bg-gray-50 dark:bg-zinc-800/60 border-b border-border">
               <tr>
-                <th className="p-4 text-left text-xs font-medium text-muted-foreground uppercase tracking-wide">Date</th>
-                <th className="text-left text-xs font-medium text-muted-foreground uppercase tracking-wide">Description</th>
-                <th className="text-left text-xs font-medium text-muted-foreground uppercase tracking-wide">Category</th>
-                <th className="text-left text-xs font-medium text-muted-foreground uppercase tracking-wide">Type</th>
-                <th className="text-left text-xs font-medium text-muted-foreground uppercase tracking-wide">Amount</th>
-                <th className="text-center text-xs font-medium text-muted-foreground uppercase tracking-wide">Action</th>
+                <th className="p-4 text-left text-xs font-medium text-muted-foreground uppercase tracking-wide">
+                  Date
+                </th>
+                <th className="text-left text-xs font-medium text-muted-foreground uppercase tracking-wide">
+                  Description
+                </th>
+                <th className="text-left text-xs font-medium text-muted-foreground uppercase tracking-wide">
+                  Category
+                </th>
+                <th className="text-left text-xs font-medium text-muted-foreground uppercase tracking-wide">
+                  Type
+                </th>
+                <th className="text-left text-xs font-medium text-muted-foreground uppercase tracking-wide">
+                  Amount
+                </th>
+                <th className="text-center text-xs font-medium text-muted-foreground uppercase tracking-wide">
+                  Action
+                </th>
               </tr>
             </thead>
 
@@ -663,10 +687,12 @@ function TransactionContent() {
 
                     <td
                       className={`font-semibold ${
-                        transaction.type === "income" ? "text-green-600" : "text-red-500"
+                        transaction.type === "income"
+                          ? "text-green-600"
+                          : "text-red-500"
                       }`}
                     >
-                      ₦{(transaction.amount ?? 0).toLocaleString()}
+                      {formatCurrency(transaction.amount ?? 0, currency)}
                     </td>
 
                     <td className="py-4">
@@ -681,7 +707,9 @@ function TransactionContent() {
                                 `editTransaction_${transaction.id}`,
                                 JSON.stringify(transaction),
                               );
-                              router.push(`/dashboard/transaction/editTransaction/${transaction.id}`);
+                              router.push(
+                                `/dashboard/transaction/editTransaction/${transaction.id}`,
+                              );
                             }}
                             className="w-4 h-4"
                           />
@@ -703,7 +731,10 @@ function TransactionContent() {
 
               {!isLoading && transactions.length === 0 && (
                 <tr>
-                  <td colSpan={6} className="py-16 text-center text-sm text-muted-foreground">
+                  <td
+                    colSpan={6}
+                    className="py-16 text-center text-sm text-muted-foreground"
+                  >
                     No transactions found.
                   </td>
                 </tr>

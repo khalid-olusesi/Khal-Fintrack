@@ -22,4 +22,11 @@ func SyncDatabase() {
 	if err != nil {
 		panic("Failed to Migrate to the database")
 	}
+
+
+	if err := DB.Model(&models.User{}).
+	Where("currency IS NULL OR currency = ?", "").
+	Update("currency", "NGN").Error; err != nil {
+	panic("Failed to set default currency")
+}
 }
