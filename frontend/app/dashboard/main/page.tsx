@@ -128,25 +128,37 @@ export default function Main() {
 
   return (
     <main className="h-full w-full overflow-y-auto bg-gray-100 p-4 dark:bg-background md:p-6">
-      <div className="mb-6 flex items-center justify-between gap-3">
-        <div className="flex min-w-0 items-center gap-3">
-          <button
-            type="button"
-            onClick={toggleSidebar}
-            className="cursor-pointer rounded-md p-2 hover:bg-muted"
-            aria-label="Open navigation menu"
-          >
-            <Menu className="h-4 w-4" />
-          </button>
-          <div className="md:hidden">
-            <MainLogo />
+      <div className="mb-6 space-y-3 md:flex md:items-center md:justify-between md:space-y-0">
+        <div className="flex min-w-0 items-center justify-between gap-3">
+          <div className="flex min-w-0 items-center gap-3">
+            <button
+              type="button"
+              onClick={toggleSidebar}
+              className="shrink-0 cursor-pointer rounded-md p-2 hover:bg-muted"
+              aria-label="Open navigation menu"
+            >
+              <Menu className="h-4 w-4" />
+            </button>
+            <div className="min-w-0 md:hidden">
+              <MainLogo />
+            </div>
+            <h1 className="hidden text-xl font-bold md:block">Dashboard</h1>
           </div>
-          <h1 className="hidden text-xl font-bold md:block">Dashboard</h1>
+          <div className="shrink-0 md:hidden">
+            <ModeToggle />
+          </div>
         </div>
-        <div className="flex items-center gap-2">
-          <DateFilter value={period} onValueChange={setPeriod} />
-          <ModeToggle />
-          <Button onClick={openAddTransaction} className="cursor-pointer gap-2">
+        <div className="flex w-full items-center gap-2 md:w-auto">
+          <div className="min-w-0 flex-1 md:flex-none">
+            <DateFilter value={period} onValueChange={setPeriod} />
+          </div>
+          <div className="hidden md:block">
+            <ModeToggle />
+          </div>
+          <Button
+            onClick={openAddTransaction}
+            className="shrink-0 cursor-pointer gap-2 whitespace-nowrap"
+          >
             <Plus className="h-4 w-4" />
             <span className="hidden sm:inline">Quick Add Transaction</span>
             <span className="sm:hidden">Add</span>
