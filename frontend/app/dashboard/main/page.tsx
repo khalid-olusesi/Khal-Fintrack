@@ -196,26 +196,24 @@ export default function Main() {
           iconBackground="bg-rose-50 dark:bg-rose-950/40"
         />
         <div className="min-h-[140px] rounded-xl border border-gray-100 bg-white p-5 shadow-sm dark:border-border dark:bg-card">
-          <div className="flex items-start justify-between gap-4">
-            <div className="min-w-0">
-              <p className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
-                Net Savings
-              </p>
-              {isLoading ? (
-                <Skeleton className="my-3 h-7 w-36" />
-              ) : (
-                <p className="my-3 truncate text-xl font-bold tabular-nums tracking-tight text-gray-900 dark:text-foreground md:text-2xl">
-                  {formatCurrency(
-                    dashboard.total_income - dashboard.total_expenses,
-                    currency,
-                  )}
-                </p>
-              )}
-            </div>
+          <div className="flex items-center justify-between gap-3">
+            <p className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+              Net Savings
+            </p>
             <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-emerald-50 text-emerald-700 dark:bg-emerald-950/40 dark:text-emerald-300">
               <PiggyBank className="h-4 w-4" />
             </span>
           </div>
+          {isLoading ? (
+            <Skeleton className="my-3 h-7 w-36" />
+          ) : (
+            <p className="my-3 whitespace-nowrap text-sm font-bold tabular-nums tracking-tight text-gray-900 dark:text-foreground sm:text-base md:text-2xl">
+              {formatCurrency(
+                dashboard.total_income - dashboard.total_expenses,
+                currency,
+              )}
+            </p>
+          )}
           {isLoading ? (
             <Skeleton className="mt-3 h-3 w-40" />
           ) : (
@@ -466,25 +464,23 @@ function Metric({
 }) {
   return (
     <div className="min-h-[140px] rounded-xl border border-gray-100 bg-white p-5 shadow-sm transition-shadow hover:shadow-md dark:border-border dark:bg-card">
-      <div className="flex items-start justify-between gap-4">
-        <div className="min-w-0">
-          <p className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
-            {title}
-          </p>
-          {loading ? (
-            <Skeleton className="my-4 h-7 w-36" />
-          ) : (
-            <p className="my-3 truncate text-xl font-bold tabular-nums tracking-tight text-gray-900 dark:text-foreground md:text-2xl">
-              {formatCurrency(value, currency)}
-            </p>
-          )}
-        </div>
+      <div className="flex items-center justify-between gap-3">
+        <p className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+          {title}
+        </p>
         <span
           className={`flex h-9 w-9 shrink-0 items-center justify-center rounded-lg ${iconBackground} ${iconColor}`}
         >
           <Icon className="h-4 w-4" />
         </span>
       </div>
+      {loading ? (
+        <Skeleton className="my-4 h-7 w-36" />
+      ) : (
+        <p className="my-3 whitespace-nowrap text-sm font-bold tabular-nums tracking-tight text-gray-900 dark:text-foreground sm:text-base md:text-2xl">
+          {formatCurrency(value, currency)}
+        </p>
+      )}
       {loading ? (
         <Skeleton className="mt-3 h-3 w-40" />
       ) : (

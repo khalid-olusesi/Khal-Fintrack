@@ -344,7 +344,7 @@ export default function Profile() {
         {isLoading ? (
           <>
             {/* Skeletons for LEFT COLUMN */}
-            <div className="lg:col-span-2 flex flex-col gap-5">
+            <div className="order-2 flex flex-col gap-5 lg:order-1 lg:col-span-2">
               <div className="bg-white dark:bg-card rounded-2xl shadow-sm border border-border p-6">
                 <div className="flex items-center gap-2 mb-5">
                   <Skeleton className="h-8 w-8 rounded-lg" />
@@ -396,7 +396,7 @@ export default function Profile() {
             </div>
 
             {/* Skeletons for RIGHT COLUMN */}
-            <div className="lg:col-span-1 flex flex-col gap-5">
+            <div className="order-1 flex flex-col gap-5 lg:order-2 lg:col-span-1">
               <div className="bg-white dark:bg-card rounded-2xl shadow-sm border border-border p-6 flex flex-col items-center text-center">
                 <Skeleton className="h-28 w-28 rounded-full mb-4" />
                 <Skeleton className="h-5 w-32 mb-1.5" />
@@ -424,7 +424,7 @@ export default function Profile() {
         ) : (
           <>
             {/* ── LEFT COLUMN: Edit forms ── */}
-            <div className="lg:col-span-2 flex flex-col gap-5">
+            <div className="order-2 flex flex-col gap-5 lg:order-1 lg:col-span-2">
               {/* Update name card */}
               <div className="bg-white dark:bg-card rounded-2xl shadow-sm border border-border p-6">
                 <div className="flex items-center gap-2 mb-5">
@@ -621,7 +621,7 @@ export default function Profile() {
             </div>
 
             {/* ── RIGHT COLUMN: Avatar + identity ── */}
-            <div className="lg:col-span-1 flex flex-col gap-5">
+            <div className="order-1 flex flex-col gap-5 lg:order-2 lg:col-span-1">
               <div className="bg-white dark:bg-card rounded-2xl shadow-sm border border-border p-6 flex flex-col items-center text-center">
                 {/* Avatar */}
                 <div className="relative mb-4">
