@@ -368,6 +368,13 @@ func UpdateAvatar(c *gin.Context) {
 		return
 	}
 
+	if file.Size > 5*1024*1024 {
+		c.JSON(http.StatusRequestEntityTooLarge, gin.H{
+			"error": "Profile picture must be smaller than 5 MB",
+		})
+		return
+	}
+
 	src, err := file.Open()
 
 	if err != nil {

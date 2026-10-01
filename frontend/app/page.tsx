@@ -410,7 +410,7 @@ export default function LandingPage() {
 
             {/* Phone */}
             <a
-              href="tel:09038244886"
+              href="tel:+2349038244886"
               className="flex flex-col items-center gap-3 p-6 rounded-2xl bg-white/50 dark:bg-white/5 hover:bg-white/80 dark:hover:bg-white/10 border border-white/60 dark:border-white/5 transition-all duration-300 group cursor-pointer hover:-translate-y-1 shadow-sm hover:shadow-lg"
             >
               <div className="w-14 h-14 rounded-2xl bg-gradient-to-tr from-green-100 to-green-50 dark:from-emerald-900/40 dark:to-emerald-800/40 flex items-center justify-center transition-transform duration-300 group-hover:scale-110 group-hover:-rotate-3 shadow-inner">
@@ -431,7 +431,7 @@ export default function LandingPage() {
               <div className="text-center">
                 <p className="font-bold text-base mb-1">Phone</p>
                 <p className="text-muted-foreground text-xs group-hover:text-green-600 dark:group-hover:text-green-400 transition-colors">
-                  09038244886
+                  +234 903 824 4886
                 </p>
               </div>
             </a>

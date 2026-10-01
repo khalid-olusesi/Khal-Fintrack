@@ -17,6 +17,7 @@ import {
   Lock,
 } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
+import imageCompression from "browser-image-compression";
 import { Button } from "@/components/ui/button";
 import { toast } from "@/components/ui/toast";
 
@@ -248,8 +249,8 @@ export default function Profile() {
       return;
     }
 
-    if (file.size > 5 * 1024 * 1024) {
-      const msg = "Image must be smaller than 5MB.";
+    if (file.size > 20 * 1024 * 1024) {
+      const msg = "Image must be smaller than 20 MB.";
       setAvatarError(msg);
       toast.add({ title: msg, type: "warning" });
       return;
@@ -258,11 +259,23 @@ export default function Profile() {
     setIsUploadingAvatar(true);
 
     try {
+      let compressedFile: File;
+      try {
+        compressedFile = await imageCompression(file, {
+          maxSizeMB: 2,
+          maxWidthOrHeight: 1200,
+          useWebWorker: true,
+        });
+      } catch (error) {
+        console.error("Image compression failed:", error);
+        throw new Error("Failed to process image");
+      }
+
       const token = localStorage.getItem("token");
 
       const formData = new FormData();
 
-      formData.append("avatar", file);
+      formData.append("avatar", compressedFile);
 
       const response = await fetch(
         `${process.env.NEXT_PUBLIC_API_URL}/profile/avatar`,
