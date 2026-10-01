@@ -12,6 +12,7 @@ import {
   EyeOff,
   Camera,
   KeyRound,
+  Trash2,
   User,
   Mail,
   Lock,
@@ -51,6 +52,7 @@ export default function Profile() {
 
   //image handling
   const [isUploadingAvatar, setIsUploadingAvatar] = useState(false);
+  const [isRemovingAvatar, setIsRemovingAvatar] = useState(false);
   const [avatarError, setAvatarError] = useState("");
   const fileInputRef = useRef<HTMLInputElement>(null);
 
@@ -316,6 +318,38 @@ export default function Profile() {
       if (fileInputRef.current) {
         fileInputRef.current.value = "";
       }
+    }
+  };
+
+  const handleRemoveAvatar = async () => {
+    if (!profile.avatar_url || isRemovingAvatar || isUploadingAvatar) return;
+
+    setIsRemovingAvatar(true);
+    setAvatarError("");
+    try {
+      const token = localStorage.getItem("token");
+      const response = await fetch(
+        `${process.env.NEXT_PUBLIC_API_URL}/profile/avatar`,
+        {
+          method: "DELETE",
+          credentials: "include",
+          headers: { Authorization: `Bearer ${token}` },
+        },
+      );
+      const data = await response.json();
+      if (!response.ok) {
+        throw new Error(data.error || "Failed to remove profile picture");
+      }
+
+      setProfile((previous) => ({ ...previous, avatar_url: "" }));
+      toast.add({ title: "Profile picture removed", type: "success" });
+    } catch (error) {
+      const msg =
+        error instanceof Error ? error.message : "Failed to remove profile picture";
+      setAvatarError(msg);
+      toast.add({ title: msg, type: "error" });
+    } finally {
+      setIsRemovingAvatar(false);
     }
   };
 
@@ -624,7 +658,7 @@ export default function Profile() {
             <div className="order-1 flex flex-col gap-5 lg:order-2 lg:col-span-1">
               <div className="bg-white dark:bg-card rounded-2xl shadow-sm border border-border p-6 flex flex-col items-center text-center">
                 {/* Avatar */}
-                <div className="relative mb-4">
+                <div className="relative">
                   <div className="h-28 w-28 rounded-full bg-gradient-to-br from-green-400 to-emerald-600 flex items-center justify-center text-white text-4xl font-bold shadow-md overflow-hidden">
                     {profile.avatar_url ? (
                       // eslint-disable-next-line @next/next/no-img-element
@@ -647,16 +681,33 @@ export default function Profile() {
                     className="hidden"
                   />
 
-                  {/* Camera button */}
-                  <button
+                </div>
+
+                <div className="mb-4 mt-3 flex items-center justify-center gap-2">
+                  <Button
                     type="button"
+                    variant="outline"
+                    size="sm"
                     onClick={() => fileInputRef.current?.click()}
-                    disabled={isUploadingAvatar}
-                    className="absolute bottom-0 right-0 h-8 w-8 rounded-full bg-white dark:bg-card border border-border shadow flex items-center justify-center hover:bg-muted disabled:opacity-50 transition-colors cursor-pointer"
-                    aria-label="Change profile photo"
+                    disabled={isUploadingAvatar || isRemovingAvatar}
+                    className="cursor-pointer gap-1.5"
                   >
-                    <Camera className="h-3.5 w-3.5 text-muted-foreground" />
-                  </button>
+                    <Camera className="h-3.5 w-3.5" />
+                    {isUploadingAvatar ? "Uploading..." : "Change photo"}
+                  </Button>
+                  {profile.avatar_url && (
+                    <Button
+                      type="button"
+                      onClick={handleRemoveAvatar}
+                      disabled={isUploadingAvatar || isRemovingAvatar}
+                      variant="outline"
+                      size="sm"
+                      className="cursor-pointer gap-1.5 text-red-600 hover:text-red-700"
+                    >
+                      <Trash2 className="h-3.5 w-3.5" />
+                      {isRemovingAvatar ? "Removing..." : "Remove"}
+                    </Button>
+                  )}
                 </div>
 
                 {avatarError && (

@@ -417,6 +417,30 @@ func UpdateAvatar(c *gin.Context) {
 	})
 }
 
+func DeleteAvatar(c *gin.Context) {
+	user, exists := c.Get("user")
+	if !exists {
+		c.JSON(http.StatusUnauthorized, gin.H{
+			"error": "user unauthorized",
+		})
+		return
+	}
+
+	currentUser := user.(*models.User)
+	currentUser.AvatarURL = ""
+
+	if err := initializers.DB.Model(currentUser).Update("avatar_url", "").Error; err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"error": "Failed to remove profile picture",
+		})
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{
+		"message": "Profile picture removed successfully",
+	})
+}
+
 func DeleteAccount(c *gin.Context) {
     user, exists := c.Get("user")
 
