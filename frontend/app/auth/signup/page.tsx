@@ -107,171 +107,185 @@ export default function Signup() {
 
   return (
     // main container
-    <div className="min-h-screen flex bg-white dark:bg-background text-gray-900 dark:text-foreground">
+    <div className="min-h-screen bg-white text-gray-900 dark:bg-background dark:text-foreground lg:grid lg:grid-cols-2">
       {/* first column */}
-      <div className="flex-1 p-8 px-6">
+      <div className="flex min-h-screen flex-col px-5 py-5 sm:px-8 sm:py-7 lg:px-12 xl:px-20">
         {/* Header with back button and centered logo on mobile, default on desktop */}
-        <div className="relative flex justify-center items-center mb-4 md:mb-6">
-          <Link href="/" className="absolute left-0 p-1 md:hidden">
+        <div className="relative flex items-center justify-between">
+          <Link
+            href="/"
+            className="rounded-md p-2 text-muted-foreground transition-colors hover:bg-muted lg:invisible"
+            aria-label="Back to home"
+          >
             <ChevronLeft className="w-5 h-5 text-gray-700 dark:text-foreground" />
           </Link>
-          <div className="flex justify-center items-center">
-            <MainLogo />
+          <MainLogo />
+          <ModeToggle />
+        </div>
+
+        <div className="flex flex-1 flex-col justify-center py-6">
+          {/* mobile image - shown at top on small screens */}
+          <div className="mb-5 flex justify-center lg:hidden">
+            <Image
+              src="/illustrations/Revenue-bro.svg"
+              alt="Revenue illustration"
+              width={112}
+              height={112}
+              priority
+            />
           </div>
-          <div className="absolute right-0">
-            <ModeToggle />
+
+          {/* header component of the signup */}
+          <div className="mx-auto mb-6 w-full max-w-md">
+            <p className="mb-2 text-center text-xs font-semibold uppercase tracking-wider text-green-700 dark:text-green-400">
+              Start with a clearer picture
+            </p>
+            <h2 className="text-center text-2xl font-bold tracking-tight md:text-3xl">
+              Create your account
+            </h2>
+            <p className="mt-2 text-center text-sm text-muted-foreground">
+              Start your journey to better finances
+            </p>
           </div>
-        </div>
 
-        {/* mobile image - shown at top on small screens */}
-        <div className="flex justify-center mb-4 md:hidden">
-          <Image
-            src="/illustrations/Revenue-bro.svg"
-            alt="Revenue illustration"
-            width={150}
-            height={150}
-            priority
-          />
-        </div>
+          {/* form */}
+          <div className="mx-auto w-full max-w-md">
+            <form onSubmit={handleSubmit}>
+              <div className="mb-3 md:mb-4">
+                <p className="mb-1.5 text-muted-foreground text-[13px] md:text-[14px]">
+                  Full Name
+                </p>
+                <input
+                  value={form.name}
+                  onChange={(e) =>
+                    setForm({
+                      ...form,
+                      name: e.target.value,
+                    })
+                  }
+                  className="h-11 w-full rounded-lg border border-border bg-white px-3 text-sm text-foreground shadow-sm outline-none transition focus:border-ring/50 focus-visible:ring-2 focus-visible:ring-ring/20 dark:bg-card dark:placeholder-gray-500"
+                  type="text"
+                  placeholder="Olusesi Khalid"
+                />
+                <p className="text-red-500 text-left text-[11px] md:text-[12px] mt-1">
+                  {errors.name}
+                </p>
+              </div>
 
-        {/* header component of the signup */}
-        <div className="mb-4">
-          <h2 className="text-2xl md:text-3xl font-bold text-center">
-            Create your account
-          </h2>
-          <p className="text-muted-foreground text-sm text-center">
-            Start your journey to better finances
-          </p>
-        </div>
+              <div className="mb-3 md:mb-4">
+                <p className="mb-1.5 text-muted-foreground text-[13px] md:text-[14px]">
+                  Email
+                </p>
+                <input
+                  value={form.email}
+                  onChange={(e) =>
+                    setForm({
+                      ...form,
+                      email: e.target.value,
+                    })
+                  }
+                  className="h-11 w-full rounded-lg border border-border bg-white px-3 text-sm text-foreground shadow-sm outline-none transition focus:border-ring/50 focus-visible:ring-2 focus-visible:ring-ring/20 dark:bg-card dark:placeholder-gray-500"
+                  type="email"
+                  placeholder="olusesikhalid43@gmail.com"
+                />
+                <p className="text-red-500 text-left text-[11px] md:text-[12px] mt-1">
+                  {errors.email}
+                </p>
+              </div>
 
-        {/* form */}
-        <div>
-          <form onSubmit={handleSubmit}>
-            <div className="mb-3 md:mb-4">
-              <p className="mb-1.5 text-muted-foreground text-[13px] md:text-[14px]">
-                Full Name
-              </p>
-              <input
-                value={form.name}
-                onChange={(e) =>
-                  setForm({
-                    ...form,
-                    name: e.target.value,
-                  })
-                }
-                className="border rounded-xl outline-none p-3 text-[13px] md:text-[14px] w-[100%] pl-3 bg-white dark:bg-card border-border shadow-sm text-foreground dark:placeholder-gray-500 transition-colors focus:border-gray-300 dark:focus:border-gray-700"
-                type="text"
-                placeholder="Olusesi Khalid"
-              />
-              <p className="text-red-500 text-left text-[11px] md:text-[12px] mt-1">
-                {errors.name}
-              </p>
-            </div>
+              <div className="mb-3 md:mb-4">
+                <p className="mb-1.5 text-muted-foreground text-[13px] md:text-[14px]">
+                  Password
+                </p>
+                <input
+                  value={form.password}
+                  onChange={(e) =>
+                    setForm({
+                      ...form,
+                      password: e.target.value,
+                    })
+                  }
+                  className="h-11 w-full rounded-lg border border-border bg-white px-3 text-sm text-foreground shadow-sm outline-none transition focus:border-ring/50 focus-visible:ring-2 focus-visible:ring-ring/20 dark:bg-card dark:placeholder-gray-500"
+                  type="password"
+                  placeholder="****"
+                />
+                <p className="text-red-500 text-left text-[11px] md:text-[12px] mt-1">
+                  {errors.password}
+                </p>
+              </div>
 
-            <div className="mb-3 md:mb-4">
-              <p className="mb-1.5 text-muted-foreground text-[13px] md:text-[14px]">
-                Email
-              </p>
-              <input
-                value={form.email}
-                onChange={(e) =>
-                  setForm({
-                    ...form,
-                    email: e.target.value,
-                  })
-                }
-                className="border rounded-xl outline-none p-3 text-[13px] md:text-[14px] w-[100%] pl-3 bg-white dark:bg-card border-border shadow-sm text-foreground dark:placeholder-gray-500 transition-colors focus:border-gray-300 dark:focus:border-gray-700"
-                type="email"
-                placeholder="olusesikhalid43@gmail.com"
-              />
-              <p className="text-red-500 text-left text-[11px] md:text-[12px] mt-1">
-                {errors.email}
-              </p>
-            </div>
+              <div className="mb-4">
+                <p className="mb-1.5 text-muted-foreground text-[13px] md:text-[14px]">
+                  Confirm Password
+                </p>
+                <input
+                  value={form.confirmPassword}
+                  onChange={(e) =>
+                    setForm({
+                      ...form,
+                      confirmPassword: e.target.value,
+                    })
+                  }
+                  className="h-11 w-full rounded-lg border border-border bg-white px-3 text-sm text-foreground shadow-sm outline-none transition focus:border-ring/50 focus-visible:ring-2 focus-visible:ring-ring/20 dark:bg-card dark:placeholder-gray-500"
+                  type="password"
+                  placeholder="****"
+                />
+                <p className="text-red-500 text-left text-[11px] md:text-[12px] mt-1">
+                  {errors.confirmPassword}
+                </p>
+              </div>
 
-            <div className="mb-3 md:mb-4">
-              <p className="mb-1.5 text-muted-foreground text-[13px] md:text-[14px]">
-                Password
-              </p>
-              <input
-                value={form.password}
-                onChange={(e) =>
-                  setForm({
-                    ...form,
-                    password: e.target.value,
-                  })
-                }
-                className="border rounded-xl outline-none p-3 text-[13px] md:text-[14px] w-[100%] pl-3 bg-white dark:bg-card border-border shadow-sm text-foreground dark:placeholder-gray-500 transition-colors focus:border-gray-300 dark:focus:border-gray-700"
-                type="password"
-                placeholder="****"
-              />
-              <p className="text-red-500 text-left text-[11px] md:text-[12px] mt-1">
-                {errors.password}
-              </p>
-            </div>
-
-            <div className="mb-4">
-              <p className="mb-1.5 text-muted-foreground text-[13px] md:text-[14px]">
-                Confirm Password
-              </p>
-              <input
-                value={form.confirmPassword}
-                onChange={(e) =>
-                  setForm({
-                    ...form,
-                    confirmPassword: e.target.value,
-                  })
-                }
-                className="border rounded-xl outline-none p-3 text-[13px] md:text-[14px] w-[100%] pl-3 bg-white dark:bg-card border-border shadow-sm text-foreground dark:placeholder-gray-500 transition-colors focus:border-gray-300 dark:focus:border-gray-700"
-                type="password"
-                placeholder="****"
-              />
-              <p className="text-red-500 text-left text-[11px] md:text-[12px] mt-1">
-                {errors.confirmPassword}
-              </p>
-            </div>
-
-            <div>
-              <Button
-                type="submit"
-                disabled={isSigningUp}
-                aria-busy={isSigningUp}
-                className="cursor-pointer w-[100%] p-5 mb-1.5 rounded-xl font-semibold shadow-sm"
-              >
-                {isSigningUp ? (
-                  <>
-                    <LoaderCircle className="h-4 w-4 animate-spin" />
-                    Creating account...
-                  </>
-                ) : (
-                  "Sign Up"
-                )}
-              </Button>
-              <p className="text-muted-foreground text-[13px] md:text-[14px] text-center mt-2">
-                Already have an account?
-                <Link className="text-green-600 ml-1" href={"/auth/login"}>
-                  Login
-                </Link>
-              </p>
-            </div>
-          </form>
+              <div>
+                <Button
+                  type="submit"
+                  disabled={isSigningUp}
+                  aria-busy={isSigningUp}
+                  className="mb-1.5 h-12 w-full cursor-pointer rounded-lg font-semibold shadow-sm"
+                >
+                  {isSigningUp ? (
+                    <>
+                      <LoaderCircle className="h-4 w-4 animate-spin" />
+                      Creating account...
+                    </>
+                  ) : (
+                    "Sign Up"
+                  )}
+                </Button>
+                <p className="text-muted-foreground text-[13px] md:text-[14px] text-center mt-2">
+                  Already have an account?
+                  <Link className="text-green-600 ml-1" href={"/auth/login"}>
+                    Login
+                  </Link>
+                </p>
+              </div>
+            </form>
+          </div>
         </div>
       </div>
 
       {/* second column - desktop only */}
-      <div className="hidden md:relative md:flex relative w-1/2 bg-gray-100 dark:bg-[#0a0e17] items-center justify-center h-full p-8 overflow-hidden">
-        <div className="absolute -left-10 top-0 h-full w-32 bg-white dark:bg-[#0b0f19] -skew-x-6" />
-
-        <div className="relative z-10">
+      <aside className="relative hidden min-h-screen flex-col items-center justify-center overflow-hidden border-l border-border bg-gray-50 px-10 py-14 text-center dark:bg-card lg:flex">
+        <p className="mb-5 rounded-full border border-green-200 bg-green-50 px-3 py-1 text-xs font-semibold text-green-800 dark:border-green-900 dark:bg-green-950/40 dark:text-green-300">
+          Khal-FinTrack
+        </p>
+        <div className="relative z-10 mb-5">
           <Image
             src="/illustrations/Revenue-bro.svg"
             alt="Revenue illustration"
-            width={350}
-            height={350}
+            width={380}
+            height={340}
             priority
+            className="h-auto w-full max-w-[380px] object-contain"
           />
         </div>
-      </div>
+        <h2 className="text-2xl font-bold tracking-tight">
+          Build healthier money habits.
+        </h2>
+        <p className="mt-3 max-w-sm text-sm leading-6 text-muted-foreground">
+          Keep everyday spending and long-term goals in view as your finances
+          grow.
+        </p>
+      </aside>
     </div>
   );
 }

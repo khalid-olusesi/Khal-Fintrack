@@ -86,139 +86,147 @@ export default function Login() {
 
   return (
     // main container
-    <div className="min-h-screen flex bg-white dark:bg-background text-gray-900 dark:text-foreground">
+    <div className="min-h-screen bg-white text-gray-900 dark:bg-background dark:text-foreground lg:grid lg:grid-cols-2">
       {/* first column */}
-      <div className="flex-1 p-8 px-6">
+      <div className="flex min-h-screen flex-col px-5 py-5 sm:px-8 sm:py-7 lg:px-12 xl:px-20">
         {/* Header with back button and centered logo on mobile, default on desktop */}
-        <div className="relative flex justify-center items-center mb-6">
-          <Link href="/" className="absolute left-0 p-1 md:hidden">
+        <div className="relative flex items-center justify-between">
+          <Link
+            href="/"
+            className="rounded-md p-2 text-muted-foreground transition-colors hover:bg-muted lg:invisible"
+            aria-label="Back to home"
+          >
             <ChevronLeft className="w-5 h-5 text-gray-700 dark:text-foreground" />
           </Link>
-          <div className="flex justify-center items-center">
-            <MainLogo />
+          <MainLogo />
+          <ModeToggle />
+        </div>
+
+        <div className="flex flex-1 flex-col justify-center py-8">
+          {/* mobile image - shown at top on small screens */}
+          <div className="mb-6 flex justify-center lg:hidden">
+            <Image
+              src="/illustrations/Security On-bro.svg"
+              alt="Security illustration"
+              width={132}
+              height={132}
+              priority
+            />
           </div>
-          <div className="absolute right-0">
-            <ModeToggle />
+
+          {/* header component of the login */}
+          <div className="mx-auto mb-7 w-full max-w-md">
+            <p className="mb-2 text-center text-xs font-semibold uppercase tracking-wider text-green-700 dark:text-green-400">
+              Personal finance, made clear
+            </p>
+            <h2 className="text-center text-2xl font-bold tracking-tight md:text-3xl">
+              Welcome back
+            </h2>
+            <p className="mt-2 text-center text-sm text-muted-foreground">
+              Login to your account.
+            </p>
           </div>
-        </div>
 
-        {/* mobile image - shown at top on small screens */}
-        <div className="flex justify-center mb-4 md:hidden">
-          <Image
-            src="/illustrations/Security On-bro.svg"
-            alt="Security illustration"
-            width={150}
-            height={150}
-            priority
-          />
-        </div>
-
-        {/* header component of the login */}
-        <div className="mb-6">
-          <h2 className="text-2xl md:text-3xl font-bold text-center">
-            Welcome back
-          </h2>
-          <p className="text-muted-foreground text-sm text-center">
-            Login to your account.
-          </p>
-        </div>
-
-        {/* form */}
-        <div>
-          <form onSubmit={handleSubmit}>
-            <div className="mb-4">
-              <p className="mb-1.5 text-muted-foreground text-[13px] md:text-[14px]">
-                Email
-              </p>
-              <input
-                value={form.email}
-                onChange={(e) =>
-                  setForm({
-                    ...form,
-                    email: e.target.value,
-                  })
-                }
-                className="border rounded-xl outline-none p-3 text-[13px] md:text-[14px] w-[100%] pl-3 bg-white dark:bg-card border-border shadow-sm text-foreground dark:placeholder-gray-500 transition-colors focus:border-gray-300 dark:focus:border-gray-700"
-                type="email"
-                placeholder="john@example.com"
-              />
-              <p className="text-red-500 text-left text-[11px] md:text-[12px] mt-1">
-                {errors.email}
-              </p>
-            </div>
-
-            <div className="mb-4">
-              <p className="mb-1.5 text-muted-foreground text-[13px] md:text-[14px]">
-                Password
-              </p>
-              <div className="relative">
+          {/* form */}
+          <div className="mx-auto w-full max-w-md">
+            <form onSubmit={handleSubmit}>
+              <div className="mb-4">
+                <p className="mb-1.5 text-muted-foreground text-[13px] md:text-[14px]">
+                  Email
+                </p>
                 <input
-                  value={form.password}
+                  value={form.email}
                   onChange={(e) =>
                     setForm({
                       ...form,
-                      password: e.target.value,
+                      email: e.target.value,
                     })
                   }
-                  className="border rounded-xl outline-none p-3 text-[13px] md:text-[14px] w-[100%] pl-3 pr-10 mb-2 bg-white dark:bg-card border-border shadow-sm text-foreground dark:placeholder-gray-500 transition-colors focus:border-gray-300 dark:focus:border-gray-700"
-                  type="password"
-                  placeholder="********"
+                  className="h-12 w-full rounded-lg border border-border bg-white px-3 text-sm text-foreground shadow-sm outline-none transition focus:border-ring/50 focus-visible:ring-2 focus-visible:ring-ring/20 dark:bg-card dark:placeholder-gray-500"
+                  type="email"
+                  placeholder="john@example.com"
                 />
+                <p className="text-red-500 text-left text-[11px] md:text-[12px] mt-1">
+                  {errors.email}
+                </p>
               </div>
-              <p className="text-red-500 text-left text-[11px] md:text-[12px] mt-1">
-                {errors.password}
-              </p>
-              <div className="flex items-center justify-end mt-1">
-                <span className="text-green-600 text-[13px] md:text-[14px] cursor-pointer">
-                  <Link href="">Forgot password?</Link>
-                </span>
-              </div>
-            </div>
 
-            <div className="mt-6">
-              <Button
-                type="submit"
-                disabled={isLoggingIn}
-                aria-busy={isLoggingIn}
-                className="cursor-pointer w-[100%] p-5 mb-1.5 rounded-xl font-semibold shadow-sm"
-              >
-                {isLoggingIn ? (
-                  <>
-                    <LoaderCircle className="h-4 w-4 animate-spin" />
-                    Logging in...
-                  </>
-                ) : (
-                  "Login"
-                )}
-              </Button>
-              <p className="text-muted-foreground text-[13px] md:text-[14px] text-center mt-3">
-                Don't have an account?
-                <Link
-                  className="text-green-600 ml-1 font-medium"
-                  href={"/auth/signup"}
+              <div className="mb-4">
+                <p className="mb-1.5 text-muted-foreground text-[13px] md:text-[14px]">
+                  Password
+                </p>
+                <div className="relative">
+                  <input
+                    value={form.password}
+                    onChange={(e) =>
+                      setForm({
+                        ...form,
+                        password: e.target.value,
+                      })
+                    }
+                    className="h-12 w-full rounded-lg border border-border bg-white px-3 text-sm text-foreground shadow-sm outline-none transition focus:border-ring/50 focus-visible:ring-2 focus-visible:ring-ring/20 dark:bg-card dark:placeholder-gray-500"
+                    type="password"
+                    placeholder="********"
+                  />
+                </div>
+                <p className="text-red-500 text-left text-[11px] md:text-[12px] mt-1">
+                  {errors.password}
+                </p>
+              </div>
+
+              <div className="mt-6">
+                <Button
+                  type="submit"
+                  disabled={isLoggingIn}
+                  aria-busy={isLoggingIn}
+                  className="mb-1.5 h-12 w-full cursor-pointer rounded-lg font-semibold shadow-sm"
                 >
-                  Sign up
-                </Link>
-              </p>
-            </div>
-          </form>
+                  {isLoggingIn ? (
+                    <>
+                      <LoaderCircle className="h-4 w-4 animate-spin" />
+                      Logging in...
+                    </>
+                  ) : (
+                    "Login"
+                  )}
+                </Button>
+                <p className="text-muted-foreground text-[13px] md:text-[14px] text-center mt-3">
+                  Don't have an account?
+                  <Link
+                    className="text-green-600 ml-1 font-medium"
+                    href={"/auth/signup"}
+                  >
+                    Sign up
+                  </Link>
+                </p>
+              </div>
+            </form>
+          </div>
         </div>
       </div>
 
       {/* second column - desktop only */}
-      <div className="hidden md:relative md:flex relative w-1/2 bg-gray-100 dark:bg-[#0a0e17] items-center justify-center h-full p-8 overflow-hidden">
-        <div className="absolute -left-10 top-0 h-full w-32 bg-white dark:bg-[#0b0f19] -skew-x-6" />
-
-        <div className="relative z-10">
+      <aside className="relative hidden min-h-screen flex-col items-center justify-center overflow-hidden border-l border-border bg-gray-50 px-10 py-14 text-center dark:bg-card lg:flex">
+        <p className="mb-5 rounded-full border border-green-200 bg-green-50 px-3 py-1 text-xs font-semibold text-green-800 dark:border-green-900 dark:bg-green-950/40 dark:text-green-300">
+          Khal-FinTrack
+        </p>
+        <div className="relative z-10 mb-5">
           <Image
             src="/illustrations/Security On-bro.svg"
             alt="Security illustration"
-            width={350}
-            height={350}
+            width={380}
+            height={340}
             priority
+            className="h-auto w-full max-w-[380px] object-contain"
           />
         </div>
-      </div>
+        <h2 className="text-2xl font-bold tracking-tight">
+          Your finances, in focus.
+        </h2>
+        <p className="mt-3 max-w-sm text-sm leading-6 text-muted-foreground">
+          See your income, spending, and budgets in one clear place.
+        </p>
+      </aside>
     </div>
   );
 }

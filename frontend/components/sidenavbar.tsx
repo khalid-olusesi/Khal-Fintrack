@@ -17,16 +17,55 @@ import {
   LogOut,
 } from "lucide-react";
 import { useRouter } from "next/navigation";
+import { useState } from "react";
+import { toast } from "@/components/ui/toast";
 
 export default function SideNavbar() {
   const pathname = usePathname();
   const router = useRouter();
   const { isOpen, toggleSidebar } = useSidebar();
+  const [isLoggingOut, setIsLoggingOut] = useState(false);
 
   const handleNavigation = (path: string) => {
     router.push(path);
     if (isOpen && window.innerWidth < 768) {
       toggleSidebar();
+    }
+  };
+
+  const handleLogout = async () => {
+    if (isLoggingOut) return;
+    setIsLoggingOut(true);
+    let logoutWarning = false;
+
+    try {
+      const response = await fetch(
+        `${process.env.NEXT_PUBLIC_API_URL}/logout`,
+        {
+          method: "POST",
+          credentials: "include",
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem("token") ?? ""}`,
+          },
+        },
+      );
+
+      if (!response.ok) {
+        logoutWarning = true;
+      }
+    } catch {
+      logoutWarning = true;
+    } finally {
+      localStorage.removeItem("token");
+      toast.add({
+        title: logoutWarning ? "Signed out on this device" : "Logged out",
+        description: logoutWarning
+          ? "You can sign in again whenever you're ready."
+          : "You have been logged out successfully.",
+        type: logoutWarning ? "warning" : "success",
+      });
+      router.replace("/auth/login");
+      setIsLoggingOut(false);
     }
   };
 
@@ -106,7 +145,7 @@ export default function SideNavbar() {
             isActive={pathname === "/dashboard/reports"}
             onClick={() => handleNavigation("/dashboard/reports")}
           />
-          
+
           <div className="my-2 border-t border-border mx-2"></div>
 
           <NavItem
@@ -128,9 +167,10 @@ export default function SideNavbar() {
           <div className="mt-auto pb-4 pt-2">
             <NavItem
               icon={<LogOut className="w-4 h-4 shrink-0" />}
-              label="Log Out"
+              label={isLoggingOut ? "Logging out..." : "Log Out"}
               isOpen={isOpen}
               isLogout
+              onClick={handleLogout}
             />
           </div>
         </div>
@@ -163,11 +203,13 @@ function NavItem({
         isActive
           ? "bg-green-50 dark:bg-green-950/40 text-green-700 dark:text-green-500 font-medium"
           : isLogout
-          ? "text-red-500 hover:bg-red-50 dark:hover:bg-red-950/30"
-          : "text-muted-foreground hover:text-foreground hover:bg-gray-100 dark:hover:bg-zinc-800/50"
+            ? "text-red-500 hover:bg-red-50 dark:hover:bg-red-950/30"
+            : "text-muted-foreground hover:text-foreground hover:bg-gray-100 dark:hover:bg-zinc-800/50"
       }`}
     >
-      <div className={`${!isOpen ? "" : ""} ${isActive ? "text-green-600 dark:text-green-500" : isLogout ? "text-red-500" : "text-muted-foreground group-hover:text-foreground"}`}>
+      <div
+        className={`${!isOpen ? "" : ""} ${isActive ? "text-green-600 dark:text-green-500" : isLogout ? "text-red-500" : "text-muted-foreground group-hover:text-foreground"}`}
+      >
         {icon}
       </div>
       {isOpen && <p className="text-[13px] whitespace-nowrap">{label}</p>}

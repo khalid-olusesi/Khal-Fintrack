@@ -466,6 +466,22 @@ func DeleteAccount(c *gin.Context) {
     })
 }
 
+func Logout(c *gin.Context) {
+    c.SetCookie(
+        "Authorization",
+        "",
+        -1,
+        "/",
+        "",
+        true,
+        true,
+    )
+
+    c.JSON(http.StatusOK, gin.H{
+        "message": "Logged out successfully",
+    })
+}
+
 /*token → the JWT you just created.
 SignedString(...) → signs it with your secret key.
 os.Getenv("JWT_SECRET") → reads the secret from your .env.
