@@ -17,8 +17,24 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "KhalFintrack",
-  description: "Personal finance tracking made simple.",
+  title: {
+    default: "KhalFintrack — Personal Finance Tracker",
+    template: "%s | KhalFintrack",
+  },
+  description:
+    "KhalFintrack is a personal finance tracker for managing expenses, income, budgets, and financial goals.",
+  metadataBase: new URL("https://khal-fintrack.vercel.app"),
+  alternates: {
+    canonical: "/",
+  },
+  openGraph: {
+    title: "KhalFintrack — Personal Finance Tracker",
+    description:
+      "Manage your expenses, income, budgets, and financial goals with KhalFintrack.",
+    url: "https://khal-fintrack.vercel.app",
+    siteName: "KhalFintrack",
+    type: "website",
+  },
 };
 
 export default function RootLayout({
