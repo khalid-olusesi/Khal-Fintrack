@@ -17,8 +17,8 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Landing Page",
-  description: "Created by me Khalid Adebanji", //for the app browser title
+  title: "KhalFintrack",
+  description: "Personal finance tracking made simple.",
 };
 
 export default function RootLayout({

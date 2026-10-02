@@ -345,7 +345,9 @@ export default function Profile() {
       toast.add({ title: "Profile picture removed", type: "success" });
     } catch (error) {
       const msg =
-        error instanceof Error ? error.message : "Failed to remove profile picture";
+        error instanceof Error
+          ? error.message
+          : "Failed to remove profile picture";
       setAvatarError(msg);
       toast.add({ title: msg, type: "error" });
     } finally {
@@ -680,7 +682,6 @@ export default function Profile() {
                     onChange={handleAvatarChange}
                     className="hidden"
                   />
-
                 </div>
 
                 <div className="mb-4 mt-3 flex items-center justify-center gap-2">
